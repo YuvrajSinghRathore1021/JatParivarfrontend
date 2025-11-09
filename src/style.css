@@ -1,0 +1,59 @@
+/* frontend/src/style.css */
+@import "tailwindcss";
+
+/* Light & dark via the same variable names */
+:root{
+  --brand:#2563eb;        /* blue-600 */
+  --brand-700:#1d4ed8;
+  --accent:#0ea5e9;       /* sky-500 */
+  --surface:#f8fafc;      /* slate-50 */
+  --surface-2:#ffffff;
+  --text:#0f172a;         /* slate-900 */
+  --muted:#475569;        /* slate-600 */
+  --ring:#93c5fd;         /* blue-300 */
+  --card:#ffffff;
+}
+
+:root.dark{
+  --brand:#60a5fa;
+  --brand-700:#3b82f6;
+  --accent:#38bdf8;
+  --surface:#0b1220;      /* near-950 */
+  --surface-2:#0f172a;
+  --text:#e2e8f0;         /* slate-200 */
+  --muted:#94a3b8;
+  --ring:#2563eb;
+  --card:#0f172a;
+}
+
+/* Full-bleed section inside a centered layout */
+.full-bleed {
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Simple line clamp helpers (avoid plugin) */
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;                /* ← add this line */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;                /* ← add this line */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+html, body, #root { height: 100%; }
+
+.container-app{ @apply mx-auto max-w-[1200px] px-4 md:px-6; }
+.focus-ring{ @apply outline-none ring-2 ring-(--ring) ring-offset-2 ring-offset-(--surface) rounded-lg; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
