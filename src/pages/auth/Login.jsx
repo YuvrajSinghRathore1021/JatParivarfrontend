@@ -27,7 +27,8 @@ const copy = {
 
 export default function Login() {
   const [phone, setPhone] = useState('')
-  const [password, setPassword] = useState('')
+   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('')
   const navigate = useNavigate()
   const { lang, makePath } = useLang()
@@ -81,17 +82,30 @@ export default function Login() {
             />
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1 relative w-full">
             <label className="text-sm font-medium text-slate-700" htmlFor="password">
               {t.password}
             </label>
+
             <input
               id="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+            />
+            <img
+              width="22"
+              height="22"
+              onClick={() => setShowPassword(!showPassword)}
+              src={
+                showPassword
+                  ? "https://img.icons8.com/fluency-systems-regular/48/hide.png"
+                  : "https://img.icons8.com/fluency-systems-regular/48/visible.png"
+              }
+              alt="toggle visibility"
+              className="absolute right-3 bottom-3 cursor-pointer"
             />
           </div>
 
