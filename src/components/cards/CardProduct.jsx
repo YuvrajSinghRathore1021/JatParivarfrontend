@@ -1,3 +1,4 @@
+let API_File = import.meta.env.VITE_API_File
 export default function CardProduct({
   href,
   image,
@@ -17,7 +18,7 @@ export default function CardProduct({
       <article className="bg-white rounded-2xl border border-gray-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] focus-visible:ring-4 focus-visible:ring-black/10">
         <div className="aspect-square bg-white grid place-items-center overflow-hidden">
           <img
-            src={image}
+            src={API_File+image}
             alt=""
             className="w-[85%] h-[85%] object-contain transition will-change-transform hover:scale-[1.02]"
             loading="lazy"

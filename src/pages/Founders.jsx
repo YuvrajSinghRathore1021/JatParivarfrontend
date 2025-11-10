@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useLang } from '../lib/useLang'
 import { makeInitialAvatar } from '../lib/avatar'
 import { get } from '../lib/api'
+let API_File = import.meta.env.VITE_API_File
 
 const fetchFounders = () => get('/public/people?role=founder')
 
@@ -20,7 +21,7 @@ export default function Founders() {
       id: person.id || person._id,
       name: person.name,
       title: person.title,
-      image: person.photo || makeInitialAvatar(person.name || 'Founder', { size: 100, radius: 28 }),
+      image: person.photo ? API_File + person.photo : makeInitialAvatar(person.name || 'Founder', { size: 100, radius: 28 }),
       bioEn: person.bioEn,
       bioHi: person.bioHi,
       place: person.place,

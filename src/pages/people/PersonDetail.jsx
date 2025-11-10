@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { get } from '../../lib/api'
 import { useLang } from '../../lib/useLang'
 import { makeInitialAvatar } from '../../lib/avatar'
-
+let API_File = import.meta.env.VITE_API_File
 const fetchPerson = (id) => get(`/public/people/${id}`)
 
 export default function PersonDetail() {
@@ -35,7 +35,7 @@ export default function PersonDetail() {
   ]
   const image = useMemo(() => {
     if (!person) return null
-    if (person.photo) return person.photo
+if (person.photo) return API_File + person.photo
     const fallbackName =
       person.name ||
       member?.displayName ||

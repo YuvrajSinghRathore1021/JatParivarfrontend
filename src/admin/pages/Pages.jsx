@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
+let API_File = import.meta.env.VITE_API_File
 
 const makeId = () =>
   (typeof crypto !== 'undefined' && crypto.randomUUID
