@@ -107,36 +107,48 @@ function HistoryFormButton({ item, category, onSaved }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-30">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">{item ? 'Edit entry' : 'Add entry'}</h2>
-          <button onClick={() => setOpen(false)} className="text-slate-500">Close</button>
-        </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="grid md:grid-cols-2 gap-3">
-            <Field label="Year / label" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} placeholder="1987" />
-            <Field label="Order" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: e.target.value })} />
-          </div>
-          <Field label="Title (EN)" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} required />
-          <Field label="Title (HI)" value={form.titleHi} onChange={(e) => setForm({ ...form, titleHi: e.target.value })} />
-          <Textarea label="Body (EN)" value={form.bodyEn} onChange={(e) => setForm({ ...form, bodyEn: e.target.value })} rows={5} />
-          <Textarea label="Body (HI)" value={form.bodyHi} onChange={(e) => setForm({ ...form, bodyHi: e.target.value })} rows={5} />
-          <Field label="Image URL" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://..." />
-          <label className="flex items-center gap-2 text-sm text-slate-600">
-            <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
-            <span>Published</span>
-          </label>
-          <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => setOpen(false)} className="px-3 py-2 text-sm border border-slate-300 rounded">Cancel</button>
-            <button type="submit" disabled={saving} className="px-3 py-2 text-sm bg-slate-900 text-white rounded disabled:opacity-50">
-              {saving ? 'Saving…' : 'Save'}
-            </button>
-          </div>
-        </form>
-      </div>
+  <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-30">
+  <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 space-y-4 max-h-[100vh] overflow-y-auto">
+    {/* Header */}
+    <div className="flex items-center justify-between">
+      <h2 className="text-lg font-semibold">{item ? 'Edit entry' : 'Add entry'}</h2>
+      <button onClick={() => setOpen(false)} className="text-slate-500">Close</button>
     </div>
+
+    {/* Error */}
+    {error && <p className="text-sm text-red-600">{error}</p>}
+
+    {/* Form */}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Year / label" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} placeholder="1987" />
+        <Field label="Order" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: e.target.value })} />
+      </div>
+
+      <Field label="Title (EN)" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} required />
+      <Field label="Title (HI)" value={form.titleHi} onChange={(e) => setForm({ ...form, titleHi: e.target.value })} />
+
+      <Textarea label="Body (EN)" value={form.bodyEn} onChange={(e) => setForm({ ...form, bodyEn: e.target.value })} rows={5} />
+      <Textarea label="Body (HI)" value={form.bodyHi} onChange={(e) => setForm({ ...form, bodyHi: e.target.value })} rows={5} />
+
+      <Field label="Image URL" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://..." />
+
+      <label className="flex items-center gap-2 text-sm text-slate-600">
+        <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
+        <span>Published</span>
+      </label>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-2 mt-2">
+        <button type="button" onClick={() => setOpen(false)} className="px-3 py-2 text-sm border border-slate-300 rounded">Cancel</button>
+        <button type="submit" disabled={saving} className="px-3 py-2 text-sm bg-slate-900 text-white rounded disabled:opacity-50">
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
   )
 }
 
