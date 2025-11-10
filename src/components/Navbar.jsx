@@ -75,7 +75,7 @@ export default function Navbar() {
 
   const renderAuthDesktop = () => {
     if (authLoading) {
-      return <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse" aria-hidden="true" />
+      return <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse " aria-hidden="true" />
     }
     if (user) {
       return (
@@ -141,7 +141,7 @@ export default function Navbar() {
     <>
       <header
         className={[
-          'fixed inset-x-0 top-0 z-50 transition border-b',
+          'fixed inset-x-0 top-0 z-50 transition border-b overflow-x-hidden',
           scrolled ? 'bg-white/95 backdrop-blur shadow-sm border-slate-200' : 'bg-white/90 border-transparent',
         ].join(' ')}
         role="banner"
@@ -153,7 +153,7 @@ export default function Navbar() {
               <img
                 src="/icons/20251021_1854_Jat Parivar Unity Logo_simple_compose_01k83f0p3behrre80djf6y47aj.png"
                 alt="Jat Parivar logo"
-                className={['h-30 w-auto', 'transition-transform duration-300 group-hover:scale-105'].join(' ')}
+                className={['h-30 w-auto transition-transform duration-300 group-hover:scale-105'].join(' ')}
               />
               <span className="sr-only">Jat Parivar</span>
             </Link>
@@ -166,11 +166,13 @@ export default function Navbar() {
                   end={it.segment === ''}
                   className={({ isActive }) =>
                     [
-                      'px-3 py-2 rounded-xl text-sm font-medium transition focus:outline-none focus-visible:ring-4 focus-visible:ring-black/10',
-                      'text-gray-800 hover:bg-gray-100',
-                      isActive ? 'bg-gray-100' : '',
+                      'relative px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                      isActive
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50',
                     ].join(' ')
                   }
+
                 >
                   {translate(it)}
                 </NavLink>
@@ -232,18 +234,22 @@ export default function Navbar() {
 
       {/* Mobile drawer */}
       <div
-        className={['fixed inset-0 z-50 lg:hidden transition', open ? 'pointer-events-auto' : 'pointer-events-none'].join(' ')}
+        className={['fixed inset-0 z-50 lg:hidden transition overflow-x-hidden', open ? 'pointer-events-auto' : 'pointer-events-none'].join(' ')}
         aria-hidden={!open}
       >
         <div
-          className={['absolute inset-0 bg-black/50 transition-opacity', open ? 'opacity-100' : 'opacity-0'].join(' ')}
-          onClick={() => setOpen(false)}
+          className={[
+            'absolute top-0 right-0 h-full w-[86%] max-w-[360px] bg-white shadow-2xl transform transition-transform  overflow-y-auto duration-300 ease-in-out',
+            open ? 'translate-x-0' : 'translate-x-full',
+          ].join(' ')}
+
         />
         <aside
           className={[
-            'absolute top-0 right-0 h-full w-[86%] max-w-[360px] bg-white shadow-xl transition-transform',
+            'absolute top-0 right-0 h-full w-[86%] max-w-[360px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out',
             open ? 'translate-x-0' : 'translate-x-full',
           ].join(' ')}
+
           role="dialog"
           aria-label="Mobile navigation"
         >

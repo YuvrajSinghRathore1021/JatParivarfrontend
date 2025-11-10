@@ -12,6 +12,9 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+html, body {
+  overflow-x: hidden;
+}
 
 a {
   font-weight: 500;
