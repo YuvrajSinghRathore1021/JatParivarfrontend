@@ -7,6 +7,7 @@ import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 export default function LoginPage() {
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -46,15 +47,28 @@ export default function LoginPage() {
               required
             />
           </div>
-          <div>
+          <div className="relative w-full">
             <label className="text-sm font-medium text-slate-700">Password</label>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-slate-200"
               required
             />
+            <img
+              width="22"
+              height="22"
+              onClick={() => setShowPassword(!showPassword)}
+              src={
+                showPassword
+                  ? "https://img.icons8.com/fluency-systems-regular/60/hide.png"
+                  : "https://img.icons8.com/fluency-systems-regular/60/visible.png"
+              }
+              alt="toggle visibility"
+              className="absolute right-3 bottom-3 cursor-pointer"
+            />
+
           </div>
           <button
             type="submit"
