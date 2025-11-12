@@ -9,7 +9,7 @@ import SelectField from '../../../components/SelectField'
 import DateField from '../../../components/DateField'
 import { useGeoOptions } from '../../../hooks/useGeoOptions'
 import { asOptions as gotraOptions } from '../../../constants/gotras'
-
+let API_File = import.meta.env.VITE_API_File
 const spotlightLabels = {
   founder: { labelEn: 'Founder listing', labelHi: 'संस्थापक सूची' },
   management: { labelEn: 'Management listing', labelHi: 'प्रबंधन सूची' },
@@ -388,7 +388,7 @@ export default function ProfileEditor() {
         </header>
 
         <section className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center md:flex-row md:items-center md:gap-6 md:text-left">
-          <img src={displayAvatar} alt={form.displayName || form.name || 'Member avatar'} className="h-28 w-28 rounded-3xl object-cover" />
+          <img src={API_File+displayAvatar} alt={form.displayName || form.name || 'Member avatar'} className="h-28 w-28 rounded-3xl object-cover" />
           <div className="space-y-3">
             <div>
               <p className="text-sm font-semibold text-slate-700">{lang === 'hi' ? 'प्रोफ़ाइल फोटो' : 'Profile photo'}</p>
@@ -616,7 +616,7 @@ export default function ProfileEditor() {
               <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 h-48 grid place-items-center">
                 {form.spotlightBannerUrl ? (
                   <img
-                    src={form.spotlightBannerUrl}
+                    src={API_File+form.spotlightBannerUrl}
                     alt="Organisation banner"
                     className="h-full w-full object-cover"
                   />

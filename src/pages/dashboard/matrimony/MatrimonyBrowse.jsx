@@ -108,6 +108,10 @@ export default function MatrimonyBrowse() {
                     <dd>{profile.education || '—'}</dd>
                   </div>
                   <div>
+                    <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'लंबाई' : 'Hight'}</dt>
+                    <dd>{profile.hight || '—'}</dd>
+                  </div>
+                  <div>
                     <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</dt>
                     <dd>{profile.occupation || user.occupation || '—'}</dd>
                   </div>

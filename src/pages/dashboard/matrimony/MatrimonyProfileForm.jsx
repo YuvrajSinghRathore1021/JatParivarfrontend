@@ -27,6 +27,7 @@ const maritalStatuses = [
 const emptyForm = {
   age: '',
   gender: 'male',
+  hight: '',
   maritalStatus: 'never_married',
   education: '',
   occupation: '',
@@ -79,10 +80,12 @@ export default function MatrimonyProfileForm() {
       setForm({
         age: data.age || '',
         gender: data.gender || 'male',
+        hight: data.hight || 'male',
         maritalStatus: data.maritalStatus || 'never_married',
         education: data.education || '',
         occupation: data.occupation || '',
         state: data.state || '',
+        hight: data.hight || '',
         stateCode: '',
         district: data.district || '',
         districtCode: '',
@@ -149,6 +152,7 @@ export default function MatrimonyProfileForm() {
       education: form.education,
       occupation: form.occupation,
       state: form.state,
+      hight: form.hight,
       district: form.district,
       city: form.city,
       village: form.village,
@@ -230,6 +234,10 @@ export default function MatrimonyProfileForm() {
                 </option>
               ))}
             </select>
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'लंबाई' : 'Hight'}</span>
+            <input value={form.hight} onChange={handleChange('hight')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
           </label>
           <label className="block text-sm">
             <span className="font-semibold text-slate-600">{lang === 'hi' ? 'वैवाहिक स्थिति' : 'Marital status'}</span>

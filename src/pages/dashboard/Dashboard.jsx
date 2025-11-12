@@ -106,6 +106,18 @@ function DashboardTopBar() {
       disabled: logoutMutation.isPending,
     },
   ].filter(Boolean)
+const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+useEffect(() => {
+  if (mobileMenuOpen) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+  return () => {
+    document.body.style.overflow = '';
+  };
+}, [mobileMenuOpen]);
+
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -141,6 +153,8 @@ function DashboardTopBar() {
             )
           })}
         </nav>
+        
+        
         <div className="ml-auto flex items-center gap-3">
           <div className="hidden text-right sm:block">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -193,6 +207,7 @@ function DashboardTopBar() {
                   className="h-10 w-10 rounded-full object-cover"
                 />
               </button>
+              
 
               {menuOpen && (
                 <div
@@ -242,10 +257,65 @@ function DashboardTopBar() {
                   )}
                 </div>
               )}
+              
             </div>
+            
           )}
+          {/* Mobile menu button */}
+<button
+  type="button"
+  onClick={() => setMobileMenuOpen(true)}
+  className="md:hidden p-2 rounded-lg hover:bg-slate-100"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+  </svg>
+</button>
+
         </div>
+        
       </div>
+      {/* Mobile Drawer */}
+<div
+  className={`fixed  inset-y-0 right-0 z-50 w-64 h-90 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+    +mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+  } md:hidden`}
+>
+  <div className="flex items-center justify-between p-4 border-b border-slate-200">
+    <span className="text-lg font-semibold">{lang === 'hi' ? 'मेनू' : 'Menu'}</span>
+    <button onClick={() => setMobileMenuOpen(false)} className="p-2 rounded-lg hover:bg-slate-100">
+      ✕
+    </button>
+  </div>
+
+  <nav className="flex flex-col h-full gap-2 p-4 bg-white">
+    {navItems.map((item) => (
+      <NavLink
+        key={item.key}
+        to={makePath(item.to)}
+        onClick={() => setMobileMenuOpen(false)}
+        className={({ isActive }) =>
+          [
+            'block rounded-xl px-3 py-2 text-sm font-medium transition',
+            isActive ? 'bg-slate-900 text-white shadow-sm ' : 'text-slate-600 hover:bg-slate-100',
+          ].join(' ')
+        }
+      >
+        {translate(item)}
+      </NavLink>
+    ))}
+  </nav>
+</div>
+
+{/* Background overlay */}
+{mobileMenuOpen && (
+  <div
+    className="fixed inset-0 +bg-black md:hidden"
+    onClick={() => setMobileMenuOpen(false)}
+  ></div>
+)}
+
+      
     </header>
   )
 }
@@ -278,6 +348,7 @@ export default function Dashboard() {
         <Route path="sansthaye/*" element={<InstitutionRoutes kind="sanstha" />} />
         <Route path="profile" element={<ProfileEditor />} />
         <Route path="*" element={<Navigate to="." replace />} />
+        
       </Route>
     </Routes>
   )

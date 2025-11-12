@@ -348,13 +348,15 @@ function toProductCards(people, makePath, role) {
 
     const place =
       p.spotlightPlace || p.place || p.person?.place || user?.place || ''
+    const urlid =
+      p.id || p.id || p.person?.id || user?.id || ''
 
     return {
       kind: 'product',
       title,                          // CardProduct title
       price: [subTitle, place].filter(Boolean).join(' • ') || '', // shown under title
       image,                          // avatar/fallback
-      href: makePath(role === 'founder' ? 'founders' : 'management'), // goes to full list page
+      href: makePath(role === 'founder' ? `founders/${urlid}` : 'management'), // goes to full list page
     }
   })
 }

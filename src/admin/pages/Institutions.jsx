@@ -1,14 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
 import { useAdminQuery } from '../hooks/useAdminApi.js'
+import { useGeoOptions } from '../../hooks/useGeoOptions'
 
 export default function InstitutionsPage() {
   const [kind, setKind] = useState('dharamshala')
   const [query, setQuery] = useState('')
   const [published, setPublished] = useState('') // '', 'true', 'false'
 
-  const key = useMemo(() => ['admin','institutions', { kind, query, published }], [kind, query, published])
+
+
+  const key = useMemo(() => ['admin', 'institutions', { kind, query, published }], [kind, query, published])
 
   const { data, refetch, isLoading } = useAdminQuery(
     key,
@@ -36,14 +39,14 @@ export default function InstitutionsPage() {
           <option value="dharamshala">Dharamshalaye</option>
           <option value="sanstha">Sansthaye</option>
         </select>
-        <select value={published} onChange={(e)=>setPublished(e.target.value)} className="border border-slate-300 rounded px-3 py-2 text-sm">
+        <select value={published} onChange={(e) => setPublished(e.target.value)} className="border border-slate-300 rounded px-3 py-2 text-sm">
           <option value="">All</option>
           <option value="true">Published</option>
           <option value="false">Draft</option>
         </select>
         <input
           value={query}
-          onChange={(e)=>setQuery(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder="Search title / city / state…"
           className="border border-slate-300 rounded px-3 py-2 text-sm flex-1 min-w-[220px]"
         />
@@ -65,14 +68,22 @@ export default function InstitutionsPage() {
 }
 
 function InstitutionCard({ item, onSaved }) {
+
   const { token } = useAdminAuth()
   const [busy, setBusy] = useState(false)
-  const call = (path, body) => adminApiFetch(path, { token, method: 'PATCH', body })
+  const call = (path, body, type = 'PATCH') => adminApiFetch(path, { token, body, method: type })
 
   const toggleApprove = async () => {
     setBusy(true)
     try {
       await call(`/institutions/${item.id}/approve`, { approved: !item.approved })
+      onSaved?.()
+    } finally { setBusy(false) }
+  }
+  const toggleDelete = async () => {
+    setBusy(true)
+    try {
+      await call(`/institutions/${item.id}`, { approved: !item.approved }, 'DELETE')
       onSaved?.()
     } finally { setBusy(false) }
   }
@@ -109,6 +120,13 @@ function InstitutionCard({ item, onSaved }) {
           <button disabled={busy} onClick={togglePublish} className="px-2 py-1 border rounded">
             {item.published ? 'Unpublish' : 'Publish'}
           </button>
+          <button
+            onClick={toggleDelete}
+            disabled={busy}
+            className="rounded border border-red-300 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60"
+          >
+            {busy ? 'Deleting…' : 'Delete'}
+          </button>
         </div>
         <InstitutionFormButton item={item} onSaved={onSaved} />
       </div>
@@ -117,6 +135,7 @@ function InstitutionCard({ item, onSaved }) {
 }
 
 function InstitutionFormButton({ item, kind, onSaved }) {
+  console.log(item)
   const { token } = useAdminAuth()
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -127,12 +146,56 @@ function InstitutionFormButton({ item, kind, onSaved }) {
       kind: kind || 'dharamshala',
       titleEn: '',
       addressEn: '',
-      city: '',
       state: '',
+      district: '',
+      city: '',
       published: false,
       approved: false,
+      pin: '',
+      email: '',
+      contact: {
+        email: '',
+        name: '',
+        phone: '',
+
+      }
     }
-  )
+  )// ✅ Add this for geo selections
+  const [addressCodes, setAddressCodes] = useState({ stateCode: '', districtCode: '', cityCode: '' })
+  const { states, districts, cities, stateOptions, districtOptions, cityOptions } =
+    useGeoOptions(addressCodes.stateCode, addressCodes.districtCode, 'en')
+
+  // ✅ Handlers for dependent dropdowns (same as in MemberDetail)
+  const onStateChange = (code) => {
+    const selected = states.find((s) => s.code === code)
+    setAddressCodes({ stateCode: code, districtCode: '', cityCode: '' })
+    setForm((prev) => ({
+      ...prev,
+      state: selected?.name.en || '',
+      district: '',
+      city: '',
+    }))
+  }
+
+  const onDistrictChange = (code) => {
+    const selected = districts.find((d) => d.code === code)
+    setAddressCodes((prev) => ({ ...prev, districtCode: code, cityCode: '' }))
+    setForm((prev) => ({
+      ...prev,
+      district: selected?.name.en || '',
+      city: '',
+    }))
+  }
+
+  const onCityChange = (code) => {
+    const selected = cities.find((c) => c.code === code)
+    setAddressCodes((prev) => ({ ...prev, cityCode: code }))
+    setForm((prev) => ({
+      ...prev,
+      city: selected?.name.en || '',
+    }))
+  }
+
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -164,19 +227,23 @@ function InstitutionFormButton({ item, kind, onSaved }) {
     return <button onClick={() => setOpen(true)} className="px-3 py-2 text-sm bg-slate-900 text-white rounded">Add listing</button>
   }
 
+
+
   return (
     <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-30">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 space-y-4">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">{item ? 'Edit listing' : 'Add listing'}</h2>
           <button onClick={() => setOpen(false)} className="text-slate-500">Close</button>
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
+
+
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid md:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium text-slate-600">Kind</label>
-              <select value={form.kind} onChange={(e)=>setForm({ ...form, kind: e.target.value })} className="mt-1 w-full border rounded px-3 py-2 text-sm">
+              <select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })} className="mt-1 w-full border rounded px-3 py-2 text-sm">
                 <option value="dharamshala">Dharamshala</option>
                 <option value="sanstha">Sanstha</option>
               </select>
@@ -184,7 +251,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
             <div>
               <label className="text-xs font-medium text-slate-600">Published</label>
               <div className="mt-1">
-                <input type="checkbox" checked={!!form.published} onChange={(e)=>setForm({ ...form, published: e.target.checked })} /> <span className="text-sm">Published</span>
+                <input type="checkbox" checked={!!form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /> <span className="text-sm">Published</span>
               </div>
             </div>
           </div>
@@ -196,27 +263,123 @@ function InstitutionFormButton({ item, kind, onSaved }) {
 
           <div>
             <label className="text-xs font-medium text-slate-600">Description (EN)</label>
-            <textarea value={form.descriptionEn || ''} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" rows={4} />
+            <textarea value={form.descriptionEn || ''} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
+          </div>
+
+          {/* ✅ Address fields using geoOptions */}
+
+          <div className="grid md:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium text-slate-600">Name</label>
+              <input value={form.contact?.name} onChange={(e) =>
+                setForm({
+                  ...form,
+                  contact: {
+                    ...form.contact,
+                    name: e.target.value,
+                  },
+                })
+              }
+                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" required />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-slate-600">Email</label>
+              <input value={form.contact?.email} onChange={(e) =>
+                setForm({
+                  ...form,
+                  contact: {
+                    ...form.contact,
+                    email: e.target.value,
+                  },
+                })
+              }
+                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" required />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-slate-600">Phone</label>
+              <input value={form.contact?.phone} onChange={(e) =>
+                setForm({
+                  ...form,
+                  contact: {
+                    ...form.contact,
+                    phone: e.target.value,
+                  },
+                })
+              }
+                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" required />
+            </div>
+          </div>
+
+
+
+          <div>
+            <div>
+              <label className="text-xs font-medium text-slate-600">State</label>
+              <select
+                value={addressCodes.stateCode}
+                onChange={(e) => onStateChange(e.target.value)}
+                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              >
+                <option value="">Select state</option>
+                {stateOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-3">
             <div>
+              <label className="text-xs font-medium text-slate-600">District</label>
+              <select
+                value={addressCodes.districtCode}
+                onChange={(e) => onDistrictChange(e.target.value)}
+                disabled={!addressCodes.stateCode}
+                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              >
+                <option value="">Select district</option>
+                {districtOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
               <label className="text-xs font-medium text-slate-600">City</label>
-              <input value={form.city || ''} onChange={(e) => setForm({ ...form, city: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+              <select
+                value={addressCodes.cityCode}
+                onChange={(e) => onCityChange(e.target.value)}
+                disabled={!addressCodes.districtCode}
+                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              >
+                <option value="">Select city</option>
+                {cityOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
             </div>
             <div>
-              <label className="text-xs font-medium text-slate-600">State</label>
-              <input value={form.state || ''} onChange={(e) => setForm({ ...form, state: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+              <label className="text-xs font-medium text-slate-600">Pin</label>
+              <input value={form.pin} onChange={(e) => setForm({ ...form, pin: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" required />
             </div>
+
+
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div>
+            <label className="text-xs font-medium text-slate-600">Address</label>
+            <textarea value={form.addressEn || ''} onChange={(e) => setForm({ ...form, addressEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
+          </div>
+
+          <div className="flex justify-end gap-2 mt-4">
             <button type="button" onClick={() => setOpen(false)} className="px-3 py-2 text-sm border border-slate-300 rounded">Cancel</button>
             <button type="submit" disabled={saving} className="px-3 py-2 text-sm bg-slate-900 text-white rounded disabled:opacity-50">
               {saving ? 'Saving…' : 'Save'}
             </button>
           </div>
         </form>
+
+
       </div>
     </div>
   )

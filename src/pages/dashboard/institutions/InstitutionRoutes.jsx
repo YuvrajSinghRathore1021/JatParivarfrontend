@@ -9,16 +9,16 @@ const labels = {
   dharamshala: {
     nav: {
       browseEn: 'Dharamshala listings', browseHi: 'धर्मशाला सूची',
-      createEn: 'Add Dharamshala',      createHi: 'धर्मशाला जोड़ें',
-      manageEn: 'Manage submissions',   manageHi: 'सबमिशन प्रबंधित करें',
+      createEn: 'Add Dharamshala', createHi: 'धर्मशाला जोड़ें',
+      manageEn: 'Manage submissions', manageHi: 'सबमिशन प्रबंधित करें',
     },
     segment: 'dharamshalaye',
   },
   sanstha: {
     nav: {
-      browseEn: 'Sanstha listings',     browseHi: 'संस्था सूची',
-      createEn: 'Add Sanstha',          createHi: 'संस्था जोड़ें',
-      manageEn: 'Manage submissions',   manageHi: 'सबमिशन प्रबंधित करें',
+      browseEn: 'Sanstha listings', browseHi: 'संस्था सूची',
+      createEn: 'Add Sanstha', createHi: 'संस्था जोड़ें',
+      manageEn: 'Manage submissions', manageHi: 'सबमिशन प्रबंधित करें',
     },
     segment: 'sansthaye',
   },
@@ -30,9 +30,9 @@ function InstitutionLayout({ kind }) {
   const root = useSectionRoot(meta.segment) // "/hi/dashboard/dharamshalaye" etc.
 
   const links = [
-    { key: 'browse', to: root,                 end: true, labelEn: meta.nav.browseEn, labelHi: meta.nav.browseHi },
-    { key: 'create', to: `${root}/create`,               labelEn: meta.nav.createEn, labelHi: meta.nav.createHi },
-    { key: 'manage', to: `${root}/manage`,               labelEn: meta.nav.manageEn, labelHi: meta.nav.manageHi },
+    { key: 'browse', to: root, end: true, labelEn: meta.nav.browseEn, labelHi: meta.nav.browseHi },
+    { key: 'create', to: `${root}/create`, labelEn: meta.nav.createEn, labelHi: meta.nav.createHi },
+    { key: 'manage', to: `${root}/manage`, labelEn: meta.nav.manageEn, labelHi: meta.nav.manageHi },
   ]
 
   return (

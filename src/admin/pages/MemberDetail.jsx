@@ -223,7 +223,7 @@ export default function MemberDetailPage() {
     if (!personForm) return
     setSavingSpotlight(true)
     setError('')
-  try {
+    try {
       await adminApiFetch(`/founders/${personForm.id}`, {
         token,
         method: 'PATCH',
