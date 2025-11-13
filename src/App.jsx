@@ -2,6 +2,7 @@
 import { useEffect } from 'react'
 import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import ScrollToTop from './components/ScrollToTop.jsx'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -43,6 +44,7 @@ function LangLayout({ lang }) {
 function PublicShell() {
   return (
     <>
+      <ScrollToTop />
       <Navbar />
       <Outlet />
       <Footer />
