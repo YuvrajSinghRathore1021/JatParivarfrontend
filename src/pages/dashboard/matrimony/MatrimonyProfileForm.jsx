@@ -80,7 +80,6 @@ export default function MatrimonyProfileForm() {
       setForm({
         age: data.age || '',
         gender: data.gender || 'male',
-        hight: data.hight || 'male',
         maritalStatus: data.maritalStatus || 'never_married',
         education: data.education || '',
         occupation: data.occupation || '',
