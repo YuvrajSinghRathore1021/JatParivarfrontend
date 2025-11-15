@@ -15,7 +15,8 @@ const menu = [
   { label: 'News', to: '/admin/news' },
   { label: 'History', to: '/admin/history' },
   { label: 'Institutions', to: '/admin/institutions' },
-  { label: 'Jobs', to: '/admin/jobs' },  
+  { label: 'Matrimony', to: '/admin/matrimony' },
+  { label: 'Jobs', to: '/admin/jobs' },
   { label: 'Settings', to: '/admin/settings' },
   { label: 'Audit Log', to: '/admin/audit-log' }
 ]

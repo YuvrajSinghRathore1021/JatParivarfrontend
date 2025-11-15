@@ -180,7 +180,7 @@ if (person.photo) return API_File + person.photo
                 </div>
                 {person.bannerUrl ? (
                   <img
-                    src={person.bannerUrl}
+                    src={API_File+person.bannerUrl}
                     alt={person.name}
                     className="h-full w-full object-cover"
                   />

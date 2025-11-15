@@ -8,6 +8,7 @@ export const fetchMatrimonyProfiles = (sort = 'recent') =>
 export const fetchMyMatrimonyProfile = () => get('/matrimony/profiles/me')
 
 export const saveMatrimonyProfile = (payload) => post('/matrimony/profiles', payload)
+export const saveMatrimony = (payload) => post('/admin/matrimony/save', payload)
 
 export const sendMatrimonyInterest = (userId) => post(`/matrimony/interest/${userId}`, {})
 

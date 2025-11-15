@@ -5,10 +5,7 @@ import SelectField from '../../../components/SelectField'
 import FileDrop from '../../../components/FileDrop'
 import { useGeoOptions } from '../../../hooks/useGeoOptions'
 import { useLang } from '../../../lib/useLang'
-import {
-  fetchMyMatrimonyProfile,
-  saveMatrimonyProfile,
-} from '../../../lib/dashboardApi'
+import { fetchMyMatrimonyProfile, saveMatrimonyProfile } from '../../../lib/dashboardApi'
 import { asOptions as gotraOptions } from '../../../constants/gotras'
 import { upload } from '../../../lib/api'
 
@@ -27,7 +24,7 @@ const maritalStatuses = [
 const emptyForm = {
   age: '',
   gender: 'male',
-  hight: '',
+  height: '',
   maritalStatus: 'never_married',
   education: '',
   occupation: '',
@@ -84,7 +81,7 @@ export default function MatrimonyProfileForm() {
         education: data.education || '',
         occupation: data.occupation || '',
         state: data.state || '',
-        hight: data.hight || '',
+        height: data.height || '',
         stateCode: '',
         district: data.district || '',
         districtCode: '',
@@ -151,7 +148,7 @@ export default function MatrimonyProfileForm() {
       education: form.education,
       occupation: form.occupation,
       state: form.state,
-      hight: form.hight,
+      height: form.height,
       district: form.district,
       city: form.city,
       village: form.village,
@@ -236,7 +233,7 @@ export default function MatrimonyProfileForm() {
           </label>
           <label className="block text-sm">
             <span className="font-semibold text-slate-600">{lang === 'hi' ? 'लंबाई' : 'Hight'}</span>
-            <input value={form.hight} onChange={handleChange('hight')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+            <input value={form.height} onChange={handleChange('height')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
           </label>
           <label className="block text-sm">
             <span className="font-semibold text-slate-600">{lang === 'hi' ? 'वैवाहिक स्थिति' : 'Marital status'}</span>

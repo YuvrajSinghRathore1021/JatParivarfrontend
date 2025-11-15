@@ -18,8 +18,7 @@ export default function InstitutionsPage() {
     () => `/institutions?${[
       kind ? `kind=${encodeURIComponent(kind)}` : '',
       query ? `search=${encodeURIComponent(query)}` : '',
-      published ? `published=${published}` : ''
-    ].filter(Boolean).join('&')}`
+      published ? `published=${published}` : '' ].filter(Boolean).join('&')}`
   )
 
   const list = data?.data || []

@@ -109,7 +109,7 @@ export default function MatrimonyBrowse() {
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'लंबाई' : 'Hight'}</dt>
-                    <dd>{profile.hight || '—'}</dd>
+                    <dd>{profile.height || '—'}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</dt>

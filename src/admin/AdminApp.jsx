@@ -15,9 +15,12 @@ import PagesPage from './pages/Pages.jsx'
 import NewsPage from './pages/News.jsx'
 import HistoryPage from './pages/History.jsx'
 import InstitutionsPage from './pages/Institutions.jsx'
+import Matrimony from './pages/Matrimony.jsx'
 import SettingsPage from './pages/Settings.jsx'
 import JobsPage from './pages/Jobs.jsx'    
 import AuditLogPage from './pages/AuditLog.jsx'
+import MatrimonyDetail from './pages/MatrimonyDetail.jsx'
+
 import { adminApiFetch } from './api/client.js'
 
 function RequireAdmin({ children }) {
@@ -53,6 +56,7 @@ function AdminRoutes() {
         <Route index element={<DashboardPage />} />
         <Route path="members" element={<MembersPage />} />
         <Route path="members/:id" element={<MemberDetailPage />} />
+       
         <Route path="founders" element={<PeoplePage role="founder" />} />
         <Route path="management" element={<PeoplePage role="management" />} />
         <Route path="payments" element={<PaymentsPage />} />
@@ -63,6 +67,8 @@ function AdminRoutes() {
         <Route path="history" element={<HistoryPage />} />
         <Route path="jobs" element={<JobsPage />} />   
         <Route path="institutions" element={<InstitutionsPage />} />
+        <Route path="matrimony" element={<Matrimony />} />
+         <Route path="matrimony/:id" element={<MatrimonyDetail />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="audit-log" element={<AuditLogPage />} />
       </Route>
