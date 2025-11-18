@@ -1,5 +1,6 @@
 // frontend/src/App.jsx
 import { useEffect } from 'react'
+import { BrowserRouter } from "react-router-dom";
 import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import ScrollToTop from './components/ScrollToTop.jsx'
@@ -24,6 +25,7 @@ import Sansthaye from './pages/Sansthaye'
 import Subscriptions from './pages/Subscriptions'
 import PersonDetail from './pages/people/PersonDetail'
 import SamajKeGaurav from './pages/people/Samaj ke gorav.jsx'
+import GouravDetails from './pages/people/GoravDetails.jsx'
 import { useLang, DEFAULT_LANG, SUPPORTED_LANGS } from './lib/useLang'
 import i18n from './i18n'
 import AdminApp from './admin/AdminApp.jsx'
@@ -52,7 +54,9 @@ function PublicShell() {
       <Footer />
     </>
   )
+
 }
+
 
 function RequireAuth() {
   const location = useLocation()
@@ -102,6 +106,8 @@ export default function App() {
         <Route path="sansthaye" element={<Sansthaye />} />
         <Route path="subscriptions" element={<Subscriptions />} />
         <Route path="samajKeGaurav" element={<SamajKeGaurav />} />
+        <Route path="samajKeGaurav/:personId" element={<GouravDetails />} />
+
         <Route path="*" element={<Navigate to="." replace />} />
 
       </Route>
