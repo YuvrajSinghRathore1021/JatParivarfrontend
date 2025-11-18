@@ -14,8 +14,8 @@ import History from './pages/History'
 import News from './pages/News'
 import NewsArticle from './pages/news/NewsArticle.jsx'
 import Login from './pages/auth/Login'
-import Register from './pages/auth/Register'
 import ForgetPassword from './pages/auth/ForgetPassword'
+import Register from './pages/auth/Register'
 import Dashboard from './pages/dashboard/Dashboard'
 import MatrimonyBrowse from './pages/matrimony/Browse'
 import JobsIndex from './pages/jobs/JobsIndex'
@@ -23,6 +23,7 @@ import Dharamshalaye from './pages/Dharamshalaye'
 import Sansthaye from './pages/Sansthaye'
 import Subscriptions from './pages/Subscriptions'
 import PersonDetail from './pages/people/PersonDetail'
+import SamajKeGaurav from './pages/people/Samaj ke gorav.jsx'
 import { useLang, DEFAULT_LANG, SUPPORTED_LANGS } from './lib/useLang'
 import i18n from './i18n'
 import AdminApp from './admin/AdminApp.jsx'
@@ -87,20 +88,22 @@ export default function App() {
         <Route path="founders" element={<Founders />} />
         <Route path="founders/:personId" element={<PersonDetail />} />
         <Route path="management" element={<Management />} />
-        <Route path="management/:personId" element={<PersonDetail />} />
+        <Route path="management/:profileId" element={<PersonDetail />} />
         <Route path="visheshayen" element={<Visheshayen />} />
         <Route path="history" element={<History />} />
         <Route path="news" element={<News />} />
         <Route path="news/:slug" element={<NewsArticle />} />
         <Route path="login" element={<Login />} />
+        <Route path="forget-password" element={<ForgetPassword />} />
         <Route path="register" element={<Register />} />
-        <Route path="forgetPassword" element={<ForgetPassword />} />
         <Route path="matrimony" element={<MatrimonyBrowse />} />
         <Route path="jobs" element={<JobsIndex />} />
         <Route path="dharamshaalaye" element={<Dharamshalaye />} />
         <Route path="sansthaye" element={<Sansthaye />} />
         <Route path="subscriptions" element={<Subscriptions />} />
+        <Route path="samajKeGaurav" element={<SamajKeGaurav />} />
         <Route path="*" element={<Navigate to="." replace />} />
+
       </Route>
       <Route element={<RequireAuth />}>
         <Route path="dashboard/*" element={<Dashboard />} />

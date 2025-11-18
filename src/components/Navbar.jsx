@@ -14,6 +14,7 @@ const navItems = [
   { key: 'visheshayen', labelEn: 'Highlights', labelHi: 'विशेषताएँ', segment: 'visheshayen' },
   { key: 'history', labelEn: 'History', labelHi: 'इतिहास', segment: 'history' },
   { key: 'news', labelEn: 'Community News', labelHi: 'कम्युनिटी न्यूज़', segment: 'news' },
+  { key: 'samajKeGaurav', labelEn: 'Samaj Ke Gaurav', labelHi: 'समाज के गौरव', segment: 'samajKeGaurav' },
 ]
 
 const externalItems = [
@@ -158,7 +159,7 @@ export default function Navbar() {
               <span className="sr-only">Jat Parivar</span>
             </Link>
 
-            <nav className="hidden xl:flex items-center gap-2" aria-label="Primary">
+            <nav className="hidden lg:flex items-center gap-1 flex-1" aria-label="Primary">
               {navItems.map((it) => (
                 <NavLink
                   key={it.key}

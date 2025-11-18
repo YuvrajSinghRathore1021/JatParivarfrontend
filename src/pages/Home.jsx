@@ -356,7 +356,7 @@ function toProductCards(people, makePath, role) {
       title,                          // CardProduct title
       price: [subTitle, place].filter(Boolean).join(' • ') || '', // shown under title
       image,                          // avatar/fallback
-      href: makePath(role === 'founder' ? `founders/${urlid}` : `management/${urlid}`), // goes to full list page
+      href: makePath(role === 'founder' ? `founders/${urlid}` : 'management'), // goes to full list page
     }
   })
 }
@@ -593,7 +593,7 @@ export default function Home() {
 
             <div className="mt-4">
               {managementQ.isLoading ? (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 ">
                   {Array.from({ length: 8 }).map((_, i) => (
                     <div key={i} className="h-36 rounded-2xl bg-white shadow-sm animate-pulse" />
                   ))}
