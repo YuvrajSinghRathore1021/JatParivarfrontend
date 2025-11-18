@@ -25,7 +25,7 @@ const copy = {
     referral: 'Referral Code (6 characters)',
     otp: 'OTP',
     fullName: 'Full Name',
-    email: 'Email (optional)',
+    email: 'Email',
     dob: 'Date of birth',
     gender: 'Gender',
     marital: 'Marital Status',
@@ -54,6 +54,7 @@ const copy = {
     errorGeneric: 'Something went wrong. Please try again.',
     invalidOtp: 'Invalid OTP. Please try again.',
     invalidEmail: 'Please enter a valid email address.',
+    invalidEmailReq: 'Please enter a email address.',
     placeholders: {
       gender: 'Select gender',
       marital: 'Select marital status',
@@ -84,7 +85,7 @@ const copy = {
     referral: 'रेफ़रल कोड (6 वर्ण)',
     otp: 'OTP',
     fullName: 'पूरा नाम',
-    email: 'ईमेल (वैकल्पिक)',
+    email: 'ईमेल',
     dob: 'जन्मतिथि',
     gender: 'लिंग',
     marital: 'वैवाहिक स्थिति',
@@ -113,6 +114,7 @@ const copy = {
     errorGeneric: 'कुछ गड़बड़ हुई। कृपया फिर से प्रयास करें।',
     invalidOtp: 'OTP मान्य नहीं है। कृपया पुनः प्रयास करें।',
     invalidEmail: 'कृपया मान्य ईमेल पता दर्ज करें।',
+    invalidEmailReq: 'कृपया ईमेल पता दर्ज करें।',
     placeholders: {
       gender: 'लिंग चुनें',
       marital: 'वैवाहिक स्थिति चुनें',
@@ -194,9 +196,9 @@ export default function Register() {
 
   // ===== TEST SWITCHES =====
   // Toggle this to bypass phone OTP during testing.
-  const TEST_BYPASS_OTP = false // <-- set to false for production (OTP enforced)
+  const TEST_BYPASS_OTP = true // <-- set to false for production (OTP enforced)
   // Set to false to restore the original PhonePe redirect flow.
-  const TEST_BYPASS_PHONEPE = false // <-- set to false for production
+  const TEST_BYPASS_PHONEPE = true // <-- set to false for production
 
   const OTP_ENABLED = !TEST_BYPASS_OTP
 
@@ -324,9 +326,14 @@ export default function Register() {
       setError(t.nameRequired)
       return
     }
+    if (form.email == "") {
+      setError(t.invalidEmailReq)
+      return
+    }
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       setError(t.invalidEmail)
       return
+
     }
     if (!form.password || form.password.length < 6) {
       setError(t.passwordHint)
@@ -569,12 +576,12 @@ export default function Register() {
                   >
                     {showPwd ? (
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a18.4 18.4 0 0 1 5.06-6.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 10 8 10 8a18.4 18.4 0 0 1-3.17 4.31M14.12 9.88A3 3 0 0 1 9.88 14.12M1 1l22 22"/>
+                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a18.4 18.4 0 0 1 5.06-6.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 10 8 10 8a18.4 18.4 0 0 1-3.17 4.31M14.12 9.88A3 3 0 0 1 9.88 14.12M1 1l22 22" />
                       </svg>
                     ) : (
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M1 12s3-8 11-8 11 8 11 8-3 8-11 8-11-8-11-8Z"/>
-                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M1 12s3-8 11-8 11 8 11 8-3 8-11 8-11-8-11-8Z" />
+                        <circle cx="12" cy="12" r="3" />
                       </svg>
                     )}
                   </button>

@@ -356,7 +356,7 @@ function toProductCards(people, makePath, role) {
       title,                          // CardProduct title
       price: [subTitle, place].filter(Boolean).join(' • ') || '', // shown under title
       image,                          // avatar/fallback
-      href: makePath(role === 'founder' ? `founders/${urlid}` : 'management'), // goes to full list page
+      href: makePath(role === 'founder' ? `founders/${urlid}` : `management/${urlid}`), // goes to full list page
     }
   })
 }

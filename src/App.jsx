@@ -15,6 +15,7 @@ import News from './pages/News'
 import NewsArticle from './pages/news/NewsArticle.jsx'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import ForgetPassword from './pages/auth/ForgetPassword'
 import Dashboard from './pages/dashboard/Dashboard'
 import MatrimonyBrowse from './pages/matrimony/Browse'
 import JobsIndex from './pages/jobs/JobsIndex'
@@ -93,6 +94,7 @@ export default function App() {
         <Route path="news/:slug" element={<NewsArticle />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="forgetPassword" element={<ForgetPassword />} />
         <Route path="matrimony" element={<MatrimonyBrowse />} />
         <Route path="jobs" element={<JobsIndex />} />
         <Route path="dharamshaalaye" element={<Dharamshalaye />} />

@@ -84,6 +84,15 @@ function JobCard({ job, onSaved }) {
       setBusy(false)
     }
   }
+  const setDelete = async (deletedata) => {
+    setBusy(true)
+    try {
+      await adminApiFetch(`/jobs/${job.id}`, { token, method: 'DELETE', body: { deletedata } })
+      onSaved?.()
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
@@ -115,6 +124,14 @@ function JobCard({ job, onSaved }) {
         >
           {job.published ? 'Unpublish' : 'Publish'}
         </button>
+        <button
+                   onClick={()=>setDelete(job.id)}
+                    disabled={busy}
+                    className="rounded border border-red-300 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60"
+                >
+                    {busy ? "Deleting…" : "Delete"}
+                </button>
+
         <JobFormButton job={job} onSaved={onSaved} />
       </div>
     </div>

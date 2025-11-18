@@ -58,7 +58,7 @@ function InstitutionCard({ item, onSaved }) {
     const toggleDelete = async () => {
         setBusy(true)
         try {
-            await call(`/matrimony/${item.id}`, { approved: !item.approved }, 'DELETE')
+            await call(`/matrimony/${item._id}`, { approved: !item.approved }, 'DELETE')
             onSaved?.()
         } finally { setBusy(false) }
     }
