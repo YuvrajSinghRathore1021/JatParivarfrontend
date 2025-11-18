@@ -88,7 +88,7 @@ export default function App() {
         <Route path="founders" element={<Founders />} />
         <Route path="founders/:personId" element={<PersonDetail />} />
         <Route path="management" element={<Management />} />
-        <Route path="management/:profileId" element={<PersonDetail />} />
+        <Route path="management/:personId" element={<PersonDetail />} />
         <Route path="visheshayen" element={<Visheshayen />} />
         <Route path="history" element={<History />} />
         <Route path="news" element={<News />} />

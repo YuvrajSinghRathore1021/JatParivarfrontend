@@ -348,15 +348,14 @@ function toProductCards(people, makePath, role) {
 
     const place =
       p.spotlightPlace || p.place || p.person?.place || user?.place || ''
-    const urlid =
-      p.id || p.id || p.person?.id || user?.id || ''
+    const urlid = p.id || p.id || p.person?.id || user?.id || ''
 
     return {
       kind: 'product',
       title,                          // CardProduct title
       price: [subTitle, place].filter(Boolean).join(' • ') || '', // shown under title
       image,                          // avatar/fallback
-      href: makePath(role === 'founder' ? `founders/${urlid}` : 'management'), // goes to full list page
+      href: makePath(role === 'founder' ? `founders/${urlid}` : `management/${urlid}`), // goes to full list page
     }
   })
 }
@@ -619,7 +618,7 @@ export default function Home() {
           </section>
 
           {/* IMPACT & MILESTONES */}
-          <section>
+          {/* <section>
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
               <div>
                 <h3 className="text-xl font-bold text-slate-900">{t.impactHeading}</h3>
@@ -666,7 +665,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          </section>
+          </section> */}
 
           {/* NEWS */}
           <section>

@@ -52,6 +52,7 @@ export default function MatrimonyDetail() {
     const { id } = useParams()
     let lang = "en"
     const qc = useQueryClient()
+    
     // const { data, isLoading } = useQuery({
     //     queryKey: ['matrimony', 'profile'],
     //     queryFn: fetchMyMatrimonyProfile,
