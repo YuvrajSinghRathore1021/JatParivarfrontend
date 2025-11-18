@@ -59,6 +59,16 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+  if (open) {
+    document.body.style.overflow = "hidden";  
+  } else {
+    document.body.style.overflow = "auto"; 
+  }
+}, [open]);
+
+
+
   const switchLang = (to) => {
     const current = currentLangFromPath(pathname)
     if (to === current) return
@@ -159,7 +169,7 @@ export default function Navbar() {
               <span className="sr-only">Jat Parivar</span>
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-1 flex-1" aria-label="Primary">
+            <nav className="hidden h-16 lg:flex items-center gap-1 flex-1" aria-label="Primary">
               {navItems.map((it) => (
                 <NavLink
                   key={it.key}
@@ -233,94 +243,106 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile drawer */}
-      <div
-        className={['fixed inset-0 z-50 lg:hidden transition overflow-x-hidden', open ? 'pointer-events-auto' : 'pointer-events-none'].join(' ')}
-        aria-hidden={!open}
-      >
-        <div
-          className={[
-            'absolute top-0 right-0 h-full w-[86%] max-w-[360px] bg-white shadow-2xl transform transition-transform  overflow-y-auto duration-300 ease-in-out',
-            open ? 'translate-x-0' : 'translate-x-full',
-          ].join(' ')}
+      {/* Mobile Sidebar */}
+  <div
+  className={[
+    'fixed inset-0 z-50 lg:hidden transition',
+    open ? 'pointer-events-auto' : 'pointer-events-none'
+  ].join(' ')}
+  aria-hidden={!open}
+>
+    {/* Background Overlay */}
+    <div
+      onClick={() => setOpen(false)}
+      className={[
+        'absolute inset-0 bg-black/40 transition-opacity duration-300',
+        open ? 'opacity-100' : 'opacity-0'
+      ].join(' ')}
+    />
 
-        />
-        <aside
-          className={[
-            'absolute top-0 right-0 h-full w-[86%] max-w-[360px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out',
-            open ? 'translate-x-0' : 'translate-x-full',
-          ].join(' ')}
+    {/* Sidebar */}
+    <aside
+      className={[
+        'absolute top-0 right-0 h-full w-[86%] max-w-[360px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out  overflow-y-auto',
+        open ? 'translate-x-0' : 'translate-x-full'
+      ].join(' ')}
+      role="dialog"
+      aria-label="Mobile navigation"
+    >
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200 flex items-center justify-between overflow-y-auto">
+        <span className="text-lg font-extrabold text-gray-900">Jat Parivar</span>
 
-          role="dialog"
-          aria-label="Mobile navigation"
+        <button
+          onClick={() => setOpen(false)}
+          className="h-9 w-9 grid place-items-center rounded-md hover:bg-gray-100 "
+          aria-label="Close menu"
         >
-          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-            <span className="text-lg font-extrabold text-gray-900">Jat Parivar</span>
-            <button
-              onClick={() => setOpen(false)}
-              className="h-9 w-9 grid place-items-center rounded-md hover:bg-gray-100"
-              aria-label="Close menu"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M6.4 5l12.6 12.6-1.4 1.4L5 6.4 6.4 5z" />
-                <path d="M18.6 5L6 17.6l-1.4-1.4L17.2 3.6 18.6 5z" />
-              </svg>
-            </button>
-          </div>
-
-          <nav className="p-4" aria-label="Mobile">
-            <ul className="space-y-1">
-              {navItems.map((it) => (
-                <li key={it.key}>
-                  <Link
-                    to={makePath(it.segment)}
-                    onClick={() => setOpen(false)}
-                    className="block px-3 py-3 rounded-lg text-base font-medium text-gray-900 hover:bg-gray-100"
-                  >
-                    {translate(it)}
-                  </Link>
-                </li>
-              ))}
-              {externalItems.map((it) => (
-                <li key={it.href}>
-                  <a
-                    href={it.href}
-                    target="_blank"
-                    rel="noopener"
-                    className="block px-3 py-3 rounded-lg text-base font-medium text-gray-900 hover:bg-gray-100"
-                    onClick={() => setOpen(false)}
-                  >
-                    {translate(it)}
-                  </a>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-4 border-t border-gray-200 pt-4 flex items-center gap-2">
-              <button
-                onClick={() => switchLang('en')}
-                className={[
-                  'inline-flex items-center justify-center px-3 h-10 rounded-lg text-sm font-semibold',
-                  lang === 'en' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800',
-                ].join(' ')}
-              >
-                EN
-              </button>
-              <button
-                onClick={() => switchLang('hi')}
-                className={[
-                  'inline-flex items-center justify-center px-3 h-10 rounded-lg text-sm font-semibold',
-                  lang === 'hi' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800',
-                ].join(' ')}
-              >
-                HI
-              </button>
-
-              {renderAuthMobile()}
-            </div>
-          </nav>
-        </aside>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6.4 5l12.6 12.6-1.4 1.4L5 6.4 6.4 5z" />
+            <path d="M18.6 5L6 17.6l-1.4-1.4L17.2 3.6 18.6 5z" />
+          </svg>
+        </button>
       </div>
+
+      {/* Navigation */}
+      <nav className="p-4" aria-label="Mobile">
+        <ul className="space-y-1">
+          {navItems.map((it) => (
+            <li key={it.key}>
+              <Link
+                to={makePath(it.segment)}
+                onClick={() => setOpen(false)}
+                className="block px-3 py-3 rounded-lg text-base font-medium text-gray-900 hover:bg-gray-100"
+              >
+                {translate(it)}
+              </Link>
+            </li>
+          ))}
+
+          {externalItems.map((it) => (
+            <li key={it.href}>
+              <a
+                href={it.href}
+                target="_blank"
+                rel="noopener"
+                onClick={() => setOpen(false)}
+                className="block px-3 py-3 rounded-lg text-base font-medium text-gray-900 hover:bg-gray-100"
+              >
+                {translate(it)}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        {/* Buttons */}
+        <div className="mt-4 border-t border-gray-200 pt-4 flex items-center gap-2">
+          <button
+            onClick={() => switchLang('en')}
+            className={[
+              'inline-flex items-center justify-center px-3 h-10 rounded-lg text-sm font-semibold',
+              lang === 'en' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'
+            ].join(' ')}
+          >
+            EN
+          </button>
+
+          <button
+            onClick={() => switchLang('hi')}
+            className={[
+              'inline-flex items-center justify-center px-3 h-10 rounded-lg text-sm font-semibold',
+              lang === 'hi' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'
+            ].join(' ')}
+          >
+            HI
+          </button>
+
+          {renderAuthMobile()}
+        </div>
+      </nav>
+    </aside>
+  </div>
+
 
       <div className="h-16" />
     </>
