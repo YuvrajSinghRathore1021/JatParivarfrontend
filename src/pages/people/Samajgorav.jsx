@@ -54,7 +54,7 @@ function ProfileCard({ person, onClick }) {
   );
 }
 
-export default function SamajKeGaurav() {
+export default function Samajgorav() {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
 

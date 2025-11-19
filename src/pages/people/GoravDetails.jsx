@@ -22,7 +22,7 @@ const SAMPLE_DATA = [
   },
 ];
 
-export default function GouravDetails() {
+export default function GoravDetails() {
   const { personId } = useParams();
   const navigate = useNavigate();
 

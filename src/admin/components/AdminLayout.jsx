@@ -16,6 +16,7 @@ const menu = [
   { label: 'History', to: '/admin/history' },
   { label: 'Institutions', to: '/admin/institutions' },
   { label: 'Matrimony', to: '/admin/matrimony' },
+  { label: 'Samaj ke Gaurav', to: '/admin/samaj_ke_gaurav' },
   { label: 'Jobs', to: '/admin/jobs' },
   { label: 'Settings', to: '/admin/settings' },
   { label: 'Audit Log', to: '/admin/audit-log' }
