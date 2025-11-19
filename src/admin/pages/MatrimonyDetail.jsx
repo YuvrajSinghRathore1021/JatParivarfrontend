@@ -45,6 +45,7 @@ const emptyForm = {
     gotraDadi: '',
     visible: true,
     photos: [],
+    
 }
 
 export default function MatrimonyDetail() {

@@ -37,7 +37,7 @@ const emptyForm = {
 export default function InstitutionForm({ kind }) {
   const { lang } = useLang()
   const qc = useQueryClient()
-  const [form, setForm] = useState(emptyForm)
+  const [form, setForm] = useState(emptyForm) 
   const [message, setMessage] = useState('')
   const labels = copy[kind] || copy.dharamshala
 

@@ -8,9 +8,9 @@ let API_File = import.meta.env.VITE_API_File;
 
 export default function SamajkeGaurav() {
     const [query, setQuery] = useState('');
-    const [timeline, setTimeline] = useState('PAST'); 
-    const [category, setCategory] = useState('games'); 
-    
+    const [timeline, setTimeline] = useState('');
+    const [category, setCategory] = useState('');
+
     const key = useMemo(
         () => ['admin', 'gaurav', { query, timeline, category }],
         [query, timeline, category]
@@ -55,21 +55,16 @@ export default function SamajkeGaurav() {
                     value={timeline}
                     onChange={(e) => setTimeline(e.target.value)}
                     className="border px-3 py-2 rounded"
-                >
+                > <option value=""> Select Option </option>
                     <option value="PAST">Past</option>
                     <option value="PRESENT">Present</option>
                 </select>
 
                 {/* Category */}
-                <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="border px-3 py-2 rounded"
-                >
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className="border px-3 py-2 rounded">
+                    <option value=""> Select Option </option>
                     {categories.map((c) => (
-                        <option key={c} value={c}>
-                            {c}
-                        </option>
+                        <option key={c} value={c}> {c} </option>
                     ))}
                 </select>
 

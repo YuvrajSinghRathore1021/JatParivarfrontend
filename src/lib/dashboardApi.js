@@ -32,8 +32,8 @@ export const applyToJob = (jobId, payload) => post(`/jobs/${jobId}/applications`
 export const fetchJobApplicants = (jobId) => get(`/jobs/${jobId}/applications`)
 
 // Institutions
-export const fetchInstitutions = (kind) =>
-  get(`/institutions${kind ? `?kind=${encodeURIComponent(kind)}` : ''}`)
+export const fetchInstitutions = (kind, id = 0) =>
+  get(`/institutions${kind ? `?kind=${encodeURIComponent(kind)}` : ''}${kind ? `&id=${id}` : `?id=${id}`}`)
 
 export const fetchMyInstitutions = () => get('/institutions/mine')
 

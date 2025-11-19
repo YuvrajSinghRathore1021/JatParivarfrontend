@@ -2,8 +2,10 @@ import { NavLink, Outlet, Route, Routes } from 'react-router-dom'
 import { useLang } from '../../../lib/useLang'
 import { useSectionRoot } from '../../../lib/useSectionRoot'
 import InstitutionBrowse from './InstitutionBrowse'
+import InstitutionDetail from './InstitutionDetail'
 import InstitutionForm from './InstitutionForm'
 import InstitutionManage from './InstitutionManage'
+
 
 const labels = {
   dharamshala: {
@@ -25,6 +27,7 @@ const labels = {
 }
 
 function InstitutionLayout({ kind }) {
+
   const { lang } = useLang()
   const meta = labels[kind] || labels.dharamshala
   const root = useSectionRoot(meta.segment) // "/hi/dashboard/dharamshalaye" etc.
@@ -72,6 +75,7 @@ export default function InstitutionRoutes({ kind }) {
       <Route element={<InstitutionLayout kind={kind} />}>
         <Route index element={<InstitutionBrowse kind={kind} />} />
         <Route path="create" element={<InstitutionForm kind={kind} />} />
+        <Route path="/:id" element={<InstitutionDetail kind={kind} />} />
         <Route path="manage" element={<InstitutionManage kind={kind} />} />
       </Route>
     </Routes>

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchInstitutions } from '../../../lib/dashboardApi'
 import { useLang } from '../../../lib/useLang'
+import { Link } from 'react-router-dom'
 
 const copy = {
   dharamshala: {
@@ -68,19 +69,22 @@ export default function InstitutionBrowse({ kind }) {
         <div className="grid gap-4 md:grid-cols-2">
           {filtered.map((item) => (
             <article key={item._id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-3">
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900">{lang === 'hi' ? item.titleHi || item.titleEn : item.titleEn || item.titleHi}</h3>
-                <p className="text-sm text-slate-500">{lang === 'hi' ? item.descriptionHi || item.descriptionEn : item.descriptionEn || item.descriptionHi}</p>
-              </div>
-              <p className="text-xs uppercase tracking-wide text-slate-400">
-                {[item.city, item.state].filter(Boolean).join(', ') || '—'}
-              </p>
-              {item.contact?.phone && (
-                <p className="text-sm text-slate-700">{lang === 'hi' ? 'संपर्क:' : 'Phone:'} {item.contact.phone}</p>
-              )}
-              {item.contact?.email && (
-                <p className="text-sm text-slate-700">{lang === 'hi' ? 'ईमेल:' : 'Email:'} {item.contact.email}</p>
-              )}
+             <Link to="/dharamshalaye/${item._id}">
+
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">{lang === 'hi' ? item.titleHi || item.titleEn : item.titleEn || item.titleHi}</h3>
+                  <p className="text-sm text-slate-500">{lang === 'hi' ? item.descriptionHi || item.descriptionEn : item.descriptionEn || item.descriptionHi}</p>
+                </div>
+                <p className="text-xs uppercase tracking-wide text-slate-400">
+                  {[item.city, item.state].filter(Boolean).join(', ') || '—'}
+                </p>
+                {item.contact?.phone && (
+                  <p className="text-sm text-slate-700">{lang === 'hi' ? 'संपर्क:' : 'Phone:'} {item.contact.phone}</p>
+                )}
+                {item.contact?.email && (
+                  <p className="text-sm text-slate-700">{lang === 'hi' ? 'ईमेल:' : 'Email:'} {item.contact.email}</p>
+                )}
+              </Link>
             </article>
           ))}
         </div>
