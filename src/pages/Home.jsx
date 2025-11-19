@@ -469,6 +469,7 @@ export default function Home() {
     return langKey === 'hi' ? TICKER_FALLBACK.hi : TICKER_FALLBACK.en
   }, [impactStats, langKey])
 
+  
   const membershipPlans = useMemo(() => {
     const data = Array.isArray(plansQ.data) ? plansQ.data : []
     const planMap = new Map(data.map((plan) => [plan.code, plan]))
