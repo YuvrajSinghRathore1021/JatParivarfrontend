@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { useLang } from '../../lib/useLang'
 import { fetchPublicNewsDetail } from '../../lib/publicApi'
-
+let API_File = import.meta.env.VITE_API_File
 const FALLBACK_ARTICLE = {
   title: {
     en: 'Story not found',
@@ -128,7 +128,7 @@ export default function NewsArticle() {
         {article.heroImageUrl ? (
           <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <img
-              src={article.heroImageUrl}
+              src={API_File+article.heroImageUrl}
               alt={article.title[langKey]}
               className="w-full h-full object-cover"
               loading="lazy"

@@ -5,7 +5,7 @@ import { currentLangFromPath, switchLangInPath } from '../lib/i18nPath'
 import { useLang } from '../lib/useLang'
 import { me } from '../lib/auth'
 import { makeInitialAvatar } from '../lib/avatar'
-
+let API_File = import.meta.env.VITE_API_File
 const navItems = [
   { key: 'home', labelEn: 'Home', labelHi: 'होम', segment: '' },
   { key: 'uddeshay', labelEn: 'Uddeshay', labelHi: 'उद्देश्य', segment: 'uddeshay' },
