@@ -10,7 +10,7 @@ const makeId = () =>
 
 const PAGE_BLUEPRINTS = {
   uddeshay: {
-    label: 'Uddeshay',
+    label: 'uddeshay',
     description: 'Purpose page hero and pillars.',
     createDefault: () => ({
       heroTitleEn: '',

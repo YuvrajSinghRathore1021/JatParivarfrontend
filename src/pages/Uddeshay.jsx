@@ -103,8 +103,8 @@ export default function Uddeshay() {
   const langKey = lang === 'hi' ? 'hi' : 'en'
 
   const { data } = useQuery({
-    queryKey: ['public', 'page', 'Uddeshay'],
-    queryFn: () => fetchPublicPage('Uddeshay'),
+    queryKey: ['public', 'page', 'uddeshay'],
+    queryFn: () => fetchPublicPage('uddeshay'),
     staleTime: 5 * 60 * 1000,
   })
 
