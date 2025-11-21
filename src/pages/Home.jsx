@@ -508,7 +508,7 @@ export default function Home() {
   )
 
   return (
-    <main className="pb-20 bg-slate-50">
+<main className="pb-20 bg-slate-50 overflow-x-hidden">
       <HeroScrollYouTube
         youtubeId="LyROt7AWuNo"
         stickyVh={60}
@@ -593,7 +593,7 @@ export default function Home() {
 
             <div className="mt-4">
               {managementQ.isLoading ? (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 ">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   {Array.from({ length: 8 }).map((_, i) => (
                     <div key={i} className="h-36 rounded-2xl bg-white shadow-sm animate-pulse" />
                   ))}

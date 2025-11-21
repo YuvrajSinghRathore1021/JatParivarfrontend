@@ -8,6 +8,7 @@ import {
   sendMatrimonyInterest,
 } from '../../../lib/dashboardApi'
 import { makeInitialAvatar } from '../../../lib/avatar'
+let API_File = import.meta.env.VITE_API_File
 
 const sortOptions = [
   { value: 'recent', labelEn: 'Recently updated', labelHi: 'हाल ही में अपडेट' },
@@ -85,7 +86,7 @@ export default function MatrimonyBrowse() {
         <div className="grid gap-4 md:grid-cols-2">
           {sortedProfiles.map((profile) => {
             const user = profile.user || {}
-            const avatar = user.avatarUrl || makeInitialAvatar(user.displayName || 'Member', { size: 96, radius: 28 })
+            const avatar =API_File+ user.avatarUrl || makeInitialAvatar(user.displayName || 'Member', { size: 96, radius: 28 })
             const interested = user.id ? likedSet.has(user.id) : false
             return (
               <article key={profile.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">

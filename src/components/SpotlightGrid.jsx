@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { fetchPublicPeople } from '../lib/publicApi'
 import { useLang } from '../lib/useLang'
 import { makeInitialAvatar } from '../lib/avatar'
-
+let API_File = import.meta.env.VITE_API_File
 /**
  * Props:
  * - role: 'founder' | 'management'
@@ -58,7 +58,7 @@ export default function SpotlightGrid({ role, titleHi, viewAllPath, limit = 10 }
           {people.map((p) => {
             const user = p.user || p
             const avatar =
-              user?.avatarUrl ||
+              API_File+user?.avatarUrl ||
               makeInitialAvatar(user?.displayName || user?.name || 'Member', {
                 size: 80,
                 radius: 20,

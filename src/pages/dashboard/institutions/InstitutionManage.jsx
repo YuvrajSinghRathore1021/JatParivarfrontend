@@ -88,6 +88,7 @@ export default function InstitutionManage({ kind }) {
           phone: editingForm.contactPhone || '',
           email: editingForm.contactEmail || '',
         },
+        contactpersons: editingForm?.contactpersons || []
       },
     })
   }
@@ -95,6 +96,30 @@ export default function InstitutionManage({ kind }) {
   const updateEditingField = (field) => (event) => {
     const value = event.target.value
     setEditingForm((prev) => (prev ? { ...prev, [field]: value } : prev))
+  }
+  const addContact = () => {
+    setEditingForm(prev => ({
+      ...prev,
+      contactpersons: [
+        ...prev.contactpersons,
+        { name: "", email: "", phone: "", post: "" }
+      ]
+    }))
+  }
+
+  const updateContact = (index, field, value) => {
+    setEditingForm(prev => {
+      const list = [...prev.contactpersons]
+      list[index][field] = value
+      return { ...prev, contactpersons: list }
+    })
+  }
+
+  const removeContact = (index) => {
+    setEditingForm(prev => ({
+      ...prev,
+      contactpersons: prev.contactpersons.filter((_, i) => i !== index)
+    }))
   }
 
   return (
@@ -158,6 +183,7 @@ export default function InstitutionManage({ kind }) {
                           contactName: item.contact?.name || '',
                           contactPhone: item.contact?.phone || '',
                           contactEmail: item.contact?.email || '',
+                          contactpersons:item?.contactpersons || []
                         })
                       }
                     }}
@@ -252,6 +278,77 @@ export default function InstitutionManage({ kind }) {
                         <span>{lang === 'hi' ? 'ईमेल' : 'Email'}</span>
                         <input value={editingForm.contactEmail} onChange={updateEditingField('contactEmail')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
                       </label>
+                    </div>
+                    {/* ===========================
+    CONTACTS SECTION
+   =========================== */}
+                    <div className="border p-4 rounded-xl space-y-3 bg-slate-50">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-semibold">Contact Persons</p>
+
+                        <button
+                          type="button"
+                          onClick={addContact}
+                          className="px-3 py-1 text-xs bg-blue-600 text-white rounded-lg"
+                        >
+                          Add Contact
+                        </button>
+                      </div>
+
+                      {editingForm?.contactpersons?.length === 0 && (
+                        <p className="text-xs text-slate-500">No contactpersons added yet.</p>
+                      )}
+
+                      {editingForm?.contactpersons.map((c, index) => (
+                        <div
+                          key={index}
+                          className="grid md:grid-cols-4 gap-3 p-4 border rounded-lg bg-white relative"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => removeContact(index)}
+                            className="absolute right-3 top-3 text-red-600 text-xs"
+                          >
+                            Remove
+                          </button>
+
+                          <div>
+                            <label className="text-xs text-slate-600">Name</label>
+                            <input
+                              value={c.name}
+                              onChange={(e) => updateContact(index, "name", e.target.value)}
+                              className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-xs text-slate-600">Email</label>
+                            <input
+                              value={c.email}
+                              onChange={(e) => updateContact(index, "email", e.target.value)}
+                              className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-xs text-slate-600">Phone</label>
+                            <input
+                              value={c.phone}
+                              onChange={(e) => updateContact(index, "phone", e.target.value)}
+                              className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="text-xs text-slate-600">Post / Role</label>
+                            <input
+                              value={c.post}
+                              onChange={(e) => updateContact(index, "post", e.target.value)}
+                              className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                     <div className="flex justify-end gap-3">
                       <button

@@ -1,4 +1,5 @@
 // src/components/AdSlot.jsx (unchanged behavior, clean style)
+let API_File = import.meta.env.VITE_API_File
 export default function AdSlot({ campaign, variant = "billboard" }) {
   if (!campaign) return null;
   const { href, image, title, label = "Sponsored" } = campaign;
@@ -12,7 +13,7 @@ export default function AdSlot({ campaign, variant = "billboard" }) {
         <div className="aspect-[16/9] w-full rounded-xl overflow-hidden bg-gray-100">
           {image && (
             <img
-              src={image}
+              src={API_File+image}
               alt={title}
               className="h-full w-full object-cover transition group-hover:scale-[1.02]"
               loading="lazy"

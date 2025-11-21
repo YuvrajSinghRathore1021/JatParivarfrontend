@@ -8,7 +8,7 @@ import { useLang } from '../../../lib/useLang'
 import { fetchMyMatrimonyProfile, saveMatrimonyProfile } from '../../../lib/dashboardApi'
 import { asOptions as gotraOptions } from '../../../constants/gotras'
 import { upload } from '../../../lib/api'
-
+let API_File = import.meta.env.VITE_API_File
 const genders = [
   { value: 'male', labelEn: 'Male', labelHi: 'पुरुष' },
   { value: 'female', labelEn: 'Female', labelHi: 'महिला' },
@@ -435,7 +435,7 @@ export default function MatrimonyProfileForm() {
               <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {form.photos.map((photo, idx) => (
                   <li key={photo} className="relative overflow-hidden rounded-2xl border border-slate-200">
-                    <img src={photo} alt={`Matrimony upload ${idx + 1}`} className="h-36 w-full object-cover" />
+                    <img src={API_File + photo} alt={`Matrimony upload ${idx + 1}`} className="h-36 w-full object-cover" />
                     <button
                       type="button"
                       onClick={() => removePhoto(idx)}

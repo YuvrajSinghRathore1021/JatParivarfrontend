@@ -15,8 +15,8 @@ export default function CardProduct({
       className="block focus:outline-none"
       role="listitem"
     >
-      <article className="bg-white rounded-2xl border border-gray-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] focus-visible:ring-4 focus-visible:ring-black/10">
-        <div className="aspect-square  bg-white grid place-items-center overflow-hidden">
+      <article className="bg-white rounded-2xl border max-h-90 max-w-90 border-gray-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] focus-visible:ring-4 focus-visible:ring-black/10">
+        <div className="aspect-square  bg-white grid place-items-center overflow-hidden ">
           <img
             src={API_File + image}
             alt={title}

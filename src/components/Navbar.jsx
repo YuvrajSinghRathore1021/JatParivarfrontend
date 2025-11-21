@@ -49,7 +49,7 @@ export default function Navbar() {
         radius: 60,
       })
     }
-    return user.avatarUrl
+    return API_File+user.avatarUrl
   }, [avatarError, user])
 
   useEffect(() => {
@@ -60,12 +60,12 @@ export default function Navbar() {
   }, [])
 
   useEffect(() => {
-  if (open) {
-    document.body.style.overflow = "hidden";  
-  } else {
-    document.body.style.overflow = "auto"; 
-  }
-}, [open]);
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [open]);
 
 
 
@@ -152,7 +152,7 @@ export default function Navbar() {
     <>
       <header
         className={[
-          'fixed inset-x-0 top-0 z-50 transition border-b overflow-x-hidden',
+          'fixed inset-x-0 top-0 z-50 transition border-b ',
           scrolled ? 'bg-white/95 backdrop-blur shadow-sm border-slate-200' : 'bg-white/90 border-transparent',
         ].join(' ')}
         role="banner"
@@ -244,104 +244,104 @@ export default function Navbar() {
       </header>
 
       {/* Mobile Sidebar */}
-  <div
-  className={[
-    'fixed inset-0 z-50 lg:hidden transition',
-    open ? 'pointer-events-auto' : 'pointer-events-none'
-  ].join(' ')}
-  aria-hidden={!open}
->
-    {/* Background Overlay */}
-    <div
-      onClick={() => setOpen(false)}
-      className={[
-        'absolute inset-0 bg-black/40 transition-opacity duration-300',
-        open ? 'opacity-100' : 'opacity-0'
-      ].join(' ')}
-    />
-
-    {/* Sidebar */}
-    <aside
-      className={[
-        'absolute top-0 right-0 h-full w-[86%] max-w-[360px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out  overflow-y-auto',
-        open ? 'translate-x-0' : 'translate-x-full'
-      ].join(' ')}
-      role="dialog"
-      aria-label="Mobile navigation"
-    >
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between overflow-y-auto">
-        <span className="text-lg font-extrabold text-gray-900">Jat Parivar</span>
-
-        <button
+      <div
+        className={[
+          'fixed inset-0 z-50 lg:hidden transition',
+          open ? 'pointer-events-auto' : 'pointer-events-none'
+        ].join(' ')}
+        aria-hidden={!open}
+      >
+        {/* Background Overlay */}
+        <div
           onClick={() => setOpen(false)}
-          className="h-9 w-9 grid place-items-center rounded-md hover:bg-gray-100 "
-          aria-label="Close menu"
+          className={[
+            'absolute inset-0 bg-black/40 transition-opacity duration-300',
+            open ? 'opacity-100' : 'opacity-0'
+          ].join(' ')}
+        />
+
+        {/* Sidebar */}
+        <aside
+          className={[
+            'absolute top-0 right-0 h-full w-[86%] max-w-[360px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out  overflow-y-auto',
+            open ? 'translate-x-0' : 'translate-x-full'
+          ].join(' ')}
+          role="dialog"
+          aria-label="Mobile navigation"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6.4 5l12.6 12.6-1.4 1.4L5 6.4 6.4 5z" />
-            <path d="M18.6 5L6 17.6l-1.4-1.4L17.2 3.6 18.6 5z" />
-          </svg>
-        </button>
+          {/* Header */}
+          <div className="p-4 border-b border-gray-200 flex items-center justify-between overflow-y-auto">
+            <span className="text-lg font-extrabold text-gray-900">Jat Parivar</span>
+
+            <button
+              onClick={() => setOpen(false)}
+              className="h-9 w-9 grid place-items-center rounded-md hover:bg-gray-100 "
+              aria-label="Close menu"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.4 5l12.6 12.6-1.4 1.4L5 6.4 6.4 5z" />
+                <path d="M18.6 5L6 17.6l-1.4-1.4L17.2 3.6 18.6 5z" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Navigation */}
+          <nav className="p-4" aria-label="Mobile">
+            <ul className="space-y-1">
+              {navItems.map((it) => (
+                <li key={it.key}>
+                  <Link
+                    to={makePath(it.segment)}
+                    onClick={() => setOpen(false)}
+                    className="block px-3 py-3 rounded-lg text-base font-medium text-gray-900 hover:bg-gray-100"
+                  >
+                    {translate(it)}
+                  </Link>
+                </li>
+              ))}
+
+              {externalItems.map((it) => (
+                <li key={it.href}>
+                  <a
+                    href={it.href}
+                    target="_blank"
+                    rel="noopener"
+                    onClick={() => setOpen(false)}
+                    className="block px-3 py-3 rounded-lg text-base font-medium text-gray-900 hover:bg-gray-100"
+                  >
+                    {translate(it)}
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            {/* Buttons */}
+            <div className="mt-4 border-t border-gray-200 pt-4 flex items-center gap-2">
+              <button
+                onClick={() => switchLang('en')}
+                className={[
+                  'inline-flex items-center justify-center px-3 h-10 rounded-lg text-sm font-semibold',
+                  lang === 'en' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'
+                ].join(' ')}
+              >
+                EN
+              </button>
+
+              <button
+                onClick={() => switchLang('hi')}
+                className={[
+                  'inline-flex items-center justify-center px-3 h-10 rounded-lg text-sm font-semibold',
+                  lang === 'hi' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'
+                ].join(' ')}
+              >
+                HI
+              </button>
+
+              {renderAuthMobile()}
+            </div>
+          </nav>
+        </aside>
       </div>
-
-      {/* Navigation */}
-      <nav className="p-4" aria-label="Mobile">
-        <ul className="space-y-1">
-          {navItems.map((it) => (
-            <li key={it.key}>
-              <Link
-                to={makePath(it.segment)}
-                onClick={() => setOpen(false)}
-                className="block px-3 py-3 rounded-lg text-base font-medium text-gray-900 hover:bg-gray-100"
-              >
-                {translate(it)}
-              </Link>
-            </li>
-          ))}
-
-          {externalItems.map((it) => (
-            <li key={it.href}>
-              <a
-                href={it.href}
-                target="_blank"
-                rel="noopener"
-                onClick={() => setOpen(false)}
-                className="block px-3 py-3 rounded-lg text-base font-medium text-gray-900 hover:bg-gray-100"
-              >
-                {translate(it)}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        {/* Buttons */}
-        <div className="mt-4 border-t border-gray-200 pt-4 flex items-center gap-2">
-          <button
-            onClick={() => switchLang('en')}
-            className={[
-              'inline-flex items-center justify-center px-3 h-10 rounded-lg text-sm font-semibold',
-              lang === 'en' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'
-            ].join(' ')}
-          >
-            EN
-          </button>
-
-          <button
-            onClick={() => switchLang('hi')}
-            className={[
-              'inline-flex items-center justify-center px-3 h-10 rounded-lg text-sm font-semibold',
-              lang === 'hi' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'
-            ].join(' ')}
-          >
-            HI
-          </button>
-
-          {renderAuthMobile()}
-        </div>
-      </nav>
-    </aside>
-  </div>
 
 
       <div className="h-16" />

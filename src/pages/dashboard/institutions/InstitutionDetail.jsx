@@ -161,7 +161,7 @@ export default function InstitutionDetail() {
         <div className="space-y-8 pb-20">
 
             {/* ===== Banner ===== */}
-            <div className="relative h-48 md:h-64 w-full bg-slate-100 rounded-2xl overflow-hidden shadow">
+            {/* <div className="relative h-48 md:h-64 w-full bg-slate-100 rounded-2xl overflow-hidden shadow">
                 {item.images?.length > 0 ? (
                     <img
                         src={item.images[0]?.url}
@@ -173,7 +173,7 @@ export default function InstitutionDetail() {
                         {lang === "hi" ? "कोई फोटो उपलब्ध नहीं" : "No Image Available"}
                     </div>
                 )}
-            </div>
+            </div> */}
 
             {/* ===== Title + Description ===== */}
             <section className="px-4 space-y-3">

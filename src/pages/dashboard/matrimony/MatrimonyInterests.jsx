@@ -7,7 +7,7 @@ import {
 } from '../../../lib/dashboardApi'
 import { useLang } from '../../../lib/useLang'
 import { makeInitialAvatar } from '../../../lib/avatar'
-
+let API_File = import.meta.env.VITE_API_File
 export default function MatrimonyInterests() {
   const { lang } = useLang()
   const qc = useQueryClient()
@@ -44,7 +44,7 @@ export default function MatrimonyInterests() {
           <div className="mt-4 space-y-3">
             {incoming.map((item) => {
               const user = item.user || {}
-              const avatar = user.avatarUrl || makeInitialAvatar(user.displayName || 'Member', { size: 80, radius: 24 })
+              const avatar = API_File+user.avatarUrl || makeInitialAvatar(user.displayName || 'Member', { size: 80, radius: 24 })
               return (
                 <article key={item.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -98,7 +98,7 @@ export default function MatrimonyInterests() {
           <div className="mt-4 space-y-3">
             {outgoing.map((item) => {
               const user = item.user || {}
-              const avatar = user.avatarUrl || makeInitialAvatar(user.displayName || 'Member', { size: 80, radius: 24 })
+              const avatar = API_File+user.avatarUrl || makeInitialAvatar(user.displayName || 'Member', { size: 80, radius: 24 })
               return (
                 <article key={item.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-center gap-4">

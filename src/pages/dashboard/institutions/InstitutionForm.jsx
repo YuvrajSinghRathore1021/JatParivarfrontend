@@ -32,12 +32,13 @@ const emptyForm = {
   contactName: '',
   contactPhone: '',
   contactEmail: '',
+  contactpersons: []
 }
 
 export default function InstitutionForm({ kind }) {
   const { lang } = useLang()
   const qc = useQueryClient()
-  const [form, setForm] = useState(emptyForm) 
+  const [form, setForm] = useState(emptyForm)
   const [message, setMessage] = useState('')
   const labels = copy[kind] || copy.dharamshala
 
@@ -78,7 +79,32 @@ export default function InstitutionForm({ kind }) {
         phone: form.contactPhone,
         email: form.contactEmail,
       },
+      contactpersons: form.contactpersons
     })
+  }
+  const addContact = () => {
+    setForm(prev => ({
+      ...prev,
+      contactpersons: [
+        ...prev.contactpersons,
+        { name: "", email: "", phone: "", post: "" }
+      ]
+    }))
+  }
+
+  const updateContact = (index, field, value) => {
+    setForm(prev => {
+      const list = [...prev.contactpersons]
+      list[index][field] = value
+      return { ...prev, contactpersons: list }
+    })
+  }
+
+  const removeContact = (index) => {
+    setForm(prev => ({
+      ...prev,
+      contactpersons: prev.contactpersons.filter((_, i) => i !== index)
+    }))
   }
 
   return (
@@ -176,7 +202,79 @@ export default function InstitutionForm({ kind }) {
           <span className="font-semibold text-slate-600">{lang === 'hi' ? 'ईमेल' : 'Email'}</span>
           <input value={form.contactEmail} onChange={handleChange('contactEmail')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
         </label>
+      
       </div>
+        {/* ===========================
+    CONTACTS SECTION
+   =========================== */}
+        <div className="border p-4 rounded-xl space-y-3 bg-slate-50">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold">Contact Persons</p>
+
+            <button
+              type="button"
+              onClick={addContact}
+              className="px-3 py-1 text-xs bg-blue-600 text-white rounded-lg"
+            >
+              Add Contact
+            </button>
+          </div>
+
+          {form?.contactpersons?.length === 0 && (
+            <p className="text-xs text-slate-500">No contactpersons added yet.</p>
+          )}
+
+          {form.contactpersons.map((c, index) => (
+            <div
+              key={index}
+              className="grid md:grid-cols-4 gap-3 p-4 border rounded-lg bg-white relative"
+            >
+              <button
+                type="button"
+                onClick={() => removeContact(index)}
+                className="absolute right-3 top-3 text-red-600 text-xs"
+              >
+                Remove
+              </button>
+
+              <div>
+                <label className="text-xs text-slate-600">Name</label>
+                <input
+                  value={c.name}
+                  onChange={(e) => updateContact(index, "name", e.target.value)}
+                  className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-600">Email</label>
+                <input
+                  value={c.email}
+                  onChange={(e) => updateContact(index, "email", e.target.value)}
+                  className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-600">Phone</label>
+                <input
+                  value={c.phone}
+                  onChange={(e) => updateContact(index, "phone", e.target.value)}
+                  className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-600">Post / Role</label>
+                <input
+                  value={c.post}
+                  onChange={(e) => updateContact(index, "post", e.target.value)}
+                  className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
 
       <div className="flex justify-end">
         <button
