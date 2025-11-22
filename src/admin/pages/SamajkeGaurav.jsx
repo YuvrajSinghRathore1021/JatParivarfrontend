@@ -129,9 +129,13 @@ function GauravCard({ item, onSaved }) {
                 <div>
                     <h2 className="text-lg font-semibold">{item.name}</h2>
                     <p className="text-xs text-slate-500 capitalize">
-                        {item.timeline} • {item.category}
+                        past: {item.past.category}
+                    </p>
+                    <p className="text-xs text-slate-500 capitalize">
+                        present: {item.present.category}
                     </p>
                 </div>
+              
             </div>
 
             <p className="text-sm mt-2 line-clamp-2 text-slate-600">
