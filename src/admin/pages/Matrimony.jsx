@@ -67,84 +67,84 @@ function InstitutionCard({ item, onSaved }) {
 
 
     return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
 
-        {/* Basic Info */}
-        <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">
-                {item.gender === "male" ? "Male" : "Female"} • {item.age} yrs
-            </h2>
-            <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-700">
-                {item.visible ? "Visible" : "Hidden"}
-            </span>
-        </div>
+            {/* Basic Info */}
+            <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">
+                    {item?.name} • {item.gender === "male" ? "Male" : "Female"} • {item.age} yrs
+                </h2>
+                <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-700">
+                    {item.visible ? "Visible" : "Hidden"}
+                </span>
+            </div>
 
-        {/* Location */}
-        <p className="text-sm text-slate-600 mt-1">
-            {item.village ? item.village + ", " : ""}
-            {item.city}, {item.district}, {item.state}
-        </p>
+            {/* Location */}
+            <p className="text-sm text-slate-600 mt-1">
+                {item.village ? item.village + ", " : ""}
+                {item.city}, {item.district}, {item.state}
+            </p>
 
-        {/* Education + Occupation */}
-        <div className="mt-2 text-sm text-slate-700 space-y-1">
+            {/* Education + Occupation */}
+            {/* <div className="mt-2 text-sm text-slate-700 space-y-1">
             <p><b>Education:</b> {item.education || "Not provided"}</p>
             <p><b>Occupation:</b> {item.occupation || "Not provided"}</p>
-        </div>
+        </div> */}
 
-        {/* Height + Marital Status */}
-        <div className="mt-2 text-sm text-slate-700 space-y-1">
-            <p><b>Height:</b> {item.hight ? item.hight + " inch" : "Not provided"}</p>
-            <p><b>Status:</b> {item.maritalStatus}</p>
-        </div>
-
-        {/* Gotra */}
-        <div className="mt-3 text-sm">
-            <b>Gotra:</b>
-            <div className="text-slate-700 mt-1">
-                <p>Self: {item.gotra?.self}</p>
-                <p>Mother: {item.gotra?.mother}</p>
-                <p>Nani: {item.gotra?.nani}</p>
-                <p>Dadi: {item.gotra?.dadi}</p>
+            {/* Height + Marital Status */}
+            <div className="mt-2 text-sm text-slate-700 space-y-1">
+                <p><b>Height:</b> {item.hight ? item.hight + " inch" : "Not provided"}</p>
+                <p><b>Status:</b> {item.maritalStatus}</p>
             </div>
-        </div>
 
-        {/* Photos */}
-        {item.photos?.length > 0 ? (
-            <div className="flex gap-2 mt-3 overflow-x-auto">
-                {item.photos.map((p, i) => (
-                    <img
-                        key={i}
-                        src={API_File+p}
-                        className="w-20 h-20 object-cover rounded-md border"
-                    />
-                ))}
+            {/* Gotra */}
+            <div className="mt-3 text-sm">
+                <b>Gotra:</b>
+                <div className="text-slate-700 mt-1">
+                    <p>Self: {item.gotra?.self}</p>
+                    <p>Mother: {item.gotra?.mother}</p>
+                    <p>Nani: {item.gotra?.nani}</p>
+                    <p>Dadi: {item.gotra?.dadi}</p>
+                </div>
             </div>
-        ) : (
-            <p className="text-xs text-slate-400 mt-3">No photos uploaded.</p>
-        )}
 
-        {/* Buttons */}
-        <div className="flex items-center justify-between mt-4 text-sm">
-            <div className="flex gap-2">
-                <button
-                    onClick={toggleDelete}
-                    disabled={busy}
-                    className="rounded border border-red-300 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60"
-                >
-                    {busy ? "Deleting…" : "Delete"}
-                </button>
+            {/* Photos */}
+            {item.photos?.length > 0 ? (
+                <div className="flex gap-2 mt-3 overflow-x-auto">
+                    {item.photos.map((p, i) => (
+                        <img
+                            key={i}
+                            src={API_File + p}
+                            className="w-20 h-20 object-cover rounded-md border"
+                        />
+                    ))}
+                </div>
+            ) : (
+                <p className="text-xs text-slate-400 mt-3">No photos uploaded.</p>
+            )}
 
-                <Link
-                    to={`/admin/matrimony/${item?._id}`}
-                    className="px-3 py-2 border rounded text-slate-700 hover:bg-slate-100"
-                >
-                    Edit
-                </Link>
+            {/* Buttons */}
+            <div className="flex items-center justify-between mt-4 text-sm">
+                <div className="flex gap-2">
+                    <button
+                        onClick={toggleDelete}
+                        disabled={busy}
+                        className="rounded border border-red-300 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60"
+                    >
+                        {busy ? "Deleting…" : "Delete"}
+                    </button>
+
+                    <Link
+                        to={`/admin/matrimony/${item?._id}`}
+                        className="px-3 py-2 border rounded text-slate-700 hover:bg-slate-100"
+                    >
+                        Edit
+                    </Link>
+                </div>
             </div>
-        </div>
 
-    </div>
-);
+        </div>
+    );
 
 }
 

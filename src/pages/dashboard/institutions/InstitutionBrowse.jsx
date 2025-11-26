@@ -38,7 +38,12 @@ export default function InstitutionBrowse({ kind }) {
   }, [data, query])
 
   function urlmake(item) {
-    return `/${lang}/dashboard/dharamshalaye/${item._id}`;
+    if (kind == "dharamshala") {
+      return `/${lang}/dashboard/dharamshalaye/${item._id}`;
+    } else if (kind == "sanstha") {
+      return `/${lang}/dashboard/sansthaye/${item._id}`;
+    }
+    return;
   }
   return (
     <div className="space-y-6">
@@ -77,7 +82,9 @@ export default function InstitutionBrowse({ kind }) {
               <Link to={urlmake(item)}>
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900">{lang === 'hi' ? item.titleHi || item.titleEn : item.titleEn || item.titleHi}</h3>
-                  <p className="text-sm text-slate-500">{lang === 'hi' ? item.descriptionHi || item.descriptionEn : item.descriptionEn || item.descriptionHi}</p>
+                  {kind == "sanstha" && (
+                    <p className="text-sm text-slate-500">{lang === 'hi' ? 'व्यवसाय:' : 'Business:'} {lang === 'hi' ? item?.businessHi || item?.businessEn : item?.businessEn || item?.businessHi}</p>
+                  )}
                 </div>
                 <p className="text-xs uppercase tracking-wide text-slate-400">
                   {[item.city, item.state].filter(Boolean).join(', ') || '—'}

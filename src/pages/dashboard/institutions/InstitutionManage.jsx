@@ -79,6 +79,8 @@ export default function InstitutionManage({ kind }) {
         titleHi: editingForm.titleHi || '',
         descriptionEn: editingForm.descriptionEn || '',
         descriptionHi: editingForm.descriptionHi || '',
+        businessEn: editingForm.businessEn || '',
+        businessHi: editingForm.businessHi || '',
         state: editingForm.state || '',
         district: editingForm.district || '',
         city: editingForm.city || '',
@@ -173,6 +175,8 @@ export default function InstitutionManage({ kind }) {
                           titleHi: item.titleHi || '',
                           descriptionEn: item.descriptionEn || '',
                           descriptionHi: item.descriptionHi || '',
+                          businessEn: item.businessEn || '',
+                          businessHi: item.businessHi || '',
                           state: item.state || '',
                           stateCode: '',
                           district: item.district || '',
@@ -183,7 +187,7 @@ export default function InstitutionManage({ kind }) {
                           contactName: item.contact?.name || '',
                           contactPhone: item.contact?.phone || '',
                           contactEmail: item.contact?.email || '',
-                          contactpersons:item?.contactpersons || []
+                          contactpersons: item?.contactpersons || []
                         })
                       }
                     }}
@@ -204,6 +208,18 @@ export default function InstitutionManage({ kind }) {
                         <span>{lang === 'hi' ? 'शीर्षक (हिंदी)' : 'Title (Hindi)'}</span>
                         <input value={editingForm.titleHi} onChange={updateEditingField('titleHi')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
                       </label>
+
+                      {kind == "sanstha" && (<>
+                        <label className="text-sm text-slate-600">
+                          <span>{lang === 'hi' ? 'व्यवसाय (English)' : 'Business (English)'}</span>
+                          <input value={editingForm.businessEn} onChange={updateEditingField('businessEn')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                        </label>
+                        <label className="text-sm text-slate-600">
+                          <span>{lang === 'hi' ? 'व्यवसाय (हिंदी)' : 'Business (Hindi)'}</span>
+                          <input value={editingForm.businessHi} onChange={updateEditingField('businessHi')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                        </label>
+                      </>)}
+
                       <label className="text-sm text-slate-600 md:col-span-2">
                         <span>{lang === 'hi' ? 'विवरण (English)' : 'Description (English)'}</span>
                         <textarea value={editingForm.descriptionEn} onChange={updateEditingField('descriptionEn')} rows={3} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
@@ -212,6 +228,9 @@ export default function InstitutionManage({ kind }) {
                         <span>{lang === 'hi' ? 'विवरण (हिंदी)' : 'Description (Hindi)'}</span>
                         <textarea value={editingForm.descriptionHi} onChange={updateEditingField('descriptionHi')} rows={3} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
                       </label>
+
+
+
                       <SelectField
                         label={lang === 'hi' ? 'राज्य' : 'State'}
                         value={editingForm.stateCode}

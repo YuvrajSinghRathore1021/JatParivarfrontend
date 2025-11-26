@@ -134,7 +134,6 @@ function InstitutionCard({ item, onSaved }) {
 }
 
 function InstitutionFormButton({ item, kind, onSaved }) {
-  console.log(item)
   const { token } = useAdminAuth()
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -144,6 +143,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
     item || {
       kind: kind || 'dharamshala',
       titleEn: '',
+      businessEn: '',
       addressEn: '',
       state: '',
       district: '',
@@ -287,7 +287,12 @@ function InstitutionFormButton({ item, kind, onSaved }) {
             <label className="text-xs font-medium text-slate-600">Title (EN)</label>
             <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" required />
           </div>
-
+          {form?.kind == "sanstha" && (
+            <div>
+              <label className="text-xs font-medium text-slate-600">Business (EN)</label>
+              <input value={form.businessEn} onChange={(e) => setForm({ ...form, businessEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+            </div>
+          )}
           <div>
             <label className="text-xs font-medium text-slate-600">Description (EN)</label>
             <textarea value={form.descriptionEn || ''} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />

@@ -127,8 +127,8 @@ import { useParams } from "react-router-dom";
 import { fetchInstitutions } from "../../../lib/dashboardApi";
 import { useLang } from "../../../lib/useLang";
 
-export default function InstitutionDetail() {
-    const { id, kind } = useParams();
+export default function InstitutionDetail({kind}) {
+    const { id } = useParams();
     const { lang } = useLang();
 
     const { data: item, isLoading } = useQuery({
@@ -178,6 +178,9 @@ export default function InstitutionDetail() {
             {/* ===== Title + Description ===== */}
             <section className="px-4 space-y-3">
                 <h1 className="text-3xl font-bold text-slate-900">{title}</h1>
+                {kind == "sanstha" && (
+                    <p className="text-sm text-slate-500">{lang === 'hi' ? 'व्यवसाय:' : 'Business:'} {lang === 'hi' ? item?.businessHi || item?.businessEn : item?.businessEn || item?.businessHi}</p>
+                )}
                 <p className="text-slate-600">{desc}</p>
             </section>
 

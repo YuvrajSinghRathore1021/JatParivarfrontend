@@ -101,6 +101,7 @@ export default function JobBoard() {
                       </p>
                     )}
                   </div>
+                  {!job.applied &&(
                   <button
                     type="button"
                     onClick={() => setExpanded((prev) => (prev === job.id ? null : job.id))}
@@ -114,6 +115,7 @@ export default function JobBoard() {
                       ? 'आवेदन करें'
                       : 'Apply now'}
                   </button>
+                  )}
                 </div>
 
                 {isExpanded && (

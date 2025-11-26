@@ -2,6 +2,7 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useLang } from '../../../lib/useLang'
+import { Link } from 'react-router-dom'
 import {
   fetchMatrimonyProfiles,
   fetchMatrimonyInterests,
@@ -42,6 +43,10 @@ export default function MatrimonyBrowse() {
   })
 
   const sortedProfiles = profiles || []
+
+  function urlmake(item) {
+    return `/${lang}/dashboard/matrimony/${item.id}`;
+  }
 
   return (
     <div className="space-y-6">
@@ -86,43 +91,39 @@ export default function MatrimonyBrowse() {
         <div className="grid gap-4 md:grid-cols-2">
           {sortedProfiles.map((profile) => {
             const user = profile.user || {}
-            const avatar =API_File+ user.avatarUrl || makeInitialAvatar(user.displayName || 'Member', { size: 96, radius: 28 })
+            const avatar = API_File + profile?.photos?.[0] || API_File + user.avatarUrl || makeInitialAvatar(profile?.name || user.displayName || 'Member', { size: 96, radius: 28 })
             const interested = user.id ? likedSet.has(user.id) : false
             return (
               <article key={profile.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
-                <header className="flex items-center gap-4">
-                  <img src={avatar} alt={user.displayName} className="h-14 w-14 rounded-2xl object-cover" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-900">
-                      {user.displayName || (lang === 'hi' ? 'सदस्य' : 'Member')}
-                    </h3>
-                    <p className="text-sm text-slate-500">{profile.age ? `${profile.age} ${lang === 'hi' ? 'वर्ष' : 'years'}` : '—'}</p>
-                  </div>
-                </header>
-                <dl className="grid grid-cols-2 gap-3 text-xs text-slate-600">
-                  <div>
-                    <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'गोत्र' : 'Gotra'}</dt>
-                    <dd>{profile.gotra?.self || '—'}</dd>
-                  </div>
-                  <div>
-                    <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'शिक्षा' : 'Education'}</dt>
-                    <dd>{profile.education || '—'}</dd>
-                  </div>
-                  <div>
-                    <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'लंबाई' : 'Hight'}</dt>
-                    <dd>{profile.height || '—'}</dd>
-                  </div>
-                  <div>
-                    <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</dt>
-                    <dd>{profile.occupation || user.occupation || '—'}</dd>
-                  </div>
-                  <div>
-                    <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'स्थान' : 'Location'}</dt>
-                    <dd>
-                      {[profile.location?.city, profile.location?.state].filter(Boolean).join(', ') || '—'}
-                    </dd>
-                  </div>
-                </dl>
+                <Link to={urlmake(profile)}>
+                  <header className="flex items-center gap-4">
+                    <img src={avatar} alt={profile?.name || user.displayName} className="h-14 w-14 rounded-2xl object-cover" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900">
+                        {profile?.name || user.displayName || (lang === 'hi' ? 'सदस्य' : 'Member')}
+                      </h3>
+                      <p className="text-sm text-slate-500">{profile.age ? `${profile.age} ${lang === 'hi' ? 'वर्ष' : 'years'}` : '—'}</p>
+                    </div>
+                  </header>
+                  <dl className="grid grid-cols-2 gap-3 text-xs text-slate-600">
+                    <div>
+                      <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'गोत्र' : 'Gotra'}</dt>
+                      <dd>{profile.gotra?.self || '—'}</dd>
+                    </div>
+
+                    <div>
+                      <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'लंबाई' : 'Hight'}</dt>
+                      <dd>{profile.height || '—'}</dd>
+                    </div>
+
+                    <div>
+                      <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'स्थान' : 'Location'}</dt>
+                      <dd>
+                        {[profile.location?.city, profile.location?.state].filter(Boolean).join(', ') || '—'}
+                      </dd>
+                    </div>
+                  </dl>
+                </Link>
                 <button
                   type="button"
                   onClick={() => user.id && interestMutation.mutate(user.id)}
@@ -134,8 +135,8 @@ export default function MatrimonyBrowse() {
                       ? 'रुचि भेज दी गई'
                       : 'Interest sent'
                     : lang === 'hi'
-                    ? 'रुचि दिखाएँ'
-                    : 'Express interest'}
+                      ? 'रुचि दिखाएँ'
+                      : 'Express interest'}
                 </button>
               </article>
             )

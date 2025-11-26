@@ -28,6 +28,7 @@ const maritalStatuses = [
 const emptyForm = {
     age: '',
     gender: 'male',
+    name: '',
     height: '',
     maritalStatus: 'never_married',
     education: '',
@@ -45,7 +46,7 @@ const emptyForm = {
     gotraDadi: '',
     visible: true,
     photos: [],
-    
+
 }
 
 export default function MatrimonyDetail() {
@@ -53,7 +54,7 @@ export default function MatrimonyDetail() {
     const { id } = useParams()
     let lang = "en"
     const qc = useQueryClient()
-    
+
     // const { data, isLoading } = useQuery({
     //     queryKey: ['matrimony', 'profile'],
     //     queryFn: fetchMyMatrimonyProfile,
@@ -96,6 +97,7 @@ export default function MatrimonyDetail() {
 
         setForm({
             age: data?.age || '',
+            name: data?.name || '',
             gender: data?.gender || 'male',
             maritalStatus: data?.maritalStatus || 'never_married',
             education: data?.education || '',
@@ -170,6 +172,7 @@ export default function MatrimonyDetail() {
             id: id,
             age: form.age ? Number(form.age) : undefined,
             gender: form.gender,
+            name: form.name,
             maritalStatus: form.maritalStatus,
             education: form.education,
             occupation: form.occupation,
@@ -237,6 +240,15 @@ export default function MatrimonyDetail() {
                 <div className="h-48 rounded-3xl bg-slate-100 animate-pulse" aria-hidden="true" />
             ) : (
                 <div className="grid gap-6 md:grid-cols-2">
+                    <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'नाम' : 'Name'}</span>
+                        <input
+                            type="text"
+                            value={form?.name}
+                            onChange={handleChange('name')}
+                            className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+                        />
+                    </label>
                     <label className="block text-sm">
                         <span className="font-semibold text-slate-600">{lang === 'hi' ? 'आयु' : 'Age'}</span>
                         <input

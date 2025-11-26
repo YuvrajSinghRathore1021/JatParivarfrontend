@@ -3,6 +3,7 @@ import { useLang } from '../../../lib/useLang'
 import MatrimonyBrowse from './MatrimonyBrowse'
 import MatrimonyProfileForm from './MatrimonyProfileForm'
 import MatrimonyInterests from './MatrimonyInterests'
+import MatrimonyDetail from './MatrimonyDetail'
 
 
 /**
@@ -69,6 +70,7 @@ export default function MatrimonyRoutes() {
         <Route index element={<MatrimonyBrowse />} />
         <Route path="profile" element={<MatrimonyProfileForm />} />
         <Route path="interests" element={<MatrimonyInterests />} />
+        <Route path="/:id" element={<MatrimonyDetail />} />
       </Route>
     </Routes>
   )

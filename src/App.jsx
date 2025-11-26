@@ -26,6 +26,7 @@ import Subscriptions from './pages/Subscriptions'
 import PersonDetail from './pages/people/PersonDetail'
 import SamajKeGaurav from './pages/people/Samajgorav.jsx'
 import GoravDetails from './pages/people/GoravDetails.jsx'
+import Gorav from './pages/people/Gorav.jsx'
 import { useLang, DEFAULT_LANG, SUPPORTED_LANGS } from './lib/useLang'
 import i18n from './i18n'
 import AdminApp from './admin/AdminApp.jsx'
@@ -107,6 +108,7 @@ export default function App() {
         <Route path="subscriptions" element={<Subscriptions />} />
         <Route path="samajKeGaurav" element={<SamajKeGaurav />} />
         <Route path="samajKeGaurav/:personId" element={<GoravDetails />} />
+        <Route path="samaj_ke_gaurav/:categoryname" element={<Gorav />} />
 
         <Route path="*" element={<Navigate to="." replace />} />
 
