@@ -157,9 +157,9 @@ function DashboardTopBar() {
 
         <div className="ml-auto flex items-center gap-3">
           <div className="hidden text-right sm:block">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {/* <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               {lang === 'hi' ? 'स्वागत है' : 'Welcome back'}
-            </p>
+            </p> */}
             <p className="text-sm font-semibold text-slate-900">
               {user?.displayName || user?.name || user?.phone || 'Member'}
             </p>

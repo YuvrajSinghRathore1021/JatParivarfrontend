@@ -127,7 +127,7 @@ import { useParams } from "react-router-dom";
 import { fetchInstitutions } from "../../../lib/dashboardApi";
 import { useLang } from "../../../lib/useLang";
 
-export default function InstitutionDetail({kind}) {
+export default function InstitutionDetail({ kind, web = false }) {
     const { id } = useParams();
     const { lang } = useLang();
 
@@ -158,7 +158,8 @@ export default function InstitutionDetail({kind}) {
     const desc = lang === "hi" ? item.descriptionHi || item.descriptionEn : item.descriptionEn || item.descriptionHi;
 
     return (
-        <div className="space-y-8 pb-20">
+        <div className={web == true ? 'mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-16 space-y-10' : 'space-y-8 pb-20'}>
+            {/* <div className="space-y-8 pb-20"> */}
 
             {/* ===== Banner ===== */}
             {/* <div className="relative h-48 md:h-64 w-full bg-slate-100 rounded-2xl overflow-hidden shadow">

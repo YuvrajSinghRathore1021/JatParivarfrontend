@@ -6,6 +6,7 @@ import { useLang } from '../lib/useLang'
 import { me } from '../lib/auth'
 import { makeInitialAvatar } from '../lib/avatar'
 let API_File = import.meta.env.VITE_API_File
+
 const navItems = [
   { key: 'home', labelEn: 'Home', labelHi: 'होम', segment: '' },
   { key: 'uddeshay', labelEn: 'Uddeshay', labelHi: 'उद्देश्य', segment: 'uddeshay' },
@@ -14,6 +15,8 @@ const navItems = [
   { key: 'visheshayen', labelEn: 'Highlights', labelHi: 'विशेषताएँ', segment: 'visheshayen' },
   { key: 'history', labelEn: 'History', labelHi: 'इतिहास', segment: 'history' },
   { key: 'news', labelEn: 'Community News', labelHi: 'कम्युनिटी न्यूज़', segment: 'news' },
+  { key: 'dharamshalaye', labelEn: 'Dharamshalae', labelHi: 'धर्मशालाएँ', segment: 'dharamshala' },
+  { key: 'sansthaye', labelEn: 'Sansthaye', labelHi: 'संस्थाएँ', segment: 'sanstha' },
   { key: 'samajKeGaurav', labelEn: 'Samaj Ke Gaurav', labelHi: 'समाज के गौरव', segment: 'samajKeGaurav' },
 ]
 
@@ -49,7 +52,7 @@ export default function Navbar() {
         radius: 60,
       })
     }
-    return API_File+user.avatarUrl
+    return API_File + user.avatarUrl
   }, [avatarError, user])
 
   useEffect(() => {

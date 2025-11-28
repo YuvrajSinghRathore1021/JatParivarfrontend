@@ -21,7 +21,7 @@ const copy = {
   },
 }
 
-export default function InstitutionBrowse({ kind }) {
+export default function InstitutionBrowse({ kind, web = false }) {
   const { lang } = useLang()
   const [query, setQuery] = useState('')
   const { data, isLoading } = useQuery({ queryKey: ['institutions', kind], queryFn: () => fetchInstitutions(kind) })
@@ -38,22 +38,28 @@ export default function InstitutionBrowse({ kind }) {
   }, [data, query])
 
   function urlmake(item) {
-    if (kind == "dharamshala") {
+    if (kind == "dharamshala" && web == false) {
       return `/${lang}/dashboard/dharamshalaye/${item._id}`;
-    } else if (kind == "sanstha") {
+    } else if (kind == "sanstha" && web == false) {
       return `/${lang}/dashboard/sansthaye/${item._id}`;
+    }
+    if (kind == "dharamshala" && web == true) {
+      return `/${lang}/dharamshala/${item._id}`;
+    } else if (kind == "sanstha" && web == true) {
+      return `/${lang}/sanstha/${item._id}`;
     }
     return;
   }
+  // mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-16 space-y-10
   return (
-    <div className="space-y-6">
+
+    <div className={web == true ? 'mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-16 space-y-10' : 'space-y-6'}>
+   
       <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900">{lang === 'hi' ? labels.titleHi : labels.titleEn}</h2>
           <p className="text-sm text-slate-600">
-            {lang === 'hi'
-              ? 'यहाँ केवल व्यवस्थापक द्वारा स्वीकृत सूची दिखाई देती है।'
-              : 'Only admin-approved listings are visible here.'}
+            {lang === 'hi' ? 'यहाँ केवल व्यवस्थापक द्वारा स्वीकृत सूची दिखाई देती है।' : 'Only admin-approved listings are visible here.'}
           </p>
         </div>
         <input
@@ -103,5 +109,6 @@ export default function InstitutionBrowse({ kind }) {
         </div>
       )}
     </div>
+
   )
 }

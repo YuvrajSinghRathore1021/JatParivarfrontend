@@ -211,7 +211,8 @@ export default function Overview() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl space-y-3">
             <h1 className="text-3xl font-extrabold text-slate-900">
-              {lang === 'hi' ? `${memberName} जी, स्वागत है` : `Welcome back, ${memberName}`}
+              {/* {lang === 'hi' ? `${memberName} जी, स्वागत है` : `Welcome back, ${memberName}`} */}
+              {lang === 'hi' ? `${memberName} ` : `${memberName}`}
             </h1>
             <p className="text-sm text-slate-600">{t.heroBody}</p>
             {user?.referralCode && (

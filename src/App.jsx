@@ -31,6 +31,10 @@ import { useLang, DEFAULT_LANG, SUPPORTED_LANGS } from './lib/useLang'
 import i18n from './i18n'
 import AdminApp from './admin/AdminApp.jsx'
 import { me } from './lib/auth'
+import InstitutionBrowse from './pages/dashboard/institutions/InstitutionBrowse.jsx';
+import InstitutionDetail from './pages/dashboard/institutions/InstitutionDetail.jsx';
+import Terms from './pages/Terms.jsx';
+import Policy from './pages/Policy.jsx';
 
 function LangLayout({ lang }) {
   const normalized = SUPPORTED_LANGS.includes(lang) ? lang : DEFAULT_LANG
@@ -109,6 +113,12 @@ export default function App() {
         <Route path="samajKeGaurav" element={<SamajKeGaurav />} />
         <Route path="samajKeGaurav/:personId" element={<GoravDetails />} />
         <Route path="samaj_ke_gaurav/:categoryname" element={<Gorav />} />
+        <Route path="legal/terms" element={<Terms />} />
+        <Route path="legal/privacy" element={<Policy />} />
+        <Route path="dharamshala" element={<InstitutionBrowse kind={"dharamshala"} web={true} />} />
+        <Route path="sanstha" element={<InstitutionBrowse kind={"sanstha"} web={true} />} />
+        <Route path="dharamshala/:id" element={<InstitutionDetail kind={"dharamshala"} web={true} />} />
+        <Route path="sanstha/:id" element={<InstitutionDetail kind={"sanstha"} web={true} />} />
 
         <Route path="*" element={<Navigate to="." replace />} />
 

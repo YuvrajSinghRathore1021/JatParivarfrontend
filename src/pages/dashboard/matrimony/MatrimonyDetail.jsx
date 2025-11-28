@@ -59,7 +59,7 @@ export default function MatrimonyDetail() {
             <section className="px-4">
                 <div className="rounded-xl bg-white shadow-sm border p-6 space-y-1">
                     <h2 className="text-lg font-semibold">Education</h2>
-                    <p className="text-slate-700">{item.education}</p>
+                    <p className="text-slate-700 break-all">{item.education}</p>
                 </div>
             </section>
 
@@ -67,7 +67,7 @@ export default function MatrimonyDetail() {
             <section className="px-4">
                 <div className="rounded-xl bg-white shadow-sm border p-6 space-y-1">
                     <h2 className="text-lg font-semibold">Occupation</h2>
-                    <p className="text-slate-700">{item.occupation}</p>
+                    <p className="text-slate-700 break-all" >{item.occupation}</p>
                 </div>
             </section>
 
