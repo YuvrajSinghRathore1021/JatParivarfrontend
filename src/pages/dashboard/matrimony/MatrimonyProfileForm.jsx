@@ -36,6 +36,8 @@ const emptyForm = {
   city: '',
   cityCode: '',
   village: '',
+  address: '',
+  parentaladdress: '',
   gotraSelf: '',
   gotraMother: '',
   gotraNani: '',
@@ -90,6 +92,8 @@ export default function MatrimonyProfileForm() {
         city: data.city || '',
         cityCode: '',
         village: data.village || '',
+        parentaladdress: data.parentaladdress || '',
+        address: data.address || '',
         gotraSelf: data.gotra?.self || '',
         gotraMother: data.gotra?.mother || '',
         gotraNani: data.gotra?.nani || '',
@@ -155,6 +159,8 @@ export default function MatrimonyProfileForm() {
       district: form.district,
       city: form.city,
       village: form.village,
+      parentaladdress: form.parentaladdress,
+      address: form.address,
       visible: form.visible,
       gotra: {
         self: form.gotraSelf,
@@ -323,6 +329,19 @@ export default function MatrimonyProfileForm() {
             <span className="font-semibold text-slate-600">{lang === 'hi' ? 'गाँव' : 'Village'}</span>
             <input value={form.village} onChange={handleChange('village')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
           </label>
+
+
+          {/* parentel or address */}
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पता' : 'Address'}</span>
+            <textarea value={form.address} onChange={handleChange('address')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}</span>
+            <textarea value={form.parentaladdress} onChange={handleChange('parentaladdress')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+          </label>
+
+
           <div className="rounded-2xl border border-slate-200 p-4 md:col-span-2">
             <span className="text-sm font-semibold text-slate-600">{lang === 'hi' ? 'गोत्र विवरण' : 'Gotra details'}</span>
             <div className="mt-3 grid gap-3 md:grid-cols-2">

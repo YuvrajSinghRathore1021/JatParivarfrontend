@@ -64,33 +64,33 @@ export default function GauravDetails() {
       </div>
 
       {/* ------------------------------------- */}
-      {/*              PRESENT SECTION           */}
+      {/*              SECTION           */}
       {/* ------------------------------------- */}
-      {item.present && (
+      {item.data && (
         <div className="mt-12">
           <h2 className="text-2xl font-bold text-green-600 mb-4">
-            Present Details
+            Details
           </h2>
 
           {/* Category + Timeline */}
           <p className="text-sm text-slate-500 mb-4">
-            {item.present.category} • {item.present.timeline}
+            {item.data.category} • {item.data.timeline}
           </p>
 
           {/* Biography */}
           <div className="bg-white rounded-xl shadow p-6">
             <h3 className="text-xl font-semibold mb-3">Biography</h3>
             <p className="text-slate-700 leading-relaxed">
-              {item.present.biography}
+              {item.data.biography}
             </p>
           </div>
 
           {/* Achievements */}
-          {item.present.achievements?.length > 0 && (
+          {item.data.achievements?.length > 0 && (
             <div className="mt-6 bg-white rounded-xl shadow p-6">
               <h3 className="text-xl font-semibold mb-3">Achievements</h3>
               <ul className="list-disc pl-6 text-slate-700">
-                {item.present.achievements.map((a, i) => (
+                {item.data.achievements.map((a, i) => (
                   <li key={i} className="mb-1">{a}</li>
                 ))}
               </ul>
@@ -98,12 +98,12 @@ export default function GauravDetails() {
           )}
 
           {/* Gallery */}
-          {item.present.gallery?.length > 0 && (
+          {item.data.gallery?.length > 0 && (
             <div className="mt-6 bg-white rounded-xl shadow p-6">
               <h3 className="text-xl font-semibold mb-3">Gallery</h3>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {item.present.gallery.map((g, i) => (
+                {item.data.gallery.map((g, i) => (
                   <motion.img
                     key={i}
                     src={API_File + g}
@@ -117,59 +117,7 @@ export default function GauravDetails() {
         </div>
       )}
 
-      {/* ------------------------------------- */}
-      {/*              PAST SECTION              */}
-      {/* ------------------------------------- */}
-      {item.past && (
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-orange-600 mb-4">
-            Past Details
-          </h2>
-
-          {/* Category + Timeline */}
-          <p className="text-sm text-slate-500 mb-4">
-            {item.past.category} • {item.past.timeline}
-          </p>
-
-          {/* Biography */}
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-xl font-semibold mb-3">Biography</h3>
-            <p className="text-slate-700 leading-relaxed">
-              {item.past.biography}
-            </p>
-          </div>
-
-          {/* Achievements */}
-          {item.past.achievements?.length > 0 && (
-            <div className="mt-6 bg-white rounded-xl shadow p-6">
-              <h3 className="text-xl font-semibold mb-3">Achievements</h3>
-              <ul className="list-disc pl-6 text-slate-700">
-                {item.past.achievements.map((a, i) => (
-                  <li key={i} className="mb-1">{a}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Gallery */}
-          {item.past.gallery?.length > 0 && (
-            <div className="mt-6 bg-white rounded-xl shadow p-6">
-              <h3 className="text-xl font-semibold mb-3">Gallery</h3>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {item.past.gallery.map((g, i) => (
-                  <motion.img
-                    key={i}
-                    src={API_File + g}
-                    whileHover={{ scale: 1.05 }}
-                    className="rounded-lg object-cover w-full h-40 shadow"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+     
 
       {/* META INFO */}
       <div className="mt-10 text-xs text-slate-400">

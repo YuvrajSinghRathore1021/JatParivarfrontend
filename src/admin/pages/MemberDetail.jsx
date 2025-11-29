@@ -328,6 +328,7 @@ export default function MemberDetailPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Permanent Address" value={member.address?.permanentaddress || ''} onChange={(val) => updateNested('address', 'permanentaddress', val)} />
           <Field label="Address line 1" value={member.address?.line1 || ''} onChange={(val) => updateNested('address', 'line1', val)} />
           <Field label="Address line 2" value={member.address?.line2 || ''} onChange={(val) => updateNested('address', 'line2', val)} />
           <Field label="PIN" value={member.address?.pin || ''} onChange={(val) => updateNested('address', 'pin', val)} />

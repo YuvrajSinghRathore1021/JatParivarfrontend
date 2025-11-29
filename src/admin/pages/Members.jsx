@@ -153,7 +153,7 @@ export default function MembersPage() {
         </div>
       </div>
 
-  <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
           <thead className="bg-slate-50 text-left">
             <tr>
@@ -251,8 +251,8 @@ function StatusBadge({ status }) {
     status === 'active'
       ? 'bg-green-100 text-green-700'
       : status === 'disabled'
-      ? 'bg-red-100 text-red-700'
-      : 'bg-amber-100 text-amber-700'
+        ? 'bg-red-100 text-red-700'
+        : 'bg-amber-100 text-amber-700'
   return <span className={`px-2 py-1 rounded-full text-xs font-medium ${color}`}>{status}</span>
 }
 
@@ -302,7 +302,7 @@ function MemberCreateButton({ onCreated }) {
     alternatePhone: '',
     avatarUrl: '',
     janAadhaarUrl: '',
-    address: { line1: '', line2: '', city: '', district: '', state: '', pin: '' },
+    address: { line1: '', line2: '', city: '', district: '', state: '', pin: '', permanentaddress: '' },
     gotra: { self: '', mother: '', dadi: '', nani: '' },
   })
   const [addressCodes, setAddressCodes] = useState({ stateCode: '', districtCode: '', cityCode: '' })
@@ -327,7 +327,7 @@ function MemberCreateButton({ onCreated }) {
       alternatePhone: '',
       avatarUrl: '',
       janAadhaarUrl: '',
-      address: { line1: '', line2: '', city: '', district: '', state: '', pin: '' },
+      address: { line1: '', line2: '', city: '', district: '', state: '', pin: '', permanentaddress: '' },
       gotra: { self: '', mother: '', dadi: '', nani: '' },
     })
     setAddressCodes({ stateCode: '', districtCode: '', cityCode: '' })
@@ -565,39 +565,46 @@ function MemberCreateButton({ onCreated }) {
               value={form.address.line1}
               onChange={(value) => handleNestedChange('address', 'line1', value)}
             />
-          <Field
-            label="Line 2"
-            value={form.address.line2}
-            onChange={(value) => handleNestedChange('address', 'line2', value)}
-          />
-          <SelectField
-            label="State"
-            value={addressCodes.stateCode}
-            onChange={handleStateSelect}
-            options={stateOptions}
-            placeholder="Select state"
-          />
-          <SelectField
-            label="District"
-            value={addressCodes.districtCode}
-            onChange={handleDistrictSelect}
-            options={districtOptions}
-            placeholder="Select district"
-            disabled={!addressCodes.stateCode}
-          />
-          <SelectField
-            label="City"
-            value={addressCodes.cityCode}
-            onChange={handleCitySelect}
-            options={cityOptions}
-            placeholder="Select city"
-            disabled={!addressCodes.districtCode}
-          />
-          <Field
-            label="PIN"
-            value={form.address.pin}
-            onChange={(value) => handleNestedChange('address', 'pin', value)}
-          />
+            <Field
+              label="Line 2"
+              value={form.address.line2}
+              onChange={(value) => handleNestedChange('address', 'line2', value)}
+            />
+            <SelectField
+              label="State"
+              value={addressCodes.stateCode}
+              onChange={handleStateSelect}
+              options={stateOptions}
+              placeholder="Select state"
+            />
+            <SelectField
+              label="District"
+              value={addressCodes.districtCode}
+              onChange={handleDistrictSelect}
+              options={districtOptions}
+              placeholder="Select district"
+              disabled={!addressCodes.stateCode}
+            />
+            <SelectField
+              label="City"
+              value={addressCodes.cityCode}
+              onChange={handleCitySelect}
+              options={cityOptions}
+              placeholder="Select city"
+              disabled={!addressCodes.districtCode}
+            />
+            <Field
+              label="PIN"
+              value={form.address.pin}
+              onChange={(value) => handleNestedChange('address', 'pin', value)}
+            />
+
+
+            <Field
+              label="Permanent Address"
+              value={form.address?.permanentaddress}
+              onChange={(value) => handleNestedChange('address', 'permanentaddress', value)}
+            />
           </div>
           <div className="md:col-span-2 grid gap-3 md:grid-cols-2 rounded-xl border border-slate-200 p-4">
             <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
@@ -629,6 +636,7 @@ function MemberCreateButton({ onCreated }) {
               options={gotraOptionsList}
               placeholder="Select gotra"
             />
+
           </div>
           <div className="md:col-span-2 flex justify-end gap-2 pt-2">
             <button

@@ -30,6 +30,7 @@ const emptyForm = {
     gender: 'male',
     name: '',
     height: '',
+    address: '', parentaladdress: '',
     maritalStatus: 'never_married',
     education: '',
     occupation: '',
@@ -104,6 +105,8 @@ export default function MatrimonyDetail() {
             occupation: data?.occupation || '',
             state: data?.state || '',
             height: data?.height || '',
+            address: data?.address || '',
+            parentaladdress: data?.parentaladdress || '',
             stateCode: '',
             district: data?.district || '',
             districtCode: '',
@@ -178,6 +181,8 @@ export default function MatrimonyDetail() {
             occupation: form.occupation,
             state: form.state,
             height: form.height,
+            address: form.address,
+            parentaladdress: form.parentaladdress,
             district: form.district,
             city: form.city,
             village: form.village,
@@ -349,6 +354,18 @@ export default function MatrimonyDetail() {
                         <span className="font-semibold text-slate-600">{lang === 'hi' ? 'गाँव' : 'Village'}</span>
                         <input value={form.village} onChange={handleChange('village')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
                     </label>
+
+                    {/* parentel or address */}
+                    <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पता' : 'Address'}</span>
+                        <textarea value={form.address} onChange={handleChange('address')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label>
+                    <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}</span>
+                        <textarea value={form.parentaladdress} onChange={handleChange('parentaladdress')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label>
+
+
                     <div className="rounded-2xl border border-slate-200 p-4 md:col-span-2">
                         <span className="text-sm font-semibold text-slate-600">{lang === 'hi' ? 'गोत्र विवरण' : 'Gotra details'}</span>
                         <div className="mt-3 grid gap-3 md:grid-cols-2">

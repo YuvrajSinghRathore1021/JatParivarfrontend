@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, Link ,useParams} from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useLang } from "../../lib/useLang";
 
@@ -18,9 +18,6 @@ export default function Gorav() {
     // -------------------- DATA STATES --------------------
     const [list, setList] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // const categories = ['games', 'politics', 'education',
-    //     'medical', 'samaj-sevi', 'adhikari', 'other'];
 
     useEffect(() => {
         loadData();
@@ -66,20 +63,6 @@ export default function Gorav() {
                     onChange={(e) => setSearch(e.target.value)}
                     className="border px-3 py-2 rounded w-full"
                 />
-
-                {/* Category */}
-                {/* <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="border px-3 py-2 rounded w-full"
-                >
-                    <option value="">All Categories</option>
-                    {categories.map((c) => (
-                        <option key={c} value={c}>
-                            {c}
-                        </option>
-                    ))}
-                </select> */}
 
                 {/* Timeline */}
                 <select

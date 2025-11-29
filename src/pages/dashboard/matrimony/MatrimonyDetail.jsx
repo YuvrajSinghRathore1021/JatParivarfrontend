@@ -79,6 +79,22 @@ export default function MatrimonyDetail() {
                         {item.village}, {item.city}, {item.district}, {item.state}
                     </p>
                 </div>
+            </section> 
+            <section className="px-4">
+                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-2">
+                    <h2 className="text-lg font-semibold">Address</h2>
+                    <p className="text-slate-800">
+                        {item?.address}
+                    </p>
+                </div>
+            </section>
+            <section className="px-4">
+                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-2">
+                    <h2 className="text-lg font-semibold">Parental Address</h2>
+                    <p className="text-slate-800">
+                        {item?.parentaladdress}
+                    </p>
+                </div>
             </section>
 
             {/* ===== Gotra ===== */}
