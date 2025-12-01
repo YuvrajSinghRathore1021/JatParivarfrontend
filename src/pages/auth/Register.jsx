@@ -33,6 +33,7 @@ const copy = {
     occupation: 'Occupation',
     state: 'State',
     district: 'District',
+    permanentaddress: 'Permanent Address',
     city: 'City',
     pin: 'PIN',
     gotraSelf: 'Gotra (Self)',
@@ -55,6 +56,7 @@ const copy = {
     invalidOtp: 'Invalid OTP. Please try again.',
     invalidEmail: 'Please enter a valid email address.',
     invalidEmailReq: 'Please enter a email address.',
+
     placeholders: {
       gender: 'Select gender',
       marital: 'Select marital status',
@@ -92,6 +94,7 @@ const copy = {
     education: 'शिक्षा स्तर',
     occupation: 'पेशा',
     state: 'राज्य',
+    permanentaddress: 'स्थायी पता',
     district: 'ज़िला',
     city: 'शहर',
     pin: 'पिन',
@@ -219,7 +222,7 @@ export default function Register() {
   })
 
   const [addr, setAddr] = useState({
-    state: '', stateCode: '', district: '', districtCode: '', city: '', cityCode: '', pin: ''
+    state: '', stateCode: '', district: '', districtCode: '', city: '', cityCode: '', pin: '', permanentaddress: ''
   })
 
   const [gotra, setGotra] = useState({
@@ -657,6 +660,12 @@ export default function Register() {
                   placeholder={t.pin}
                   value={addr.pin}
                   onChange={(e) => setAddr({ ...addr, pin: e.target.value })}
+                />
+                <input
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder={t.permanentaddress}
+                  value={addr.permanentaddress}
+                  onChange={(e) => setAddr({ ...addr, permanentaddress: e.target.value })}
                 />
 
                 <div className="flex gap-2">

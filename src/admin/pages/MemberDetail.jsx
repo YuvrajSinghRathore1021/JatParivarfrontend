@@ -149,6 +149,23 @@ export default function MemberDetailPage() {
       setUploading((prev) => ({ ...prev, jan: false }))
     }
   }
+  // adimage,bussinessurl
+  const handleAdimageUpload = async (file) => {
+    if (!file) return
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Please choose a document smaller than 10 MB.')
+      return
+    }
+    setUploading((prev) => ({ ...prev, adimage: true }))
+    try {
+      const { url } = await upload('/uploads/file', file)
+      updateMemberField('adimage', url)
+    } catch (err) {
+      alert(err.message || 'Upload failed')
+    } finally {
+      setUploading((prev) => ({ ...prev, adimage: false }))
+    }
+  }
 
   const handleSpotlightBannerUpload = async (file) => {
     if (!file) return
@@ -178,6 +195,9 @@ export default function MemberDetailPage() {
       const payload = {
         name: member.name,
         displayName: member.displayName,
+        message: member?.message,
+        adimage: member.adimage,
+        bussinessurl: member.bussinessurl,
         email: member.email,
         contactEmail: member.contactEmail,
         status: member.status,
@@ -424,6 +444,19 @@ export default function MemberDetailPage() {
             onChange={(val) => setPasswords((prev) => ({ ...prev, confirm: val }))}
           />
         </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <UploadField
+            label="AD Image (file URL)"
+            value={member.adimage || ''}
+            onChange={(val) => updateMemberField('adimage', val)}
+            onUpload={handleAdimageUpload}
+            uploading={uploading.adimage}
+            accept="application/pdf,image/*"
+            hint="PDF or image • Max 10 MB"
+          />
+
+          <Field label="Bussiness Details (URL)" value={member.bussinessurl || ''} />
+        </div>
 
         <div className="flex justify-end">
           <button
@@ -479,6 +512,16 @@ export default function MemberDetailPage() {
                 hint="Tall image • Max 5 MB"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-slate-600">Message</label>
+            <textarea
+              value={member?.message || ''}
+              onChange={(e) => updateMemberField('message', e.target.value)}
+              rows={3}
+              className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+            />
           </div>
           <div>
             <label className="text-xs font-medium text-slate-600">Bio (English)</label>
