@@ -455,7 +455,7 @@ export default function MemberDetailPage() {
             hint="PDF or image • Max 10 MB"
           />
 
-          <Field label="Bussiness Details (URL)" value={member.bussinessurl || ''} />
+          <Field label="Bussiness Details (URL)" value={member?.bussinessurl || ''} onChange={(val) => updateMemberField('bussinessurl', val)} />
         </div>
 
         <div className="flex justify-end">

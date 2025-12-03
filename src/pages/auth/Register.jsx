@@ -8,7 +8,7 @@ import SelectField from '../../components/SelectField'
 import FileDrop from '../../components/FileDrop'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
 import { asOptions as gotraOptions } from '../../constants/gotras'
-
+import AddressBlock from '../../components/AddressBlock'
 const copy = {
   en: {
     title: 'Create your account',
@@ -31,11 +31,6 @@ const copy = {
     marital: 'Marital Status',
     education: 'Education level',
     occupation: 'Occupation',
-    state: 'State',
-    district: 'District',
-    permanentaddress: 'Permanent Address',
-    city: 'City',
-    pin: 'PIN',
     gotraSelf: 'Gotra (Self)',
     gotraMother: "Mother's Gotra",
     gotraNani: "Nani's Gotra",
@@ -48,8 +43,7 @@ const copy = {
     otpRequired: 'Please enter the 6-digit OTP sent to your phone.',
     nameRequired: 'Your full name is required.',
     passwordHint: 'Password must be at least 6 characters.',
-    stateRequired: 'Please select your state and district.',
-    cityRequired: 'Please choose your city.',
+    addressRequired: 'Please select your address.',
     phoneExists: 'This phone number is already registered. Please log in instead.',
     referralNotFound: 'Referral code not found. Please double-check or leave it blank.',
     errorGeneric: 'Something went wrong. Please try again.',
@@ -62,9 +56,6 @@ const copy = {
       marital: 'Select marital status',
       education: 'Select education',
       occupation: 'Select occupation',
-      state: 'Select state',
-      district: 'Select district',
-      city: 'Select city',
       gotra: 'Choose gotra',
     },
     uploads: {
@@ -93,11 +84,6 @@ const copy = {
     marital: 'वैवाहिक स्थिति',
     education: 'शिक्षा स्तर',
     occupation: 'पेशा',
-    state: 'राज्य',
-    permanentaddress: 'स्थायी पता',
-    district: 'ज़िला',
-    city: 'शहर',
-    pin: 'पिन',
     gotraSelf: 'खुद का गोत्र',
     gotraMother: 'माँ का गोत्र',
     gotraNani: 'नानी का गोत्र',
@@ -110,8 +96,7 @@ const copy = {
     otpRequired: 'कृपया फोन पर प्राप्त 6 अंकों का OTP दर्ज करें।',
     nameRequired: 'कृपया अपना पूरा नाम दर्ज करें।',
     passwordHint: 'पासवर्ड कम से कम 6 वर्ण का होना चाहिए।',
-    stateRequired: 'कृपया अपना राज्य और ज़िला चुनें।',
-    cityRequired: 'कृपया अपना शहर चुनें।',
+    addressRequired: 'कृपया अपना पता चुनें।',
     phoneExists: 'यह मोबाइल नंबर पहले से पंजीकृत है। कृपया लॉगिन करें।',
     referralNotFound: 'रेफ़रल कोड नहीं मिला। कृपया दोबारा जाँचें या इसे खाली छोड़ दें।',
     errorGeneric: 'कुछ गड़बड़ हुई। कृपया फिर से प्रयास करें।',
@@ -123,9 +108,6 @@ const copy = {
       marital: 'वैवाहिक स्थिति चुनें',
       education: 'शिक्षा स्तर चुनें',
       occupation: 'पेशा चुनें',
-      state: 'राज्य चुनें',
-      district: 'ज़िला चुनें',
-      city: 'शहर चुनें',
       gotra: 'गोत्र चुनें',
     },
     uploads: {
@@ -219,6 +201,36 @@ export default function Register() {
     name: '', email: '', password: '',
     dob: '', gender: '', maritalStatus: '',
     education: '', occupation: '',
+
+    occupationAddress: {
+      state: '',
+      stateCode: '',
+      district: '',
+      districtCode: '',
+      city: '',
+      cityCode: '',
+      village: ''
+    },
+
+    currentAddress: {
+      state: '',
+      stateCode: '',
+      district: '',
+      districtCode: '',
+      city: '',
+      cityCode: '',
+      village: ''
+    },
+
+    parentalAddress: {
+      state: '',
+      stateCode: '',
+      district: '',
+      districtCode: '',
+      city: '',
+      cityCode: '',
+      village: ''
+    },
   })
 
   const [addr, setAddr] = useState({
@@ -347,14 +359,21 @@ export default function Register() {
 
   const handleAddressNext = () => {
     setError('')
-    if (!addr.stateCode || !addr.districtCode) {
-      setError(t.stateRequired)
+    if (!form.occupationAddress.state || !form.occupationAddress.stateCode || !form.occupationAddress.district || !form.occupationAddress.districtCode || !form.occupationAddress.city || !form.occupationAddress.cityCode || !form.occupationAddress.village) {
+      setError(t.addressRequired);
       return
     }
-    if (!addr.cityCode) {
-      setError(t.cityRequired)
+
+    if (!form.currentAddress.state || !form.currentAddress.stateCode || !form.currentAddress.district || !form.currentAddress.districtCode || !form.currentAddress.city || !form.currentAddress.cityCode || !form.currentAddress.village) {
+      setError(t.addressRequired);
       return
     }
+
+    if (!form.parentalAddress.state || !form.parentalAddress.stateCode || !form.parentalAddress.district || !form.parentalAddress.districtCode || !form.parentalAddress.city || !form.parentalAddress.cityCode || !form.parentalAddress.village) {
+      setError(t.addressRequired);
+      return
+    }
+    
     setStep(5)
   }
 
@@ -382,8 +401,8 @@ export default function Register() {
         phone,
         refCode: normalizedRef || null,
         form,
-        addr,
         gotra,
+
         janAadharUrl: ja,
         janAadhaarUrl: ja,
         profilePhotoUrl: pf,
@@ -408,6 +427,16 @@ export default function Register() {
   }
 
   const gotraOpts = useMemo(() => gotraOptions(lang), [lang])
+  const [sameAsCurrent, setSameAsCurrent] = useState(false)
+
+  useEffect(() => {
+    if (sameAsCurrent) {
+      setForm(prev => ({
+        ...prev,
+        parentalAddress: { ...prev.currentAddress }
+      }))
+    }
+  }, [sameAsCurrent, form.currentAddress])
 
   return (
     <main className="bg-slate-50">
@@ -602,70 +631,40 @@ export default function Register() {
             {/* STEP 4 – Address */}
             {step === 4 && (
               <div className="space-y-4">
-                <SelectField
-                  label={t.state}
-                  value={addr.stateCode}
-                  onChange={(code) => {
-                    const selected = states.find((item) => item.code === code)
-                    setAddr((prev) => ({
-                      ...prev,
-                      stateCode: code,
-                      state: selected?.name?.en || '',
-                      districtCode: '',
-                      district: '',
-                      cityCode: '',
-                      city: '',
-                    }))
-                  }}
-                  options={stateOptions}
-                  placeholder={t.placeholders.state}
+
+                <AddressBlock
+                  title={lang === 'hi' ? 'व्यवसाय का पता' : 'Occupation Address'}
+                  formKey="occupationAddress"
+                  form={form}
+                  setForm={setForm}
+                  {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
                 />
 
-                <SelectField
-                  label={t.district}
-                  value={addr.districtCode}
-                  onChange={(code) => {
-                    const selected = districts.find((item) => item.code === code)
-                    setAddr((prev) => ({
-                      ...prev,
-                      districtCode: code,
-                      district: selected?.name?.en || '',
-                      cityCode: '',
-                      city: '',
-                    }))
-                  }}
-                  options={districtOptions}
-                  placeholder={t.placeholders.district}
-                  disabled={!addr.stateCode}
+                <AddressBlock
+                  title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+                  formKey="currentAddress"
+                  form={form}
+                  setForm={setForm}
+                  {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
                 />
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+                  <input
+                    type="checkbox"
+                    checked={sameAsCurrent}
+                    onChange={(e) => setSameAsCurrent(e.target.checked)}
+                    className="h-4 w-4"
+                  />
+                  {lang === 'hi'
+                    ? 'पैतृक पता वर्तमान पते जैसा ही है'
+                    : 'Parental address is same as current address'}
+                </label>
 
-                <SelectField
-                  label={t.city}
-                  value={addr.cityCode}
-                  onChange={(code) => {
-                    const selected = cities.find((item) => item.code === code)
-                    setAddr((prev) => ({
-                      ...prev,
-                      cityCode: code,
-                      city: selected?.name?.en || '',
-                    }))
-                  }}
-                  options={cityOptions}
-                  placeholder={t.placeholders.city}
-                  disabled={!addr.districtCode}
-                />
-
-                <input
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder={t.pin}
-                  value={addr.pin}
-                  onChange={(e) => setAddr({ ...addr, pin: e.target.value })}
-                />
-                <input
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder={t.permanentaddress}
-                  value={addr.permanentaddress}
-                  onChange={(e) => setAddr({ ...addr, permanentaddress: e.target.value })}
+                <AddressBlock
+                  title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+                  formKey="parentalAddress"
+                  form={form}
+                  setForm={setForm}
+                  {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
                 />
 
                 <div className="flex gap-2">

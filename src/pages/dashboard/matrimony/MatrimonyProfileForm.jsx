@@ -8,6 +8,7 @@ import { useLang } from '../../../lib/useLang'
 import { fetchMyMatrimonyProfile, saveMatrimonyProfile } from '../../../lib/dashboardApi'
 import { asOptions as gotraOptions } from '../../../constants/gotras'
 import { upload } from '../../../lib/api'
+import AddressBlock from '../../../components/AddressBlock'
 let API_File = import.meta.env.VITE_API_File
 const genders = [
   { value: 'male', labelEn: 'Male', labelHi: 'पुरुष' },
@@ -29,21 +30,42 @@ const emptyForm = {
   maritalStatus: 'never_married',
   education: '',
   occupation: '',
-  state: '',
-  stateCode: '',
-  district: '',
-  districtCode: '',
-  city: '',
-  cityCode: '',
-  village: '',
-  address: '',
-  parentaladdress: '',
   gotraSelf: '',
   gotraMother: '',
   gotraNani: '',
   gotraDadi: '',
   visible: true,
   photos: [],
+
+  occupationAddress: {
+    state: '',
+    stateCode: '',
+    district: '',
+    districtCode: '',
+    city: '',
+    cityCode: '',
+    village: ''
+  },
+
+  currentAddress: {
+    state: '',
+    stateCode: '',
+    district: '',
+    districtCode: '',
+    city: '',
+    cityCode: '',
+    village: ''
+  },
+
+  parentalAddress: {
+    state: '',
+    stateCode: '',
+    district: '',
+    districtCode: '',
+    city: '',
+    cityCode: '',
+    village: ''
+  },
 }
 
 export default function MatrimonyProfileForm() {
@@ -70,8 +92,7 @@ export default function MatrimonyProfileForm() {
   )
 
   const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(
-    form.stateCode,
-    form.districtCode,
+
     lang,
   )
 
@@ -84,52 +105,26 @@ export default function MatrimonyProfileForm() {
         maritalStatus: data.maritalStatus || 'never_married',
         education: data.education || '',
         occupation: data.occupation || '',
-        state: data.state || '',
+
         height: data.height || '',
-        stateCode: '',
-        district: data.district || '',
-        districtCode: '',
-        city: data.city || '',
-        cityCode: '',
-        village: data.village || '',
-        parentaladdress: data.parentaladdress || '',
-        address: data.address || '',
         gotraSelf: data.gotra?.self || '',
         gotraMother: data.gotra?.mother || '',
         gotraNani: data.gotra?.nani || '',
         gotraDadi: data.gotra?.dadi || '',
         visible: data.visible !== undefined ? data.visible : true,
         photos: Array.isArray(data.photos) ? data.photos : [],
+
+
+
+        occupationAddress: data.occupationAddress || emptyForm.occupationAddress,
+        currentAddress: data.currentAddress || emptyForm.currentAddress,
+        parentalAddress: data.parentalAddress || emptyForm.parentalAddress,
+
       })
     }
   }, [data])
 
-  useEffect(() => {
-    if (!form.stateCode && form.state && states.length) {
-      const match = states.find((s) => s.name.en === form.state)
-      if (match) {
-        setForm((prev) => ({ ...prev, stateCode: match.code }))
-      }
-    }
-  }, [states, form.state, form.stateCode])
 
-  useEffect(() => {
-    if (!form.districtCode && form.district && districts.length) {
-      const match = districts.find((d) => d.name.en === form.district)
-      if (match) {
-        setForm((prev) => ({ ...prev, districtCode: match.code }))
-      }
-    }
-  }, [districts, form.district, form.districtCode])
-
-  useEffect(() => {
-    if (!form.cityCode && form.city && cities.length) {
-      const match = cities.find((c) => c.name.en === form.city)
-      if (match) {
-        setForm((prev) => ({ ...prev, cityCode: match.code }))
-      }
-    }
-  }, [cities, form.city, form.cityCode])
 
   const mutation = useMutation({
     mutationFn: saveMatrimonyProfile,
@@ -154,21 +149,20 @@ export default function MatrimonyProfileForm() {
       maritalStatus: form.maritalStatus,
       education: form.education,
       occupation: form.occupation,
-      state: form.state,
       height: form.height,
-      district: form.district,
-      city: form.city,
-      village: form.village,
-      parentaladdress: form.parentaladdress,
-      address: form.address,
       visible: form.visible,
+
       gotra: {
         self: form.gotraSelf,
         mother: form.gotraMother,
         nani: form.gotraNani,
         dadi: form.gotraDadi,
       },
+
       photos: form.photos,
+      occupationAddress: form.occupationAddress,
+      currentAddress: form.currentAddress,
+      parentalAddress: form.parentalAddress,
     })
   }
 
@@ -201,6 +195,17 @@ export default function MatrimonyProfileForm() {
       photos: prev.photos.filter((_, idx) => idx !== index),
     }))
   }
+  const [sameAsCurrent, setSameAsCurrent] = useState(false)
+
+  useEffect(() => {
+    if (sameAsCurrent) {
+      setForm(prev => ({
+        ...prev,
+        parentalAddress: { ...prev.currentAddress }
+      }))
+    }
+  }, [sameAsCurrent, form.currentAddress])
+
 
   return (
     <form onSubmit={onSubmit} className="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -271,75 +276,42 @@ export default function MatrimonyProfileForm() {
             <span className="font-semibold text-slate-600">{lang === 'hi' ? 'शिक्षा' : 'Education'}</span>
             <input value={form.education} onChange={handleChange('education')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
           </label>
-          <label className="block text-sm md:col-span-2">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
-            <input value={form.occupation} onChange={handleChange('occupation')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
-          </label>
-          <SelectField
-            label={lang === 'hi' ? 'राज्य' : 'State'}
-            value={form.stateCode}
-            onChange={(code) => {
-              const selected = states.find((item) => item.code === code)
-              setForm((prev) => ({
-                ...prev,
-                stateCode: code,
-                state: selected?.name.en || '',
-                districtCode: '',
-                district: '',
-                cityCode: '',
-                city: '',
-              }))
-            }}
-            options={stateOptions}
-            placeholder={lang === 'hi' ? 'राज्य चुनें' : 'Select state'}
-          />
-          <SelectField
-            label={lang === 'hi' ? 'ज़िला' : 'District'}
-            value={form.districtCode}
-            onChange={(code) => {
-              const selected = districts.find((item) => item.code === code)
-              setForm((prev) => ({
-                ...prev,
-                districtCode: code,
-                district: selected?.name.en || '',
-                cityCode: '',
-                city: '',
-              }))
-            }}
-            options={districtOptions}
-            placeholder={lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}
-            disabled={!form.stateCode}
-          />
-          <SelectField
-            label={lang === 'hi' ? 'शहर' : 'City'}
-            value={form.cityCode}
-            onChange={(code) => {
-              const selected = cities.find((item) => item.code === code)
-              setForm((prev) => ({
-                ...prev,
-                cityCode: code,
-                city: selected?.name.en || '',
-              }))
-            }}
-            options={cityOptions}
-            placeholder={lang === 'hi' ? 'शहर चुनें' : 'Select city'}
-            disabled={!form.districtCode}
-          />
-          <label className="block text-sm">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'गाँव' : 'Village'}</span>
-            <input value={form.village} onChange={handleChange('village')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
-          </label>
 
 
-          {/* parentel or address */}
-          <label className="block text-sm">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पता' : 'Address'}</span>
-            <textarea value={form.address} onChange={handleChange('address')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+          <AddressBlock
+            title={lang === 'hi' ? 'व्यवसाय का पता' : 'Occupation Address'}
+            formKey="occupationAddress"
+            form={form}
+            setForm={setForm}
+            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+          />
+
+          <AddressBlock
+            title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+            formKey="currentAddress"
+            form={form}
+            setForm={setForm}
+            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+          />
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+            <input
+              type="checkbox"
+              checked={sameAsCurrent}
+              onChange={(e) => setSameAsCurrent(e.target.checked)}
+              className="h-4 w-4"
+            />
+            {lang === 'hi'
+              ? 'पैतृक पता वर्तमान पते जैसा ही है'
+              : 'Parental address is same as current address'}
           </label>
-          <label className="block text-sm">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}</span>
-            <textarea value={form.parentaladdress} onChange={handleChange('parentaladdress')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
-          </label>
+
+          <AddressBlock
+            title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+            formKey="parentalAddress"
+            form={form}
+            setForm={setForm}
+            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+          />
 
 
           <div className="rounded-2xl border border-slate-200 p-4 md:col-span-2">
