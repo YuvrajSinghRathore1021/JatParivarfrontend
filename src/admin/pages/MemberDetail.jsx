@@ -1,10 +1,12 @@
 // frontend/src/admin/pages/MemberDetail.jsx
+
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
 import { upload } from '../../lib/api.js'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
+import AddressBlock from '../../components/AddressBlock.jsx'
 
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
@@ -13,10 +15,11 @@ const STATUS_OPTIONS = [
 ]
 
 export default function MemberDetailPage() {
+  let lang = "en"
   const { id } = useParams()
   const navigate = useNavigate()
   const { token } = useAdminAuth()
-
+  const [sameAsCurrent, setSameAsCurrent] = useState(false);
   const [member, setMember] = useState(null)
   const [personForm, setPersonForm] = useState(null)
   const [error, setError] = useState('')
@@ -36,14 +39,14 @@ export default function MemberDetailPage() {
     stateOptions,
     districtOptions,
     cityOptions,
-  } = useGeoOptions(addressCodes.stateCode, addressCodes.districtCode, 'en')
+  } = useGeoOptions(addressCodes?.stateCode, addressCodes?.districtCode, 'en')
 
   useEffect(() => {
     const fetchMember = async () => {
       try {
         setError('')
         const res = await adminApiFetch(`/members/${id}`, { token })
-        setMember(res.member)
+        setMember(res.member);
         setPersonForm(res.person ? {
           id: res.person.id,
           role: res.person.role,
@@ -56,8 +59,9 @@ export default function MemberDetailPage() {
           order: res.person.order ?? 1,
           visible: res.person.visible ?? true,
           bannerUrl: res.person.bannerUrl || '',
+
         } : null)
-        setAddressCodes({ stateCode: '', districtCode: '', cityCode: '' })
+
       } catch (err) {
         setError(err.message)
       }
@@ -65,32 +69,17 @@ export default function MemberDetailPage() {
     fetchMember()
   }, [id, token])
 
+  // ⬇️ ADD THIS useEffect
   useEffect(() => {
-    if (!member || !states.length) return
-    if (!member.address?.state || addressCodes.stateCode) return
-    const match = states.find((s) => s.name.en === member.address.state || s.name.hi === member.address.state)
-    if (match) {
-      setAddressCodes((prev) => ({ ...prev, stateCode: match.code }))
+    if (member) {
+      setAddressCodes({
+        stateCode: member.currentAddress?.state || "",
+        districtCode: member.currentAddress?.district || "",
+        cityCode: member.currentAddress?.city || ""
+      });
     }
-  }, [member, states, addressCodes.stateCode])
+  }, [member]);
 
-  useEffect(() => {
-    if (!member || !districts.length) return
-    if (!member.address?.district || addressCodes.districtCode) return
-    const match = districts.find((d) => d.name.en === member.address.district || d.name.hi === member.address.district)
-    if (match) {
-      setAddressCodes((prev) => ({ ...prev, districtCode: match.code }))
-    }
-  }, [member, districts, addressCodes.districtCode])
-
-  useEffect(() => {
-    if (!member || !cities.length) return
-    if (!member.address?.city || addressCodes.cityCode) return
-    const match = cities.find((c) => c.name.en === member.address.city || c.name.hi === member.address.city)
-    if (match) {
-      setAddressCodes((prev) => ({ ...prev, cityCode: match.code }))
-    }
-  }, [member, cities, addressCodes.cityCode])
 
   const isSpotlightEligible = member?.role === 'founder' || member?.role === 'member'
 
@@ -207,8 +196,10 @@ export default function MemberDetailPage() {
         publicNote: member.publicNote,
         avatarUrl: member.avatarUrl,
         janAadhaarUrl: member.janAadhaarUrl,
-        address: hasValues(member.address) ? member.address : undefined,
         gotra: hasValues(member.gotra) ? member.gotra : undefined,
+        occupationAddress: member?.occupationAddress,
+        currentAddress: member?.currentAddress,
+        parentalAddress: member?.parentalAddress,
       }
       if (passwords.value) {
         payload.password = passwords.value
@@ -267,26 +258,8 @@ export default function MemberDetailPage() {
     }
   }
 
-  const onStateChange = (code) => {
-    const selected = states.find((s) => s.code === code)
-    setAddressCodes({ stateCode: code, districtCode: '', cityCode: '' })
-    updateNested('address', 'state', selected?.name.en || '')
-    updateNested('address', 'district', '')
-    updateNested('address', 'city', '')
-  }
 
-  const onDistrictChange = (code) => {
-    const selected = districts.find((d) => d.code === code)
-    setAddressCodes((prev) => ({ ...prev, districtCode: code, cityCode: '' }))
-    updateNested('address', 'district', selected?.name.en || '')
-    updateNested('address', 'city', '')
-  }
 
-  const onCityChange = (code) => {
-    const selected = cities.find((c) => c.code === code)
-    setAddressCodes((prev) => ({ ...prev, cityCode: code }))
-    updateNested('address', 'city', selected?.name.en || '')
-  }
 
   return (
     <div className="space-y-6">
@@ -348,57 +321,62 @@ export default function MemberDetailPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Permanent Address" value={member.address?.permanentaddress || ''} onChange={(val) => updateNested('address', 'permanentaddress', val)} />
-          <Field label="Address line 1" value={member.address?.line1 || ''} onChange={(val) => updateNested('address', 'line1', val)} />
-          <Field label="Address line 2" value={member.address?.line2 || ''} onChange={(val) => updateNested('address', 'line2', val)} />
-          <Field label="PIN" value={member.address?.pin || ''} onChange={(val) => updateNested('address', 'pin', val)} />
-          <div>
-            <label className="text-xs font-medium text-slate-600">State</label>
-            <select
-              value={addressCodes.stateCode}
-              onChange={(e) => onStateChange(e.target.value)}
-              className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
-            >
-              <option value="">Select state</option>
-              {stateOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-medium text-slate-600">District</label>
-            <select
-              value={addressCodes.districtCode}
-              onChange={(e) => onDistrictChange(e.target.value)}
-              className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
-              disabled={!addressCodes.stateCode}
-            >
-              <option value="">Select district</option>
-              {districtOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-medium text-slate-600">City</label>
-            <select
-              value={addressCodes.cityCode}
-              onChange={(e) => onCityChange(e.target.value)}
-              className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
-              disabled={!addressCodes.districtCode}
-            >
-              <option value="">Select city</option>
-              {cityOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* address  */}
+
+          <AddressBlock
+            title={lang === 'hi' ? 'व्यवसाय का पता' : 'Occupation Address'}
+            formKey="occupationAddress"
+            form={member}
+            setForm={setMember}
+            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+          />
+
+          <AddressBlock
+            title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+            formKey="currentAddress"
+            form={member}
+            setForm={setMember}
+            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+          />
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+              <input
+                type="checkbox"
+                checked={sameAsCurrent}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setSameAsCurrent(checked);
+
+                  if (checked) {
+                    // copy current -> parental
+                    setMember((prev) => ({
+                      ...prev,
+                      parentalAddress: { ...(prev?.currentAddress || {}) }
+                    }));
+                  } else {
+                    // reset parental
+                    setMember((prev) => ({
+                      ...prev,
+                      parentalAddress: { state: "", district: "", city: "", address: "" }
+                    }));
+                  }
+                }}
+                className="h-4 w-4"
+              />
+              {lang === 'hi'
+                ? 'पैतृक पता वर्तमान पते जैसा ही है'
+                : 'Parental address is same as current address'}
+            </label>
+
+          </label>
+
+          <AddressBlock
+            title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+            formKey="parentalAddress"
+            form={member}
+            setForm={setMember}
+            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+          />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">

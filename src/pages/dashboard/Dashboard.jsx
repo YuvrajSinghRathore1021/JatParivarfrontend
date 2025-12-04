@@ -11,10 +11,12 @@ import MatrimonyRoutes from './matrimony/MatrimonyRoutes'
 import JobsRoutes from './jobs/JobsRoutes'
 import InstitutionRoutes from './institutions/InstitutionRoutes'
 import ProfileEditor from './profile/ProfileEditor'
+import Found from '../Found';
 
 const navItems = [
   { key: 'overview', labelEn: 'Overview', labelHi: 'अवलोकन', to: 'dashboard' },
   { key: 'matrimony', labelEn: 'Matrimony', labelHi: 'विवाह सेवा', to: 'dashboard/matrimony' },
+  { key: 'found', labelEn: 'Found', labelHi: 'खोजे', to: 'dashboard/found' },
   { key: 'jobs', labelEn: 'Jobs', labelHi: 'नौकरियाँ', to: 'dashboard/jobs' },
   { key: 'dharamshalaye', labelEn: 'Dharamshalae', labelHi: 'धर्मशालाएँ', to: 'dashboard/dharamshalaye' },
   { key: 'sansthaye', labelEn: 'Sansthaye', labelHi: 'संस्थाएँ', to: 'dashboard/sansthaye' },
@@ -342,6 +344,7 @@ export default function Dashboard() {
       <Route element={<DashboardShell />}>
         <Route index element={<Overview />} />
         <Route path="matrimony/*" element={<MatrimonyRoutes />} />
+        <Route path="found" element={<Found />} />
         <Route path="jobs/*" element={<JobsRoutes />} />
         <Route path="dharamshalaye/*" element={<InstitutionRoutes kind="dharamshala" />} />
         <Route path="sansthaye/*" element={<InstitutionRoutes kind="sanstha" />} />

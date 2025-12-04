@@ -9,7 +9,7 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import Uddeshay from './pages/Uddeshay'
 import Founders from './pages/Founders'
-import Found from './pages/Found'
+
 import Management from './pages/Management'
 import Visheshayen from './pages/Visheshayen'
 import History from './pages/History'
@@ -95,8 +95,7 @@ export default function App() {
       <Route element={<PublicShell />}>
         <Route index element={<Home />} />
         <Route path="uddeshay" element={<Uddeshay />} />
-        <Route path="founders" element={<Founders />} />
-        <Route path="found" element={<Found />} />
+        <Route path="founders" element={<Founders />} />  
         <Route path="founders/:personId" element={<PersonDetail />} />
         <Route path="management" element={<Management />} />
         <Route path="management/:personId" element={<PersonDetail />} />

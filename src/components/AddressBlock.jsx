@@ -7,7 +7,7 @@ export default function AddressBlock(props) {
     const f = form[formKey]
 
     // ⭐ Correct Hook Call
-    const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(f.stateCode, f.districtCode, lang)
+    const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(f?.stateCode, f?.districtCode, lang)
 
     return (
         <div className="rounded-2xl border border-slate-200 p-4 space-y-4 md:col-span-2">
@@ -16,7 +16,7 @@ export default function AddressBlock(props) {
             {/* STATE */}
             <SelectField
                 label={lang === 'hi' ? 'राज्य' : 'State'}
-                value={f.stateCode}
+                value={f?.stateCode}
                 options={stateOptions}
                 onChange={(code) => {
                     const s = states.find(x => x.code === code)
@@ -38,9 +38,9 @@ export default function AddressBlock(props) {
             {/* DISTRICT */}
             <SelectField
                 label={lang === 'hi' ? 'ज़िला' : 'District'}
-                value={f.districtCode}
+                value={f?.districtCode}
                 options={districtOptions}
-                disabled={!f.stateCode}
+                disabled={!f?.stateCode}
                 onChange={(code) => {
                     const d = districts.find(x => x.code === code)
                     setForm(prev => ({
@@ -59,9 +59,9 @@ export default function AddressBlock(props) {
             {/* CITY */}
             <SelectField
                 label={lang === 'hi' ? 'शहर' : 'City'}
-                value={f.cityCode}
+                value={f?.cityCode}
                 options={cityOptions}
-                disabled={!f.districtCode}
+                disabled={!f?.districtCode}
                 onChange={(code) => {
                     const c = cities.find(x => x.code === code)
                     setForm(prev => ({
@@ -79,7 +79,7 @@ export default function AddressBlock(props) {
             <label className="block text-sm">
                 <span className="font-semibold text-slate-600">{lang === 'hi' ? 'गाँव' : 'Village'}</span>
                 <input
-                    value={f.village}
+                    value={f?.village}
                     onChange={(e) =>
                         setForm(prev => ({
                             ...prev,

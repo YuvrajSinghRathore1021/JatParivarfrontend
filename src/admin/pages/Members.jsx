@@ -1,5 +1,5 @@
 // frontend/src/admin/pages/Members.jsx
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
@@ -9,7 +9,7 @@ import DateField from '../../components/DateField'
 import SelectField from '../../components/SelectField'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
 import { asOptions as gotraOptions } from '../../constants/gotras'
-
+import AddressBlock from '../../components/AddressBlock.jsx'
 const pageSizes = [20, 50, 100]
 const sortOptions = [
   { value: 'createdAt:desc', label: 'Newest first' },
@@ -21,6 +21,7 @@ const sortOptions = [
 ]
 
 export default function MembersPage() {
+
   const [filters, setFilters] = useState({
     page: 1,
     pageSize: 20,
@@ -285,6 +286,7 @@ function StatusToggle({ member, onChanged }) {
 }
 
 function MemberCreateButton({ onCreated }) {
+  let lang = 'en';
   const { token } = useAdminAuth()
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -302,8 +304,38 @@ function MemberCreateButton({ onCreated }) {
     alternatePhone: '',
     avatarUrl: '',
     janAadhaarUrl: '',
-    address: { line1: '', line2: '', city: '', district: '', state: '', pin: '', permanentaddress: '' },
     gotra: { self: '', mother: '', dadi: '', nani: '' },
+
+    occupationAddress: {
+      state: '',
+      stateCode: '',
+      district: '',
+      districtCode: '',
+      city: '',
+      cityCode: '',
+      village: ''
+    },
+
+    currentAddress: {
+      state: '',
+      stateCode: '',
+      district: '',
+      districtCode: '',
+      city: '',
+      cityCode: '',
+      village: ''
+    },
+
+    parentalAddress: {
+      state: '',
+      stateCode: '',
+      district: '',
+      districtCode: '',
+      city: '',
+      cityCode: '',
+      village: ''
+    },
+
   })
   const [addressCodes, setAddressCodes] = useState({ stateCode: '', districtCode: '', cityCode: '' })
 
@@ -327,8 +359,38 @@ function MemberCreateButton({ onCreated }) {
       alternatePhone: '',
       avatarUrl: '',
       janAadhaarUrl: '',
-      address: { line1: '', line2: '', city: '', district: '', state: '', pin: '', permanentaddress: '' },
       gotra: { self: '', mother: '', dadi: '', nani: '' },
+
+      occupationAddress: {
+        state: '',
+        stateCode: '',
+        district: '',
+        districtCode: '',
+        city: '',
+        cityCode: '',
+        village: ''
+      },
+
+      currentAddress: {
+        state: '',
+        stateCode: '',
+        district: '',
+        districtCode: '',
+        city: '',
+        cityCode: '',
+        village: ''
+      },
+
+      parentalAddress: {
+        state: '',
+        stateCode: '',
+        district: '',
+        districtCode: '',
+        city: '',
+        cityCode: '',
+        village: ''
+      },
+
     })
     setAddressCodes({ stateCode: '', districtCode: '', cityCode: '' })
   }
@@ -347,26 +409,7 @@ function MemberCreateButton({ onCreated }) {
     }))
   }
 
-  const handleStateSelect = (code) => {
-    const selected = states.find((item) => item.code === code)
-    setAddressCodes({ stateCode: code, districtCode: '', cityCode: '' })
-    handleNestedChange('address', 'state', selected?.name?.en || '')
-    handleNestedChange('address', 'district', '')
-    handleNestedChange('address', 'city', '')
-  }
 
-  const handleDistrictSelect = (code) => {
-    const selected = districts.find((item) => item.code === code)
-    setAddressCodes((prev) => ({ ...prev, districtCode: code, cityCode: '' }))
-    handleNestedChange('address', 'district', selected?.name?.en || '')
-    handleNestedChange('address', 'city', '')
-  }
-
-  const handleCitySelect = (code) => {
-    const selected = cities.find((item) => item.code === code)
-    setAddressCodes((prev) => ({ ...prev, cityCode: code }))
-    handleNestedChange('address', 'city', selected?.name?.en || '')
-  }
 
   const handleUpload = async (target, file) => {
     if (!file) return
@@ -403,8 +446,38 @@ function MemberCreateButton({ onCreated }) {
         alternatePhone: form.alternatePhone || undefined,
         avatarUrl: form.avatarUrl || undefined,
         janAadhaarUrl: form.janAadhaarUrl || undefined,
-        address: hasValues(form.address) ? form.address : undefined,
         gotra: hasValues(form.gotra) ? form.gotra : undefined,
+
+        occupationAddress: {
+          state: '',
+          stateCode: '',
+          district: '',
+          districtCode: '',
+          city: '',
+          cityCode: '',
+          village: ''
+        },
+
+        currentAddress: {
+          state: '',
+          stateCode: '',
+          district: '',
+          districtCode: '',
+          city: '',
+          cityCode: '',
+          village: ''
+        },
+
+        parentalAddress: {
+          state: '',
+          stateCode: '',
+          district: '',
+          districtCode: '',
+          city: '',
+          cityCode: '',
+          village: ''
+        },
+
       }
       await adminApiFetch('/members', { token, method: 'POST', body: payload })
       resetForm()
@@ -416,6 +489,19 @@ function MemberCreateButton({ onCreated }) {
       setSaving(false)
     }
   }
+
+  const [sameAsCurrent, setSameAsCurrent] = useState(false)
+
+  useEffect(() => {
+    if (sameAsCurrent) {
+      setForm(prev => ({
+        ...prev,
+        parentalAddress: { ...prev.currentAddress }
+      }))
+    }
+  }, [sameAsCurrent, form.currentAddress])
+
+
 
   if (!open) {
     return (
@@ -560,7 +646,7 @@ function MemberCreateButton({ onCreated }) {
           </div>
           <div className="md:col-span-2 grid gap-3 md:grid-cols-2 rounded-xl border border-slate-200 p-4">
             <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Address</p>
-            <Field
+            {/* <Field
               label="Line 1"
               value={form.address.line1}
               onChange={(value) => handleNestedChange('address', 'line1', value)}
@@ -604,6 +690,40 @@ function MemberCreateButton({ onCreated }) {
               label="Permanent Address"
               value={form.address?.permanentaddress}
               onChange={(value) => handleNestedChange('address', 'permanentaddress', value)}
+            /> */}
+            <AddressBlock
+              title={lang === 'hi' ? 'व्यवसाय का पता' : 'Occupation Address'}
+              formKey="occupationAddress"
+              form={form}
+              setForm={setForm}
+              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+            />
+
+            <AddressBlock
+              title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+              formKey="currentAddress"
+              form={form}
+              setForm={setForm}
+              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+            />
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+              <input
+                type="checkbox"
+                checked={sameAsCurrent}
+                onChange={(e) => setSameAsCurrent(e.target.checked)}
+                className="h-4 w-4"
+              />
+              {lang === 'hi'
+                ? 'पैतृक पता वर्तमान पते जैसा ही है'
+                : 'Parental address is same as current address'}
+            </label>
+
+            <AddressBlock
+              title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+              formKey="parentalAddress"
+              form={form}
+              setForm={setForm}
+              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
             />
           </div>
           <div className="md:col-span-2 grid gap-3 md:grid-cols-2 rounded-xl border border-slate-200 p-4">
