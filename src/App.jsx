@@ -13,6 +13,7 @@ import Founders from './pages/Founders'
 import Management from './pages/Management'
 import Visheshayen from './pages/Visheshayen'
 import History from './pages/History'
+import HistoryDetails from './pages/HistoryDetails'
 import News from './pages/News'
 import NewsArticle from './pages/news/NewsArticle.jsx'
 import Login from './pages/auth/Login'
@@ -101,6 +102,7 @@ export default function App() {
         <Route path="management/:personId" element={<PersonDetail />} />
         <Route path="visheshayen" element={<Visheshayen />} />
         <Route path="history" element={<History />} />
+        <Route path="history/:id" element={<HistoryDetails />} />
         <Route path="news" element={<News />} />
         <Route path="news/:slug" element={<NewsArticle />} />
         <Route path="login" element={<Login />} />

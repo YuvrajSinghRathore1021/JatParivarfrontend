@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useLang } from '../lib/useLang'
+import { Link } from 'react-router-dom'
 import { fetchPublicHistory, fetchPublicPage } from '../lib/publicApi'
+let API_File = import.meta.env.VITE_API_File
 
 const DEFAULT = {
   heroTitle: {
@@ -91,6 +93,9 @@ const mergeHistoryContent = (page, items) => {
         en: item.bodyEn || fallback.body.en,
         hi: item.bodyHi || fallback.body.hi,
       },
+      imageUrl: item.imageUrl || '',
+      category: item.category || '',
+
     }
   })
 
@@ -102,7 +107,7 @@ const mergeHistoryContent = (page, items) => {
 }
 
 export default function History() {
-  const { lang } = useLang()
+  const { lang, makePath } = useLang()
   const langKey = lang === 'hi' ? 'hi' : 'en'
 
   const { data: pageData } = useQuery({
@@ -130,7 +135,92 @@ export default function History() {
           <p className="text-slate-600 leading-relaxed">{merged.intro[langKey]}</p>
         </header>
 
-        <section className="relative border-l-2 border-slate-200 pl-8 space-y-8">
+
+
+
+        {/* <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {merged.timeline.map((milestone) => (
+            <Link
+              key={milestone.id}
+              to={makePath(`history/${milestone.id}`)}
+              className="rounded-3xl border border-slate-200 bg-white shadow-sm p-6 flex flex-col gap-4 transition hover:border-blue-200 hover:shadow-md"
+            >
+              <div className="flex items-center gap-4">
+                <img
+                  src={API_File + milestone.imageUrl}
+                  alt={milestone.name}
+                  className="h-16 w-16 rounded-2xl object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">{milestone.title[langKey]}</h2>
+                  {milestone.category && (
+                    <p className="text-sm font-medium text-blue-600">category :{milestone.category}</p>
+                  )}
+                  <p className="text-sm font-medium text-blue-600">year :{milestone.year}</p>
+
+                </div>
+              </div>
+              {(lang === 'hi' ? milestone.bioHi : milestone.bioEn) && (
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  {lang === 'hi' ? milestone.bioHi : milestone.bioEn}
+                </p>
+              )}
+              {milestone.place && (
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  {lang === 'hi' ? 'प्रमुख क्षेत्र' : 'Focus region'}: {milestone.place}
+                </p>
+              )}
+            </Link>
+          ))}
+        </section> */}
+<section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+  {merged.timeline.map((item) => (
+    <Link
+      key={item.id}
+      to={makePath(`history/${item.id}`)}
+      className="rounded-3xl border border-slate-200 bg-white shadow-sm 
+                 p-6 flex flex-col gap-4 hover:shadow-md hover:border-blue-300 transition"
+    >
+      <div className="flex items-center gap-4">
+        <img
+          src={API_File + item.imageUrl}
+          className="h-16 w-16 rounded-2xl object-cover"
+          loading="lazy"
+        />
+
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">
+            {item.title[langKey]}
+          </h2>
+
+          <p className="text-sm text-blue-600">Year : {item.year}</p>
+
+          {item.category && (
+            <p className="text-sm text-amber-600">Category : {item.category}</p>
+          )}
+        </div>
+      </div>
+
+      <p className="text-sm text-slate-600 leading-relaxed line-clamp-3">
+        {item.body[langKey]}
+      </p>
+    </Link>
+  ))}
+</section>
+
+      </div>
+    </main>
+  )
+}
+
+
+
+
+
+
+{/* <section className="relative border-l-2 border-slate-200 pl-8 space-y-8">
           {merged.timeline.map((milestone) => (
             <article key={milestone.id} className="relative">
               {milestone.year ? (
@@ -142,8 +232,31 @@ export default function History() {
               <p className="mt-2 text-sm text-slate-600 leading-relaxed">{milestone.body[langKey]}</p>
             </article>
           ))}
-        </section>
-      </div>
-    </main>
-  )
-}
+        </section> */}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

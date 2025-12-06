@@ -3,7 +3,9 @@ import { useState } from 'react'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
 import { useAdminQuery } from '../hooks/useAdminApi.js'
-
+import { upload } from "../../lib/api.js";
+import FileDrop from "../../components/FileDrop.jsx";
+let API_File = import.meta.env.VITE_API_File;
 const EMPTY_HISTORY_FORM = {
   category: 'history',
   year: '',
@@ -105,49 +107,78 @@ function HistoryFormButton({ item, category, onSaved }) {
     }
     return <button onClick={openModal} className="px-3 py-2 text-sm bg-slate-900 text-white rounded">Add entry</button>
   }
+  const updateMain = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  // ---------------------------
+  // PHOTO UPLOAD
+  // ---------------------------
+  const uploadMainPhoto = async file => {
+    const { url } = await upload("/uploads/file", file);
+    updateMain("imageUrl", url);
+  };
 
   return (
-  <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-30">
-  <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 space-y-4 max-h-[100vh] overflow-y-auto">
-    {/* Header */}
-    <div className="flex items-center justify-between">
-      <h2 className="text-lg font-semibold">{item ? 'Edit entry' : 'Add entry'}</h2>
-      <button onClick={() => setOpen(false)} className="text-slate-500">Close</button>
+    <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-30">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 space-y-4 max-h-[100vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">{item ? 'Edit entry' : 'Add entry'}</h2>
+          <button onClick={() => setOpen(false)} className="text-slate-500">Close</button>
+        </div>
+
+        {/* Error */}
+        {error && <p className="text-sm text-red-600">{error}</p>}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Year / label" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} placeholder="1987" />
+            <Field label="Order" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: e.target.value })} />
+          </div>
+
+          <Field label="Title (EN)" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} required />
+          <Field label="Title (HI)" value={form.titleHi} onChange={(e) => setForm({ ...form, titleHi: e.target.value })} />
+
+          <Textarea label="Body (EN)" value={form.bodyEn} onChange={(e) => setForm({ ...form, bodyEn: e.target.value })} rows={5} />
+          <Textarea label="Body (HI)" value={form.bodyHi} onChange={(e) => setForm({ ...form, bodyHi: e.target.value })} rows={5} />
+
+          {/* <Field label="Image URL" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://..." /> */}
+          {/* PHOTO */}
+          <div>
+            <p className="font-semibold text-sm">Profile Photo</p>
+            <FileDrop
+              accept="image/*"
+              label="Upload Main Photo"
+              onFile={uploadMainPhoto}
+            />
+
+            {form.imageUrl && (
+              <img
+                src={API_File + form.imageUrl}
+                className="mt-3 w-32 h-32 rounded object-cover border"
+              />
+            )}
+          </div>
+
+
+
+          <label className="flex items-center gap-2 text-sm text-slate-600">
+            <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
+            <span>Published</span>
+          </label>
+
+          {/* Buttons */}
+          <div className="flex justify-end gap-2 mt-2">
+            <button type="button" onClick={() => setOpen(false)} className="px-3 py-2 text-sm border border-slate-300 rounded">Cancel</button>
+            <button type="submit" disabled={saving} className="px-3 py-2 text-sm bg-slate-900 text-white rounded disabled:opacity-50">
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-
-    {/* Error */}
-    {error && <p className="text-sm text-red-600">{error}</p>}
-
-    {/* Form */}
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Year / label" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} placeholder="1987" />
-        <Field label="Order" type="number" value={form.order} onChange={(e) => setForm({ ...form, order: e.target.value })} />
-      </div>
-
-      <Field label="Title (EN)" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} required />
-      <Field label="Title (HI)" value={form.titleHi} onChange={(e) => setForm({ ...form, titleHi: e.target.value })} />
-
-      <Textarea label="Body (EN)" value={form.bodyEn} onChange={(e) => setForm({ ...form, bodyEn: e.target.value })} rows={5} />
-      <Textarea label="Body (HI)" value={form.bodyHi} onChange={(e) => setForm({ ...form, bodyHi: e.target.value })} rows={5} />
-
-      <Field label="Image URL" value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://..." />
-
-      <label className="flex items-center gap-2 text-sm text-slate-600">
-        <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
-        <span>Published</span>
-      </label>
-
-      {/* Buttons */}
-      <div className="flex justify-end gap-2 mt-2">
-        <button type="button" onClick={() => setOpen(false)} className="px-3 py-2 text-sm border border-slate-300 rounded">Cancel</button>
-        <button type="submit" disabled={saving} className="px-3 py-2 text-sm bg-slate-900 text-white rounded disabled:opacity-50">
-          {saving ? 'Saving…' : 'Save'}
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
 
   )
 }
