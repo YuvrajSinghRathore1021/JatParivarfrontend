@@ -420,7 +420,7 @@ export default function ProfileEditor() {
         </header>
 
         <section className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center md:flex-row md:items-center md:gap-6 md:text-left">
-          <img src={API_File + displayAvatar} alt={form.displayName || form.name || 'Member avatar'} className="h-28 w-28 rounded-3xl object-cover" />
+          <img src={API_File + displayAvatar} alt="image" className="h-28 w-28 rounded-3xl object-cover" />
           <div className="space-y-3">
             <div>
               <p className="text-sm font-semibold text-slate-700">{lang === 'hi' ? 'प्रोफ़ाइल फोटो' : 'Profile photo'}</p>

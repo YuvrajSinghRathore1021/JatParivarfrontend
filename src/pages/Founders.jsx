@@ -70,7 +70,7 @@ export default function Founders() {
           //     >
           //       <img
           //         src={profile.image}
-          //         alt={profile.name}
+          //         alt="image"
           //         className="h-20 w-20 rounded-2xl object-cover"
           //         loading="lazy"
           //         decoding="async"
@@ -92,6 +92,7 @@ export default function Founders() {
           //     </Link>
           //   ))}
           // </section>
+          
           <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {cards.map((profile) => (
               <Link
@@ -103,19 +104,19 @@ export default function Founders() {
                   {/* Avatar */}
                   <img
                     src={profile.image}
-                    alt={profile.name}
+                    alt="image"
                     className="h-20 w-20 rounded-2xl object-cover shrink-0 bg-slate-100"
                     loading="lazy"
                   />
 
                   {/* Content */}
-                  <div className="flex-1 space-y-1">
-                    <h2 className="text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition">
+                  <div className="flex-1 space-y-1 break-words">
+                    <h2 className=" break-words text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition">
                       {profile.name}
                     </h2>
 
                     {profile.title && (
-                      <p className="text-sm font-medium text-blue-600">
+                      <p className="text-sm font-medium text-blue-600 break-words">
                         {profile.title}
                       </p>
                     )}

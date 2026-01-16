@@ -38,10 +38,10 @@ export default function History() {
 
         {/* HEADER */}
         <header className="space-y-3 text-center">
-          <h1 className="text-3xl font-extrabold text-slate-900">
+          <h1 className="text-3xl font-extrabold text-slate-900 break-words">
             {DEFAULT.heroTitle[langKey]}
           </h1>
-          <p className="text-slate-600 leading-relaxed">
+          <p className="text-slate-600 leading-relaxed break-words">
             {DEFAULT.intro[langKey]}
           </p>
         </header>

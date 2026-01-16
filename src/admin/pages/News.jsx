@@ -322,7 +322,7 @@ function NewsFormButton({ item, onSaved }) {
             {form.heroImageUrl && (
               <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <li key={form.heroImageUrl} className="relative overflow-hidden rounded-2xl border border-slate-200">
-                  <img src={API_File + form.heroImageUrl} alt={`NEWS upload`} className="h-36 w-full object-cover" />
+                  <img src={API_File + form.heroImageUrl} alt="image" className="h-36 w-full object-cover" />
                 </li>
 
               </ul>
@@ -403,7 +403,7 @@ function Field({ label, value, onChange, type = 'text', helper, required, placeh
         onChange={onChange}
         required={required}
         placeholder={placeholder}
-        className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+        className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
       />
       {helper && <span className="mt-1 block text-xs text-slate-400">{helper}</span>}
     </label>
@@ -418,7 +418,7 @@ function Textarea({ label, value, onChange, rows = 4 }) {
         value={value ?? ''}
         onChange={onChange}
         rows={rows}
-        className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+        className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
       />
     </label>
   )

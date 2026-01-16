@@ -205,7 +205,7 @@ function DashboardTopBar() {
               >
                 <img
                   src={avatar}
-                  alt={user?.displayName || 'Member avatar'}
+                  alt="image"
                   onError={() => setAvatarError(true)}
                   className="h-10 w-10 rounded-full object-cover"
                 />

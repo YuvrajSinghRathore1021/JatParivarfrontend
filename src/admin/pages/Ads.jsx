@@ -87,23 +87,23 @@ function AdFormButton({ ad, onSaved }) {
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="text-xs font-medium text-slate-600">Label</label>
-            <input value={form.label || ''} onChange={(e) => setForm({ ...form, label: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+            <input value={form.label || ''} onChange={(e) => setForm({ ...form, label: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
           </div>
           <div>
             <label className="text-xs font-medium text-slate-600">Title (EN)</label>
-            <input value={form.titleEn || ''} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+            <input value={form.titleEn || ''} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
           </div>
           <div>
             <label className="text-xs font-medium text-slate-600">Description (EN)</label>
-            <textarea value={form.descriptionEn || ''} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
+            <textarea value={form.descriptionEn || ''} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} className="mt-1 w-full  border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
           </div>
           <div>
             <label className="text-xs font-medium text-slate-600">Target URL</label>
-            <input value={form.href || ''} onChange={(e) => setForm({ ...form, href: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+            <input value={form.href || ''} onChange={(e) => setForm({ ...form, href: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
           </div>
           <div>
             <label className="text-xs font-medium text-slate-600">Variant</label>
-            <select value={form.variant} onChange={(e) => setForm({ ...form, variant: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm">
+            <select value={form.variant} onChange={(e) => setForm({ ...form, variant: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm">
               <option value="billboard">Billboard</option>
               <option value="rail">Rail</option>
               <option value="inline">Inline</option>
@@ -112,11 +112,11 @@ function AdFormButton({ ad, onSaved }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium text-slate-600">Start date</label>
-              <input type="date" value={form.startsAt ? form.startsAt.slice(0, 10) : ''} onChange={(e) => setForm({ ...form, startsAt: e.target.value ? new Date(e.target.value).toISOString() : null })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+              <input type="date" value={form.startsAt ? form.startsAt.slice(0, 10) : ''} onChange={(e) => setForm({ ...form, startsAt: e.target.value ? new Date(e.target.value).toISOString() : null })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">End date</label>
-              <input type="date" value={form.endsAt ? form.endsAt.slice(0, 10) : ''} onChange={(e) => setForm({ ...form, endsAt: e.target.value ? new Date(e.target.value).toISOString() : null })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+              <input type="date" value={form.endsAt ? form.endsAt.slice(0, 10) : ''} onChange={(e) => setForm({ ...form, endsAt: e.target.value ? new Date(e.target.value).toISOString() : null })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
             </div>
           </div>
           <div>

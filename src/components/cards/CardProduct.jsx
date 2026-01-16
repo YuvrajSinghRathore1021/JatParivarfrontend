@@ -19,7 +19,7 @@ export default function CardProduct({
         <div className="aspect-square  bg-white grid place-items-center overflow-hidden ">
           <img
             src={API_File + image}
-            alt={title}
+            alt="image"
             className="w-[85%] h-[80%] object-contain transition will-change-transform  hover:scale-[1.02] "
             loading="lazy"
             decoding="async"
@@ -42,7 +42,7 @@ export default function CardProduct({
                 <li key={i}>
                   <img
                     src={s.image}
-                    alt={s.alt}
+                    alt="image"
                     className="w-[85%] h-[85%] object-contain transition will-change-transform  hover:scale-[1.02] "
                      loading="lazy"
                     decoding="async"

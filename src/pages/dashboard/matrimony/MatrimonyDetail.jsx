@@ -38,7 +38,7 @@ export default function MatrimonyDetail() {
             <section className="px-4">
                 <img
                     src={API_File + item.photos?.[0]}
-                    alt={item.name}
+                    alt="image"
                     className="w-full h-60 object-cover rounded-2xl shadow"
                 />
             </section>

@@ -336,7 +336,7 @@ export default function InstitutionManage({ kind }) {
                             <input
                               value={c.name}
                               onChange={(e) => updateContact(index, "name", e.target.value)}
-                              className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                              className="mt-1 w-full max-w-2xl  border rounded px-3 py-2 text-sm"
                             />
                           </div>
 
@@ -345,7 +345,7 @@ export default function InstitutionManage({ kind }) {
                             <input
                               value={c.email}
                               onChange={(e) => updateContact(index, "email", e.target.value)}
-                              className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                              className="mt-1 w-full max-w-2xl  border rounded px-3 py-2 text-sm"
                             />
                           </div>
 
@@ -354,7 +354,7 @@ export default function InstitutionManage({ kind }) {
                             <input
                               value={c.phone}
                               onChange={(e) => updateContact(index, "phone", e.target.value)}
-                              className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                              className="mt-1 w-full max-w-2xl  border rounded px-3 py-2 text-sm"
                             />
                           </div>
 
@@ -363,7 +363,7 @@ export default function InstitutionManage({ kind }) {
                             <input
                               value={c.post}
                               onChange={(e) => updateContact(index, "post", e.target.value)}
-                              className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                              className="mt-1 w-full max-w-2xl  border rounded px-3 py-2 text-sm"
                             />
                           </div>
                         </div>

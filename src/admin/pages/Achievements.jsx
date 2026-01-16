@@ -139,11 +139,11 @@ function AchievementFormButton({ achievement, onSaved }) {
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="text-xs font-medium text-slate-600">Text (English)</label>
-            <textarea value={form.textEn} onChange={(e) => setForm({ ...form, textEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" rows={3} required />
+            <textarea value={form.textEn} onChange={(e) => setForm({ ...form, textEn: e.target.value })} className="mt-1 w-full   border border-slate-300 rounded px-3 py-2 text-sm" rows={3} required />
           </div>
           <div>
             <label className="text-xs font-medium text-slate-600">Text (Hindi)</label>
-            <textarea value={form.textHi || ''} onChange={(e) => setForm({ ...form, textHi: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
+            <textarea value={form.textHi || ''} onChange={(e) => setForm({ ...form, textHi: e.target.value })} className="mt-1 w-full   border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
           </div>
           <div>
             <label className="text-xs font-medium text-slate-600">Active</label>

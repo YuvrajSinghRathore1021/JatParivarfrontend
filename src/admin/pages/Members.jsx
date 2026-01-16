@@ -93,7 +93,7 @@ export default function MembersPage() {
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
               placeholder="Name, phone, referral code, gotra…"
-              className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -101,7 +101,7 @@ export default function MembersPage() {
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
             >
               <option value="">All</option>
               <option value="active">Active</option>
@@ -114,7 +114,7 @@ export default function MembersPage() {
             <select
               value={filters.role}
               onChange={(e) => handleFilterChange('role', e.target.value)}
-              className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
             >
               <option value="">All roles</option>
               <option value="sadharan">Sadharan</option>
@@ -128,7 +128,7 @@ export default function MembersPage() {
             <select
               value={currentSortValue}
               onChange={(e) => handleSortChange(e.target.value)}
-              className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
             >
               {sortOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -142,7 +142,7 @@ export default function MembersPage() {
             <select
               value={filters.pageSize}
               onChange={(e) => handleFilterChange('pageSize', Number(e.target.value))}
-              className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
             >
               {pageSizes.map((size) => (
                 <option key={size} value={size}>
@@ -584,7 +584,7 @@ function MemberCreateButton({ onCreated }) {
             <select
               value={form.role}
               onChange={(e) => handleChange('role', e.target.value)}
-              className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
             >
               <option value="sadharan">Sadharan</option>
               <option value="member">Management</option>
@@ -597,7 +597,7 @@ function MemberCreateButton({ onCreated }) {
             <select
               value={form.status}
               onChange={(e) => handleChange('status', e.target.value)}
-              className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
             >
               <option value="active">Active</option>
               <option value="disabled">Disabled</option>
@@ -818,7 +818,7 @@ function Field({ label, value, onChange, type = 'text', placeholder, required })
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+        className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
       />
     </div>
   )

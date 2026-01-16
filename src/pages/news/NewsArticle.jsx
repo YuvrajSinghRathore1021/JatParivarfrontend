@@ -129,7 +129,7 @@ export default function NewsArticle() {
           <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <img
               src={API_File+article.heroImageUrl}
-              alt={article.title[langKey]}
+              alt="image"
               className="w-full h-full object-cover"
               loading="lazy"
             />

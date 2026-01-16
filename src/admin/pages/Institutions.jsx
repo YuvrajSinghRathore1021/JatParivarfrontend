@@ -270,7 +270,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
           <div className="grid md:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium text-slate-600">Kind</label>
-              <select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })} className="mt-1 w-full border rounded px-3 py-2 text-sm">
+              <select value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })} className="mt-1 w-full max-w-2xl  border rounded px-3 py-2 text-sm">
                 <option value="dharamshala">Dharamshala</option>
                 <option value="sanstha">Sanstha</option>
               </select>
@@ -285,17 +285,17 @@ function InstitutionFormButton({ item, kind, onSaved }) {
 
           <div>
             <label className="text-xs font-medium text-slate-600">Title (EN)</label>
-            <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" required />
+            <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" required />
           </div>
           {form?.kind == "sanstha" && (
             <div>
               <label className="text-xs font-medium text-slate-600">Business (EN)</label>
-              <input value={form.businessEn} onChange={(e) => setForm({ ...form, businessEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+              <input value={form.businessEn} onChange={(e) => setForm({ ...form, businessEn: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
             </div>
           )}
           <div>
             <label className="text-xs font-medium text-slate-600">Description (EN)</label>
-            <textarea value={form.descriptionEn || ''} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
+            <textarea value={form.descriptionEn || ''} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} className="mt-1 w-full  border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
           </div>
 
           {/* ✅ Address fields using geoOptions */}
@@ -312,7 +312,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
                   },
                 })
               }
-                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" required />
+                className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" required />
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">Email</label>
@@ -325,7 +325,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
                   },
                 })
               }
-                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" required />
+                className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" required />
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">Phone</label>
@@ -338,7 +338,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
                   },
                 })
               }
-                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" required />
+                className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" required />
             </div>
           </div>
 
@@ -350,7 +350,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
               <select
                 value={addressCodes.stateCode}
                 onChange={(e) => onStateChange(e.target.value)}
-                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
               >
                 <option value="">Select state</option>
                 {stateOptions.map((opt) => (
@@ -367,7 +367,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
                 value={addressCodes.districtCode}
                 onChange={(e) => onDistrictChange(e.target.value)}
                 disabled={!addressCodes.stateCode}
-                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
               >
                 <option value="">Select district</option>
                 {districtOptions.map((opt) => (
@@ -382,7 +382,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
                 value={addressCodes.cityCode}
                 onChange={(e) => onCityChange(e.target.value)}
                 disabled={!addressCodes.districtCode}
-                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
               >
                 <option value="">Select city</option>
                 {cityOptions.map((opt) => (
@@ -392,7 +392,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">Pin</label>
-              <input value={form.pin} onChange={(e) => setForm({ ...form, pin: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" required />
+              <input value={form.pin} onChange={(e) => setForm({ ...form, pin: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" required />
             </div>
 
 
@@ -400,7 +400,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
 
           <div>
             <label className="text-xs font-medium text-slate-600">Address</label>
-            <textarea value={form.addressEn || ''} onChange={(e) => setForm({ ...form, addressEn: e.target.value })} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
+            <textarea value={form.addressEn || ''} onChange={(e) => setForm({ ...form, addressEn: e.target.value })} className="mt-1 w-full  border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
           </div>
           {/* ===========================
     CONTACTS SECTION
@@ -440,7 +440,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
                   <input
                     value={c.name}
                     onChange={(e) => updateContact(index, "name", e.target.value)}
-                    className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                    className="mt-1 w-full max-w-2xl  border rounded px-3 py-2 text-sm"
                   />
                 </div>
 
@@ -449,7 +449,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
                   <input
                     value={c.email}
                     onChange={(e) => updateContact(index, "email", e.target.value)}
-                    className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                    className="mt-1 w-full max-w-2xl  border rounded px-3 py-2 text-sm"
                   />
                 </div>
 
@@ -458,7 +458,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
                   <input
                     value={c.phone}
                     onChange={(e) => updateContact(index, "phone", e.target.value)}
-                    className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                    className="mt-1 w-full max-w-2xl  border rounded px-3 py-2 text-sm"
                   />
                 </div>
 
@@ -467,7 +467,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
                   <input
                     value={c.post}
                     onChange={(e) => updateContact(index, "post", e.target.value)}
-                    className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                    className="mt-1 w-full max-w-2xl  border rounded px-3 py-2 text-sm"
                   />
                 </div>
               </div>

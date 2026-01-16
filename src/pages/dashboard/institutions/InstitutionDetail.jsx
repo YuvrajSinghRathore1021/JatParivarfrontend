@@ -166,7 +166,7 @@ export default function InstitutionDetail({ kind, web = false }) {
                 {item.images?.length > 0 ? (
                     <img
                         src={item.images[0]?.url}
-                        alt={item.images[0]?.altEn}
+                        alt="image"
                         className="h-full w-full object-cover"
                     />
                 ) : (
@@ -279,7 +279,7 @@ export default function InstitutionDetail({ kind, web = false }) {
                             <img
                                 key={index}
                                 src={img.url}
-                                alt={img.altEn}
+                                alt="image"
                                 className="h-32 w-full object-cover rounded-xl shadow"
                             />
                         ))}

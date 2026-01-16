@@ -43,7 +43,7 @@ export default function LoginPage() {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="mt-1 w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-slate-200"
+              className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-slate-200"
               required
             />
           </div>
@@ -53,7 +53,7 @@ export default function LoginPage() {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-slate-200"
+              className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-slate-200"
               required
             />
             <img

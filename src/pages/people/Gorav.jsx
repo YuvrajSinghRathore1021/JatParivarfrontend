@@ -103,12 +103,12 @@ export default function Gorav() {
                                 <img
                                     src={item.photo ? API_File + item.photo : "/no-img.png"}
                                     className="w-full h-56 object-cover"
-                                    alt={item.name}
+                                    alt="image"
                                 />
 
                                 <div className="p-4">
-                                    <h3 className="text-lg font-semibold">{item.name}</h3>
-                                    <p className="text-sm text-slate-600">{item.title}</p>
+                                    <h3 className="text-lg font-semibold break-words">{item.name}</h3>
+                                    <p className="text-sm text-slate-600 break-words">{item.title}</p>
 
                                     {/* Past Category */}
                                     {item.past?.category && (

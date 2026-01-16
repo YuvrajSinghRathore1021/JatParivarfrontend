@@ -107,16 +107,16 @@ export default function PersonDetail() {
               <div className="absolute -top-16 left-6">
                 <img
                   src={image}
-                  alt={person.name}
+                  alt="image"
                   className="h-32 w-32 rounded-full object-cover border-4 border-white shadow-xl ring-4 ring-blue-500/20"
                 />
               </div>
 
               <div className="pt-20 pl-1 space-y-2">
-                <h1 className="text-3xl font-extrabold text-slate-900">{person.name}</h1>
+                <h1 className="text-3xl font-extrabold text-slate-900 break-words">{person.name}</h1>
 
                 {(person.title || person.designation) && (
-                  <p className="text-lg font-semibold text-blue-600">
+                  <p className="text-lg font-semibold text-blue-600 break-words">
                     {person.title || person.designation}
                   </p>
                 )}

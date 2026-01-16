@@ -70,7 +70,7 @@ export function AdminLayout() {
       <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex md:flex-col">
         <div className="p-4 border-b border-slate-200">
           <h1 className="text-lg font-semibold">Admin Portal</h1>
-          <p className="text-xs text-slate-500">{admin?.name}</p>
+          <p className="text-xs text-slate-500 ">{admin?.name}</p>
         </div>
         <nav className="flex-1 overflow-y-auto">
           <NavigationLinks />
@@ -103,7 +103,8 @@ export function AdminLayout() {
             Logout
           </button>
         </header>
-        <main className="flex-1 overflow-y-auto p-4">
+        {/* <main className="flex-1 overflow-y-auto p-4"> */}
+        <main className="container mx-auto px-4">
           <Outlet />
         </main>
       </div>

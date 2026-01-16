@@ -296,13 +296,71 @@ export default function MatrimonyDetail() {
                             ))}
                         </select>
                     </label>
-                    <label className="block text-sm">
+                    {/* <label className="block text-sm">
                         <span className="font-semibold text-slate-600">{lang === 'hi' ? 'शिक्षा' : 'Education'}</span>
                         <input value={form.education} onChange={handleChange('education')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label> */}
+                    <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">
+                            {lang === 'hi' ? 'शिक्षा' : 'Education'}
+                        </span>
+
+                        <select
+                            value={form.education}
+                            onChange={handleChange('education')}
+                            className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+                        >
+                            <option value="">
+                                {lang === 'hi' ? 'शिक्षा चुनें' : 'Select Education'}
+                            </option>
+
+                            <option value="high_school">
+                                {lang === 'hi' ? 'हाई स्कूल' : 'High School'}
+                            </option>
+
+                            <option value="graduate">
+                                {lang === 'hi' ? 'स्नातक' : 'Graduate'}
+                            </option>
+
+                            <option value="postgraduate">
+                                {lang === 'hi' ? 'स्नातकोत्तर' : 'Postgraduate'}
+                            </option>
+
+                            <option value="phd">
+                                {lang === 'hi' ? 'पीएचडी' : 'PhD'}
+                            </option>
+                        </select>
                     </label>
+
                     <label className="block text-sm md:col-span-2">
                         <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
-                        <input value={form.occupation} onChange={handleChange('occupation')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                        {/* <input value={form.occupation} onChange={handleChange('occupation')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" /> */}
+                   
+                   <select
+        value={form.occupation}
+        onChange={handleChange('occupation')}
+        className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+    >
+        <option value="">
+            {lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}
+        </option>
+
+        <option value="government_job">
+            {lang === 'hi' ? 'सरकारी नौकरी' : 'Government Job'}
+        </option>
+
+        <option value="private_job">
+            {lang === 'hi' ? 'प्राइवेट नौकरी' : 'Private Job'}
+        </option>
+
+        <option value="business">
+            {lang === 'hi' ? 'व्यवसाय' : 'Business'}
+        </option>
+
+        <option value="student">
+            {lang === 'hi' ? 'छात्र' : 'Student'}
+        </option>
+    </select>
                     </label>
 
 
@@ -334,15 +392,15 @@ export default function MatrimonyDetail() {
                             ? 'पैतृक पता वर्तमान पते जैसा ही है'
                             : 'Parental address is same as current address'}
                     </label>
-{!sameAsCurrent && (
-                    <AddressBlock
-                        title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
-                        formKey="parentalAddress"
-                        form={form}
-                        setForm={setForm}
-                        {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
-                    />
-)}
+                    {!sameAsCurrent && (
+                        <AddressBlock
+                            title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+                            formKey="parentalAddress"
+                            form={form}
+                            setForm={setForm}
+                            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+                        />
+                    )}
 
 
 

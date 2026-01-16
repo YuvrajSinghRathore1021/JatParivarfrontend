@@ -94,9 +94,9 @@ export default function PeoplePage({ role = 'founder' }) {
                 makeInitialAvatar(displayName, { size: 80, radius: 20 })
               return (
                 <li key={p.id} className="rounded-2xl border bg-white p-3 flex items-center gap-3">
-                  <img src={avatar} alt={displayName} className="h-12 w-12 rounded-xl object-cover" />
+                  <img src={avatar} alt="" className="h-12 w-12 rounded-xl object-cover " />
                   <div className="flex-1 min-w-0 space-y-1">
-                    <div className="font-semibold truncate">{displayName}</div>
+                    <div className="font-semibold truncate break-words">{displayName}</div><br/>
                     <div className="text-xs text-slate-500 truncate">
                       {[p.title, p.place].filter(Boolean).join(' • ') || '—'}
                     </div>

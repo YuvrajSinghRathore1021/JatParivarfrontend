@@ -63,15 +63,15 @@ export default function Management() {
                 <div className="flex items-center gap-4">
                   <img
                     src={profile.image}
-                    alt={profile.name}
+                    alt="image"
                     className="h-16 w-16 rounded-2xl object-cover"
                     loading="lazy"
                     decoding="async"
                   />
                   <div>
-                    <h2 className="text-lg font-semibold text-slate-900">{profile.name}</h2>
+                    <h2 className="text-lg font-semibold text-slate-900 break-words">{profile.name}</h2>
                     {profile.title && (
-                      <p className="text-sm font-medium text-blue-600">{profile.title}</p>
+                      <p className="text-sm font-medium text-blue-600 break-words">{profile.title}</p>
                     )}
                   </div>
                 </div>

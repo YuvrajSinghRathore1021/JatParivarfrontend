@@ -187,26 +187,26 @@ function JobFormButton({ job, onSaved }) {
         <form onSubmit={submit} className="space-y-3">
           <div>
             <label className="text-xs font-medium text-slate-600">Title</label>
-            <input value={form.title} onChange={e=>setForm({...form, title:e.target.value})} required className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+            <input value={form.title} onChange={e=>setForm({...form, title:e.target.value})} required className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
           </div>
           <div>
             <label className="text-xs font-medium text-slate-600">Description</label>
-            <textarea value={form.description||''} onChange={e=>setForm({...form, description:e.target.value})} rows={5} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+            <textarea value={form.description||''} onChange={e=>setForm({...form, description:e.target.value})} rows={5} className="mt-1 w-full   border border-slate-300 rounded px-3 py-2 text-sm" />
           </div>
           <div className="grid md:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium text-slate-600">City</label>
-              <input value={form.locationCity||''} onChange={e=>setForm({...form, locationCity:e.target.value})} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+              <input value={form.locationCity||''} onChange={e=>setForm({...form, locationCity:e.target.value})} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">State</label>
-              <input value={form.locationState||''} onChange={e=>setForm({...form, locationState:e.target.value})} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+              <input value={form.locationState||''} onChange={e=>setForm({...form, locationState:e.target.value})} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
             </div>
           </div>
           <div className="grid md:grid-cols-3 gap-3">
             <div>
               <label className="text-xs font-medium text-slate-600">Type</label>
-              <select value={form.type||'full_time'} onChange={e=>setForm({...form, type:e.target.value})} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm">
+              <select value={form.type||'full_time'} onChange={e=>setForm({...form, type:e.target.value})} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm">
                 <option value="full_time">Full time</option>
                 <option value="part_time">Part time</option>
                 <option value="contract">Contract</option>
@@ -215,11 +215,11 @@ function JobFormButton({ job, onSaved }) {
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">Salary range</label>
-              <input value={form.salaryRange||''} onChange={e=>setForm({...form, salaryRange:e.target.value})} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+              <input value={form.salaryRange||''} onChange={e=>setForm({...form, salaryRange:e.target.value})} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">Contact phone</label>
-              <input value={form.contactPhone||''} onChange={e=>setForm({...form, contactPhone:e.target.value})} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+              <input value={form.contactPhone||''} onChange={e=>setForm({...form, contactPhone:e.target.value})} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
             </div>
           </div>
           <div className="flex items-center gap-6">

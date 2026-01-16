@@ -283,8 +283,37 @@ export default function MatrimonyProfileForm() {
           </label>
           <label className="block text-sm">
             <span className="font-semibold text-slate-600">{lang === 'hi' ? 'शिक्षा' : 'Education'}</span>
-            <input value={form.education} onChange={handleChange('education')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
-          </label>
+            {/* <input value={form.education} onChange={handleChange('education')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" /> */}
+         
+         
+         
+         <select
+                            value={form.education}
+                            onChange={handleChange('education')}
+                            className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+                        >   
+                          <option value="">
+                                {lang === 'hi' ? 'शिक्षा चुनें' : 'Select Education'}
+                            </option>
+
+                           
+                       
+                            <option value="high_school">
+                                {lang === 'hi' ? 'हाई स्कूल' : 'High School'}
+                            </option>
+
+                            <option value="graduate">
+                                {lang === 'hi' ? 'स्नातक' : 'Graduate'}
+                            </option>
+
+                            <option value="postgraduate">
+                                {lang === 'hi' ? 'स्नातकोत्तर' : 'Postgraduate'}
+                            </option>
+
+                            <option value="phd">
+                                {lang === 'hi' ? 'पीएचडी' : 'PhD'}
+                            </option>
+                        </select> </label>
 
 
           <AddressBlock
@@ -459,7 +488,7 @@ export default function MatrimonyProfileForm() {
               <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {form.photos.map((photo, idx) => (
                   <li key={photo} className="relative overflow-hidden rounded-2xl border border-slate-200">
-                    <img src={API_File + photo} alt={`Matrimony upload ${idx + 1}`} className="h-36 w-full object-cover" />
+                    <img src={API_File + photo} alt="image" className="h-36 w-full object-cover" />
                     <button
                       type="button"
                       onClick={() => removePhoto(idx)}

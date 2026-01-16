@@ -77,7 +77,7 @@ export default function SpotlightGrid({ role, titleHi, viewAllPath, limit = 10 }
               >
                 <img
                   src={avatar}
-                  alt={user?.displayName || 'Member'}
+                  alt="image"
                   className="h-14 w-14 rounded-xl object-cover"
                 />
                 <div className="min-w-0">

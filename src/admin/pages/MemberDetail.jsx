@@ -291,14 +291,29 @@ export default function MemberDetailPage() {
           <Field label="Secondary phone" value={member.alternatePhone || ''} onChange={(val) => updateMemberField('alternatePhone', val)} />
           <Field label="Email" value={member.email || ''} onChange={(val) => updateMemberField('email', val)} />
           <Field label="Contact email" value={member.contactEmail || ''} onChange={(val) => updateMemberField('contactEmail', val)} />
-          <Field label="Occupation" value={member.occupation || ''} onChange={(val) => updateMemberField('occupation', val)} />
+          {/* <Field label="Occupation" value={member.occupation || ''} onChange={(val) => updateMemberField('occupation', val)} /> */}
+
+          <Field
+            label="Occupation"
+            type="select"
+            value={member.occupation || ''}
+            onChange={(val) => updateMemberField('occupation', val)}
+            options={[
+              { value: '', label: 'Select Occupation' },
+              { value: 'government_job', label: 'Government Job' },
+              { value: 'private_job', label: 'Private Job' },
+              { value: 'business', label: 'Business' },
+              { value: 'student', label: 'Student' },
+            ]}
+          />
+
           <Field label="Company" value={member.company || ''} onChange={(val) => updateMemberField('company', val)} />
           <div>
             <label className="text-xs font-medium text-slate-600">Status</label>
             <select
               value={member.status || 'active'}
               onChange={(e) => updateMemberField('status', e.target.value)}
-              className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+              className="mt-1 w-full max-w-2xl  rounded border border-slate-300 px-3 py-2 text-sm"
             >
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -317,7 +332,7 @@ export default function MemberDetailPage() {
             value={member.publicNote || ''}
             onChange={(e) => updateMemberField('publicNote', e.target.value)}
             rows={3}
-            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+            className="mt-1 w-full  rounded border border-slate-300 px-3 py-2 text-sm"
           />
         </div>
 
@@ -534,7 +549,7 @@ export default function MemberDetailPage() {
               value={member?.message || ''}
               onChange={(e) => updateMemberField('message', e.target.value)}
               rows={3}
-              className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+              className="mt-1 w-full   rounded border border-slate-300 px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -543,7 +558,7 @@ export default function MemberDetailPage() {
               value={personForm.bioEn || ''}
               onChange={(e) => setPersonForm((prev) => ({ ...prev, bioEn: e.target.value }))}
               rows={3}
-              className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+              className="mt-1 w-full   rounded border border-slate-300 px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -552,7 +567,7 @@ export default function MemberDetailPage() {
               value={personForm.bioHi || ''}
               onChange={(e) => setPersonForm((prev) => ({ ...prev, bioHi: e.target.value }))}
               rows={3}
-              className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+              className="mt-1 w-full  rounded border border-slate-300 px-3 py-2 text-sm"
             />
           </div>
           <div className="flex justify-end">
@@ -585,7 +600,7 @@ function Field({ label, value, onChange, type = 'text', placeholder, required, d
         placeholder={placeholder}
         required={required}
         disabled={disabled}
-        className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm disabled:bg-slate-100"
+        className="mt-1 w-full max-w-2xl  rounded border border-slate-300 px-3 py-2 text-sm disabled:bg-slate-100"
       />
     </div>
   )
@@ -600,7 +615,7 @@ function UploadField({ label, value, onChange, onUpload, uploading, accept, hint
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="https://…"
-        className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+        className="mt-1 w-full max-w-2xl  rounded border border-slate-300 px-3 py-2 text-sm"
       />
       <div className="mt-3 flex items-center gap-3">
         <label className="text-sm font-medium text-blue-600 cursor-pointer">

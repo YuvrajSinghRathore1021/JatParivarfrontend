@@ -49,7 +49,7 @@ export default function MatrimonyInterests() {
                 <article key={item.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-center gap-4">
-                      <img src={avatar} alt={user.displayName} className="h-14 w-14 rounded-2xl object-cover" />
+                      <img src={avatar} alt="image" className="h-14 w-14 rounded-2xl object-cover" />
                       <div>
                         <h3 className="text-lg font-semibold text-slate-900">{user.displayName || 'Member'}</h3>
                         <p className="text-sm text-slate-500">{user.occupation || user.company || '—'}</p>
@@ -102,7 +102,7 @@ export default function MatrimonyInterests() {
               return (
                 <article key={item.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-center gap-4">
-                    <img src={avatar} alt={user.displayName} className="h-14 w-14 rounded-2xl object-cover" />
+                    <img src={avatar} alt="image" className="h-14 w-14 rounded-2xl object-cover" />
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-slate-900">{user.displayName || 'Member'}</h3>
                       <p className="text-sm text-slate-500">{user.occupation || user.company || '—'}</p>

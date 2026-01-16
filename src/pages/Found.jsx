@@ -116,15 +116,17 @@ export default function Found() {
     const gotraChoices = useMemo(() => gotraOptions(lang), [lang]);
 
     const OCCUPATION = {
+    
+
         en: [
-            { value: "govt", label: "Government job" },
-            { value: "private", label: "Private job" },
+            { value: "government_job", label: "Government job" },
+            { value: "private_job", label: "private_job job" },
             { value: "business", label: "Business" },
             { value: "student", label: "Student" },
         ],
         hi: [
-            { value: "govt", label: "सरकारी नौकरी" },
-            { value: "private", label: "निजी नौकरी" },
+            { value: "government_job", label: "सरकारी नौकरी" },
+            { value: "private_job", label: "निजी नौकरी" },
             { value: "business", label: "व्यवसाय" },
             { value: "student", label: "छात्र" },
         ],
@@ -294,7 +296,7 @@ export default function Found() {
                                     {/* PHOTO */}
                                     <img
                                         src={p.image}
-                                        alt={p.name}
+                                        alt="image"
                                         className="h-20 w-20 rounded-2xl object-cover"
                                     />
 
@@ -412,7 +414,7 @@ export default function Found() {
                                     {/* User Image */}
                                     <img
                                         src={API_File + r.senderId?.avatarUrl}
-                                        alt={r.senderId?.name}
+                                        alt="image"
                                         className="w-12 h-12 rounded-full object-cover border"
                                     />
 

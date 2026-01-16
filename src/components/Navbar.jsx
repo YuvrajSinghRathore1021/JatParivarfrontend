@@ -100,7 +100,7 @@ export default function Navbar() {
         >
           <img
             src={avatarUrl}
-            alt={user.displayName || user.name || 'Member avatar'}
+            alt="Member "
             onError={() => setAvatarError(true)}
             className="h-10 w-10 rounded-full object-cover"
           />
@@ -130,7 +130,7 @@ export default function Navbar() {
           <span className="sr-only">{lang === 'hi' ? 'डैशबोर्ड खोलें' : 'Open dashboard'}</span>
           <img
             src={avatarUrl}
-            alt={user.displayName || user.name || 'Member avatar'}
+            alt='Member avatar'
             onError={() => setAvatarError(true)}
             className="h-10 w-10 rounded-full object-cover"
           />

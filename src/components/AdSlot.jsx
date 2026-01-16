@@ -14,7 +14,7 @@ export default function AdSlot({ campaign, variant = "billboard" }) {
           {image && (
             <img
               src={API_File+image}
-              alt={title}
+              alt="img"
               className="h-full w-full object-cover transition group-hover:scale-[1.02]"
               loading="lazy"
               decoding="async"

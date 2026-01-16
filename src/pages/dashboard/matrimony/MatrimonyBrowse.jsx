@@ -97,7 +97,7 @@ export default function MatrimonyBrowse() {
               <article key={profile.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
                 <Link to={urlmake(profile)}>
                   <header className="flex items-center gap-4">
-                    <img src={avatar} alt={profile?.name || user.displayName} className="h-14 w-14 rounded-2xl object-cover" />
+                    <img src={avatar} alt="image" className="h-14 w-14 rounded-2xl object-cover" />
                     <div>
                       <h3 className="text-lg font-semibold text-slate-900">
                         {profile?.name || user.displayName || (lang === 'hi' ? 'सदस्य' : 'Member')}

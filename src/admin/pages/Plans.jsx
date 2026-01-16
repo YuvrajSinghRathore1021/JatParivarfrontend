@@ -157,7 +157,7 @@ function Field({ label, value, onChange, type = 'text', ...rest }) {
         value={value ?? ''}
         onChange={onChange}
         {...rest}
-        className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+        className="mt-1 w-full max-w-2xl  rounded-lg border border-slate-300 px-3 py-2 text-sm"
       />
     </label>
   )
@@ -171,7 +171,7 @@ function Textarea({ label, value, onChange, rows = 3 }) {
         value={value ?? ''}
         onChange={onChange}
         rows={rows}
-        className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+        className="mt-1 w-full max-w-2xl  rounded-lg border border-slate-300 px-3 py-2 text-sm"
       />
     </label>
   )

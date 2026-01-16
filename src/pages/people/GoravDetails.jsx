@@ -51,7 +51,7 @@ export default function GauravDetails() {
         <div className="absolute -bottom-16 left-6">
           <img
             src={API_File + item.photo}
-            alt={item.name}
+            alt="image"
             className="w-32 h-32 rounded-full ring-4 ring-white object-cover shadow-xl"
           />
         </div>
@@ -59,8 +59,8 @@ export default function GauravDetails() {
 
       {/* NAME + TITLE */}
       <div className="mt-20 px-2">
-        <h1 className="text-3xl font-bold">{item.name}</h1>
-        <p className="text-xl text-slate-700 mt-1">{item.title}</p>
+        <h1 className="text-3xl font-bold break-words">{item.name}</h1>
+        <p className="text-xl text-slate-700 mt-1 break-words">{item.title}</p>
       </div>
 
       {/* ------------------------------------- */}

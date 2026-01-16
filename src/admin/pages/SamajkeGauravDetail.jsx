@@ -158,7 +158,7 @@ export default function SamajkeGauravDetail() {
                         <input
                             value={form.name}
                             onChange={e => updateMain("name", e.target.value)}
-                            className="mt-1 w-full border px-3 py-2 rounded"
+                            className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
                         />
                     </label>
 
@@ -168,7 +168,7 @@ export default function SamajkeGauravDetail() {
                         <input
                             value={form.title}
                             onChange={e => updateMain("title", e.target.value)}
-                            className="mt-1 w-full border px-3 py-2 rounded"
+                            className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
                         />
                     </label>
                     <label className="block text-sm">
@@ -178,7 +178,7 @@ export default function SamajkeGauravDetail() {
                             onChange={(e) =>
                                 update("data", "timeline", e.target.value)
                             }
-                            className="mt-1 w-full border px-3 py-2 rounded"
+                            className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
                         >
                             {timelineData.map((c) => (
                                 <option key={c}>{c}</option>
@@ -216,7 +216,7 @@ export default function SamajkeGauravDetail() {
                                 onChange={(e) =>
                                     update("data", "category", e.target.value)
                                 }
-                                className="mt-1 w-full border px-3 py-2 rounded"
+                                className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
                             >
                                 {categories.map((c) => (
                                     <option key={c}>{c}</option>
@@ -233,7 +233,7 @@ export default function SamajkeGauravDetail() {
                                 onChange={(e) =>
                                     update("data", "biography", e.target.value)
                                 }
-                                className="mt-1 w-full border px-3 py-2 rounded"
+                                className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
                             />
                         </label>
 
@@ -531,7 +531,7 @@ export default function SamajkeGauravDetail() {
 //                     <select
 //                         value={s.category}
 //                         onChange={e => update(section, "category", e.target.value)}
-//                         className="mt-1 w-full border px-3 py-2 rounded"
+//                         className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
 //                     >
 //                         {categories.map(c => (
 //                             <option key={c}>{c}</option>
@@ -546,7 +546,7 @@ export default function SamajkeGauravDetail() {
 //                         rows={4}
 //                         value={s.biography}
 //                         onChange={e => update(section, "biography", e.target.value)}
-//                         className="mt-1 w-full border px-3 py-2 rounded"
+//                         className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
 //                     />
 //                 </label>
 
@@ -643,7 +643,7 @@ export default function SamajkeGauravDetail() {
 //                         <input
 //                             value={form.name}
 //                             onChange={e => updateMain("name", e.target.value)}
-//                             className="mt-1 w-full border px-3 py-2 rounded"
+//                             className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
 //                         />
 //                     </label>
 
@@ -653,7 +653,7 @@ export default function SamajkeGauravDetail() {
 //                         <input
 //                             value={form.title}
 //                             onChange={e => updateMain("title", e.target.value)}
-//                             className="mt-1 w-full border px-3 py-2 rounded"
+//                             className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
 //                         />
 //                     </label>
 
@@ -690,7 +690,7 @@ export default function SamajkeGauravDetail() {
 //                                 onChange={(e) =>
 //                                     update("past", "category", e.target.value)
 //                                 }
-//                                 className="mt-1 w-full border px-3 py-2 rounded"
+//                                 className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
 //                             >
 //                                 {categories.map((c) => (
 //                                     <option key={c}>{c}</option>
@@ -707,7 +707,7 @@ export default function SamajkeGauravDetail() {
 //                                 onChange={(e) =>
 //                                     update("past", "biography", e.target.value)
 //                                 }
-//                                 className="mt-1 w-full border px-3 py-2 rounded"
+//                                 className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
 //                             />
 //                         </label>
 
@@ -803,7 +803,7 @@ export default function SamajkeGauravDetail() {
 //                                 onChange={(e) =>
 //                                     update("present", "category", e.target.value)
 //                                 }
-//                                 className="mt-1 w-full border px-3 py-2 rounded"
+//                                 className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
 //                             >
 //                                 {categories.map((c) => (
 //                                     <option key={c}>{c}</option>
@@ -820,7 +820,7 @@ export default function SamajkeGauravDetail() {
 //                                 onChange={(e) =>
 //                                     update("present", "biography", e.target.value)
 //                                 }
-//                                 className="mt-1 w-full border px-3 py-2 rounded"
+//                                 className="mt-1 w-full max-w-2xl  border px-3 py-2 rounded"
 //                             />
 //                         </label>
 
