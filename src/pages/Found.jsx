@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useLang } from "../lib/useLang";
+import { Link } from 'react-router-dom'
 import { makeInitialAvatar } from "../lib/avatar";
 import { get, patch } from "../lib/api";
 import { useGeoOptions } from "../hooks/useGeoOptions";
@@ -15,7 +16,7 @@ const fetchFounders = async () => {
 };
 
 export default function Found() {
-    const { lang } = useLang();
+    const { lang, makePath } = useLang();
 
     // ---------------- FILTER STATES ----------------
     const [stateCode, setStateCode] = useState("");
@@ -65,7 +66,7 @@ export default function Found() {
                 cityCode: addr.cityCode || "",
 
                 gotra: p.gotra?.self || "",
-                occupation: p.role || "",
+                occupation: p.occupation || "",
             };
         });
     }, [data]);
@@ -275,74 +276,78 @@ export default function Found() {
                 {/* ---------------- RESULT LIST ---------------- */}
                 {filteredCards.length === 0 ? (
                     <div className="text-center p-10 bg-white rounded-3xl border shadow-sm text-slate-500">
-                        {lang === "hi"
-                            ? "कृपया राज्य और जिला चुनकर खोजें।"
+                        {lang === "hi" ? "कृपया राज्य और जिला चुनकर खोजें।"
                             : "Please select State & District and click Search."}
                     </div>
                 ) : (
                     <section className="grid gap-6 md:grid-cols-2">
                         {filteredCards.map((p) => (
-                            <div
+                            <Link
                                 key={p.id}
-                                className="rounded-3xl border bg-white shadow-sm p-6 flex gap-5 hover:border-blue-200 hover:shadow-md transition"
+                                to={makePath(`/dashboard/found/${p.id}`)}
+                                className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
                             >
-                                {/* PHOTO */}
-                                <img
-                                    src={p.image}
-                                    alt={p.name}
-                                    className="h-20 w-20 rounded-2xl object-cover"
-                                />
+                                <div
+                                    key={p.id}
+                                    className="rounded-3xl border bg-white shadow-sm p-6 flex gap-5 hover:border-blue-200 hover:shadow-md transition"
+                                >
+                                    {/* PHOTO */}
+                                    <img
+                                        src={p.image}
+                                        alt={p.name}
+                                        className="h-20 w-20 rounded-2xl object-cover"
+                                    />
 
-                                {/* DETAILS */}
-                                <div className="flex-1 space-y-1">
-                                    {/* NAME */}
-                                    <h2 className="text-xl font-semibold text-slate-900">
-                                        {p.name}
-                                    </h2>
+                                    {/* DETAILS */}
+                                    <div className="flex-1 space-y-1">
+                                        {/* NAME */}
+                                        <h2 className="text-xl font-semibold text-slate-900">
+                                            {p.name}
+                                        </h2>
 
-                                    {/* TITLE / DISPLAY NAME */}
-                                    {p.title && (
-                                        <p className="text-sm font-medium text-blue-600">
-                                            {p.title}
+                                        {/* TITLE / DISPLAY NAME */}
+                                        {p.title && (
+                                            <p className="text-sm font-medium text-blue-600">
+                                                {p.title}
+                                            </p>
+                                        )}
+
+                                        {/* GOTRA */}
+                                        {p.gotra && (
+                                            <p className="text-sm text-slate-600">
+                                                <span className="font-medium">Gotra:</span> {p.gotra}
+                                            </p>
+                                        )}
+
+                                        {/* OCCUPATION */}
+                                        {p.occupation && (
+                                            <p className="text-sm text-slate-600">
+                                                <span className="font-medium">Occupation:</span> {p.occupation}
+                                            </p>
+                                        )}
+
+                                        {/* ADDRESS */}
+                                        <p className="text-sm text-slate-700">
+                                            <span className="font-medium">Address:</span>{" "}
+                                            {p.cityCode ? p.cityCode.split("-").pop() : ""},{" "}
+                                            {p.districtCode ? p.districtCode.split("-").pop() : ""},{" "}
+                                            {p.stateCode}
                                         </p>
-                                    )}
 
-                                    {/* GOTRA */}
-                                    {p.gotra && (
-                                        <p className="text-sm text-slate-600">
-                                            <span className="font-medium">Gotra:</span> {p.gotra}
-                                        </p>
-                                    )}
-
-                                    {/* OCCUPATION */}
-                                    {p.occupation && (
-                                        <p className="text-sm text-slate-600">
-                                            <span className="font-medium">Occupation:</span> {p.occupation}
-                                        </p>
-                                    )}
-
-                                    {/* ADDRESS */}
-                                    <p className="text-sm text-slate-700">
-                                        <span className="font-medium">Address:</span>{" "}
-                                        {p.cityCode ? p.cityCode.split("-").pop() : ""},{" "}
-                                        {p.districtCode ? p.districtCode.split("-").pop() : ""},{" "}
-                                        {p.stateCode}
-                                    </p>
-
-                                    {/* VIEW MORE */}
-                                    {/* <div className="pt-2">
+                                        {/* VIEW MORE */}
+                                        {/* <div className="pt-2">
                                         <button
                                             className="text-blue-600 font-medium text-sm hover:underline"
                                         >
                                             View Details →
                                         </button>
                                         </div> */}
-                                    {/* NUMBER REQUEST BUTTON */}
-                                    <div className="pt-2">
-                                        <NumberRequestButton receiverId={p.id} />
+                                        {/* NUMBER REQUEST BUTTON */}
+                                        <div className="pt-2">
+                                            <NumberRequestButton receiverId={p.id} />
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                </div></Link>
                         ))}
                     </section>
 

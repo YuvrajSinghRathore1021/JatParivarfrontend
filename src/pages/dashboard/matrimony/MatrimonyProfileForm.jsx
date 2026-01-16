@@ -196,6 +196,7 @@ export default function MatrimonyProfileForm() {
     }))
   }
   const [sameAsCurrent, setSameAsCurrent] = useState(false)
+  const [sameAsOccupation, setSameAsOccupation] = useState(false)
 
   useEffect(() => {
     if (sameAsCurrent) {
@@ -207,6 +208,14 @@ export default function MatrimonyProfileForm() {
   }, [sameAsCurrent, form.currentAddress])
 
 
+  useEffect(() => {
+    if (sameAsOccupation) {
+      setForm(prev => ({
+        ...prev,
+        currentAddress: { ...prev.occupationAddress }
+      }))
+    }
+  }, [sameAsOccupation, form.occupationAddress])
   return (
     <form onSubmit={onSubmit} className="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <header>
@@ -285,14 +294,25 @@ export default function MatrimonyProfileForm() {
             setForm={setForm}
             {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
           />
-
-          <AddressBlock
-            title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
-            formKey="currentAddress"
-            form={form}
-            setForm={setForm}
-            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
-          />
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+            <input
+              type="checkbox"
+              checked={sameAsOccupation}
+              onChange={(e) => setSameAsOccupation(e.target.checked)}
+              className="h-4 w-4"
+            />
+            {lang === 'hi'
+              ? 'वर्तमान पता व्यवसाय के पते जैसा ही है' :
+              'Current address is same as occupation address'}
+          </label>
+          {!sameAsOccupation && (
+            <AddressBlock
+              title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+              formKey="currentAddress"
+              form={form}
+              setForm={setForm}
+              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+            />)}
           <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
             <input
               type="checkbox"
@@ -304,14 +324,15 @@ export default function MatrimonyProfileForm() {
               ? 'पैतृक पता वर्तमान पते जैसा ही है'
               : 'Parental address is same as current address'}
           </label>
-
-          <AddressBlock
-            title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
-            formKey="parentalAddress"
-            form={form}
-            setForm={setForm}
-            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
-          />
+          {!sameAsCurrent && (
+            <AddressBlock
+              title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+              formKey="parentalAddress"
+              form={form}
+              setForm={setForm}
+              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+            />
+          )}
 
 
           <div className="rounded-2xl border border-slate-200 p-4 md:col-span-2">

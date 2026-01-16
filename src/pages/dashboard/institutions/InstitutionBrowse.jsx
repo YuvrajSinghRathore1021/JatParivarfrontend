@@ -54,7 +54,7 @@ export default function InstitutionBrowse({ kind, web = false }) {
   return (
 
     <div className={web == true ? 'mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-16 space-y-10' : 'space-y-6'}>
-   
+
       <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900">{lang === 'hi' ? labels.titleHi : labels.titleEn}</h2>
@@ -81,32 +81,79 @@ export default function InstitutionBrowse({ kind, web = false }) {
           {lang === 'hi' ? 'कोई सूची उपलब्ध नहीं है।' : 'No listings available yet.'}
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {filtered.map((item) => (
-            <article key={item._id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-3">
+        <>
 
-              <Link to={urlmake(item)}>
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-900">{lang === 'hi' ? item.titleHi || item.titleEn : item.titleEn || item.titleHi}</h3>
-                  {kind == "sanstha" && (
-                    <p className="text-sm text-slate-500">{lang === 'hi' ? 'व्यवसाय:' : 'Business:'} {lang === 'hi' ? item?.businessHi || item?.businessEn : item?.businessEn || item?.businessHi}</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {filtered.map((item) => (
+              <article
+                key={item._id}
+                className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition"
+              >
+                <Link to={urlmake(item)} className="block space-y-3">
+
+                  {/* Title */}
+                  <h3 className="text-lg font-semibold text-slate-900 break-words line-clamp-2">
+                    {lang === 'hi'
+                      ? item.titleHi || item.titleEn
+                      : item.titleEn || item.titleHi}
+                  </h3>
+
+                  {/* Business (if sanstha) */}
+                  {kind === "sanstha" && (
+                    <p className="text-sm text-slate-600 break-words line-clamp-1">
+                      <span className="font-medium">
+                        {lang === 'hi' ? 'व्यवसाय:' : 'Business:'}
+                      </span>{' '}
+                      {lang === 'hi'
+                        ? item?.businessHi || item?.businessEn
+                        : item?.businessEn || item?.businessHi}
+                    </p>
                   )}
-                </div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">
-                  {[item.city, item.state].filter(Boolean).join(', ') || '—'}
-                </p>
-                {item.contact?.phone && (
-                  <p className="text-sm text-slate-700">{lang === 'hi' ? 'संपर्क:' : 'Phone:'} {item.contact.phone}</p>
-                )}
-                {item.contact?.email && (
-                  <p className="text-sm text-slate-700">{lang === 'hi' ? 'ईमेल:' : 'Email:'} {item.contact.email}</p>
-                )}
 
+                  {/* Description / Long Text (IMPORTANT FIX) */}
+                  {item.description && (
+                    <p className="text-sm text-slate-700 break-words overflow-hidden line-clamp-4">
+                      {item.description}
+                    </p>
+                  )}
 
-              </Link>
-            </article>
-          ))}
-        </div>
+                  {/* Location */}
+                  <p className="text-xs uppercase tracking-wide text-slate-400">
+                    {[item.city, item.state].filter(Boolean).join(', ') || '—'}
+                  </p>
+
+                  {/* Contact */}
+                  <div className="pt-2 space-y-1 text-sm text-slate-700">
+                    {item.contact?.phone && (
+                      <p>
+                        <span className="font-medium">
+                          {lang === 'hi' ? 'संपर्क:' : 'Phone:'}
+                        </span>{' '}
+                        {item.contact.phone}
+                      </p>
+                    )}
+
+                    {item.contact?.email && (
+                      <p className="break-all">
+                        <span className="font-medium">
+                          {lang === 'hi' ? 'ईमेल:' : 'Email:'}
+                        </span>{' '}
+                        {item.contact.email}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Read more hint */}
+                  <span className="inline-block pt-2 text-sm font-medium text-blue-600">
+                    {lang === 'hi' ? 'और देखें →' : 'View details →'}
+                  </span>
+
+                </Link>
+              </article>
+            ))}
+          </div>
+
+        </>
       )}
     </div>
 

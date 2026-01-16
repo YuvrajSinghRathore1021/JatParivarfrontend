@@ -9,7 +9,6 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import Uddeshay from './pages/Uddeshay'
 import Founders from './pages/Founders'
-
 import Management from './pages/Management'
 import Visheshayen from './pages/Visheshayen'
 import History from './pages/History'
@@ -124,7 +123,6 @@ export default function App() {
         <Route path="sanstha/:id" element={<InstitutionDetail kind={"sanstha"} web={true} />} />
 
         <Route path="*" element={<Navigate to="." replace />} />
-
       </Route>
       <Route element={<RequireAuth />}>
         <Route path="dashboard/*" element={<Dashboard />} />

@@ -429,6 +429,12 @@ function MemberCreateButton({ onCreated }) {
     }
   }
 
+  const [gotraform, setgotraform] = useState({})
+  const handleChangeNew = (field) => (event) => {
+    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value
+    setgotraform((prev) => ({ ...prev, [field]: value }))
+  }
+
   const submit = async (e) => {
     e.preventDefault()
     setSaving(true)
@@ -447,6 +453,12 @@ function MemberCreateButton({ onCreated }) {
         avatarUrl: form.avatarUrl || undefined,
         janAadhaarUrl: form.janAadhaarUrl || undefined,
         gotra: hasValues(form.gotra) ? form.gotra : undefined,
+        gotra: {
+          self: form.gotra?.self == '__custom' ? gotraform?.self : form.gotra?.self,
+          mother: form.gotra?.mother == '__custom' ? gotraform?.mother : form.gotra?.mother,
+          nani: form.gotra?.nani == '__custom' ? gotraform?.nani : form.gotra?.nani,
+          dadi: form.gotra?.dadi == '__custom' ? gotraform?.dadi : form.gotra?.dadi
+        },
 
         occupationAddress: {
           state: '',
@@ -491,7 +503,7 @@ function MemberCreateButton({ onCreated }) {
   }
 
   const [sameAsCurrent, setSameAsCurrent] = useState(false)
-
+  const [sameAsOccupation, setSameAsOccupation] = useState(false)
   useEffect(() => {
     if (sameAsCurrent) {
       setForm(prev => ({
@@ -502,6 +514,14 @@ function MemberCreateButton({ onCreated }) {
   }, [sameAsCurrent, form.currentAddress])
 
 
+  useEffect(() => {
+    if (sameAsOccupation) {
+      setForm(prev => ({
+        ...prev,
+        currentAddress: { ...prev.occupationAddress }
+      }))
+    }
+  }, [sameAsOccupation, form.occupationAddress])
 
   if (!open) {
     return (
@@ -646,51 +666,7 @@ function MemberCreateButton({ onCreated }) {
           </div>
           <div className="md:col-span-2 grid gap-3 md:grid-cols-2 rounded-xl border border-slate-200 p-4">
             <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Address</p>
-            {/* <Field
-              label="Line 1"
-              value={form.address.line1}
-              onChange={(value) => handleNestedChange('address', 'line1', value)}
-            />
-            <Field
-              label="Line 2"
-              value={form.address.line2}
-              onChange={(value) => handleNestedChange('address', 'line2', value)}
-            />
-            <SelectField
-              label="State"
-              value={addressCodes.stateCode}
-              onChange={handleStateSelect}
-              options={stateOptions}
-              placeholder="Select state"
-            />
-            <SelectField
-              label="District"
-              value={addressCodes.districtCode}
-              onChange={handleDistrictSelect}
-              options={districtOptions}
-              placeholder="Select district"
-              disabled={!addressCodes.stateCode}
-            />
-            <SelectField
-              label="City"
-              value={addressCodes.cityCode}
-              onChange={handleCitySelect}
-              options={cityOptions}
-              placeholder="Select city"
-              disabled={!addressCodes.districtCode}
-            />
-            <Field
-              label="PIN"
-              value={form.address.pin}
-              onChange={(value) => handleNestedChange('address', 'pin', value)}
-            />
 
-
-            <Field
-              label="Permanent Address"
-              value={form.address?.permanentaddress}
-              onChange={(value) => handleNestedChange('address', 'permanentaddress', value)}
-            /> */}
             <AddressBlock
               title={lang === 'hi' ? 'व्यवसाय का पता' : 'Occupation Address'}
               formKey="occupationAddress"
@@ -698,14 +674,25 @@ function MemberCreateButton({ onCreated }) {
               setForm={setForm}
               {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
             />
-
-            <AddressBlock
-              title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
-              formKey="currentAddress"
-              form={form}
-              setForm={setForm}
-              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
-            />
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+              <input
+                type="checkbox"
+                checked={sameAsOccupation}
+                onChange={(e) => setSameAsOccupation(e.target.checked)}
+                className="h-4 w-4"
+              />
+              {lang === 'hi'
+                ? 'वर्तमान पता व्यवसाय के पते जैसा ही है' :
+                'Current address is same as occupation address'}
+            </label>
+            {!sameAsOccupation && (
+              <AddressBlock
+                title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+                formKey="currentAddress"
+                form={form}
+                setForm={setForm}
+                {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+              />)}
             <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
               <input
                 type="checkbox"
@@ -717,45 +704,83 @@ function MemberCreateButton({ onCreated }) {
                 ? 'पैतृक पता वर्तमान पते जैसा ही है'
                 : 'Parental address is same as current address'}
             </label>
-
-            <AddressBlock
-              title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
-              formKey="parentalAddress"
-              form={form}
-              setForm={setForm}
-              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
-            />
+            {!sameAsCurrent && (
+              <AddressBlock
+                title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+                formKey="parentalAddress"
+                form={form}
+                setForm={setForm}
+                {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+              />
+            )}
           </div>
           <div className="md:col-span-2 grid gap-3 md:grid-cols-2 rounded-xl border border-slate-200 p-4">
             <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
-            <SelectField
+            <div className="space-y-2"><SelectField
               label="Self"
               value={form.gotra.self}
               onChange={(value) => handleNestedChange('gotra', 'self', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"
             />
-            <SelectField
+              {form.gotra?.self == '__custom' && (
+                <input
+                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                  value={gotraform.self}
+                  onChange={handleChangeNew('self')}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                />
+              )}
+            </div>
+
+            <div className="space-y-2"><SelectField
               label="Mother"
               value={form.gotra.mother}
               onChange={(value) => handleNestedChange('gotra', 'mother', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"
             />
-            <SelectField
+              {form.gotra?.mother == '__custom' && (
+                <input
+                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                  value={gotraform.mother}
+                  onChange={handleChangeNew('mother')}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                />
+              )}</div>
+
+            <div className="space-y-2"><SelectField
               label="Dadi"
               value={form.gotra.dadi}
               onChange={(value) => handleNestedChange('gotra', 'dadi', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"
             />
-            <SelectField
+              {form.gotra?.dadi == '__custom' && (
+                <input
+                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                  value={gotraform.dadi}
+                  onChange={handleChangeNew('dadi')}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                />
+              )}</div>
+
+            <div className="space-y-2"><SelectField
               label="Nani"
               value={form.gotra.nani}
               onChange={(value) => handleNestedChange('gotra', 'nani', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"
             />
+              {form.gotra?.nani == '__custom' && (
+                <input
+                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                  value={gotraform.nani}
+                  onChange={handleChangeNew('nani')}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                />
+              )}</div>
+
 
           </div>
           <div className="md:col-span-2 flex justify-end gap-2 pt-2">

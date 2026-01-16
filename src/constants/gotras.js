@@ -108,6 +108,7 @@ export const JAT_GOTRAS = [
   { value: 'Thakran', en: 'Thakran', hi: 'ठाकरन' },
   { value: 'Virk', en: 'Virk', hi: 'विर्क' },
   { value: 'Waraich', en: 'Waraich / Varraich', hi: 'वरैच / वर्रैच' },
+  { value: '__custom', en: 'Other (type manually)', hi: 'अन्य (स्वयं लिखें)' }
 ]
 
 export function asOptions(lang = 'en') {

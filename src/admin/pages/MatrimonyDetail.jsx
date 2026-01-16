@@ -334,7 +334,7 @@ export default function MatrimonyDetail() {
                             ? 'पैतृक पता वर्तमान पते जैसा ही है'
                             : 'Parental address is same as current address'}
                     </label>
-
+{!sameAsCurrent && (
                     <AddressBlock
                         title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
                         formKey="parentalAddress"
@@ -342,7 +342,7 @@ export default function MatrimonyDetail() {
                         setForm={setForm}
                         {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
                     />
-
+)}
 
 
 

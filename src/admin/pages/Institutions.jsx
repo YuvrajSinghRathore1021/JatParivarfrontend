@@ -7,7 +7,7 @@ import { useGeoOptions } from '../../hooks/useGeoOptions'
 export default function InstitutionsPage() {
   const [kind, setKind] = useState('dharamshala')
   const [query, setQuery] = useState('')
-  const [published, setPublished] = useState('') // '', 'true', 'false'
+  const [published, setPublished] = useState('')
 
 
 

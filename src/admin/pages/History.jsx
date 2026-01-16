@@ -100,10 +100,39 @@ function HistoryFormButton({ item, category, onSaved }) {
       setSaving(false)
     }
   }
+  const [busy, setBusy] = useState(false)
+  const toggleDelete = async () => {
+    setBusy(true)
+    let payload = {};
+    try {
+      await adminApiFetch(`/history/${item.id}`, { token, method: 'DELETE', body: payload })
+      onSaved?.()
+    } finally { setBusy(false) }
+  }
 
   if (!open) {
     if (item) {
-      return <button onClick={openModal} className="px-3 py-2 text-sm border border-slate-300 rounded">Edit</button>
+      return (<>
+
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={openModal}
+            className="px-3 py-2 text-sm border border-slate-300 rounded"
+          >
+            Edit
+          </button>
+
+          <button
+            onClick={toggleDelete}
+            disabled={busy}
+            className="rounded border border-red-300 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60"
+          >
+            {busy ? 'Deleting…' : 'Delete'}
+          </button>
+        </div>
+
+      </>
+      )
     }
     return <button onClick={openModal} className="px-3 py-2 text-sm bg-slate-900 text-white rounded">Add entry</button>
   }

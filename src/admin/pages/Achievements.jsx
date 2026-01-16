@@ -17,7 +17,7 @@ export default function AchievementsPage() {
         </div>
         <AchievementFormButton onSaved={() => refetch()} />
       </div>
-      <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-200">
+      {/* <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-200">
         {list.map(item => (
           <div key={item.id} className="p-4 flex items-center justify-between">
             <div>
@@ -31,7 +31,40 @@ export default function AchievementsPage() {
           </div>
         ))}
         {list.length === 0 && <p className="p-4 text-sm text-slate-500">No ticker items yet.</p>}
+      </div> */}
+      <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-200">
+  {list.map(item => (
+    <div key={item.id} className="p-4 flex items-start gap-4">
+
+      {/* TEXT BLOCK */}
+      <div className="flex-1 break-all whitespace-normal">
+        <p className="text-sm font-medium">{item.textEn}</p>
+        <p className="text-xs text-slate-500">{item.textHi}</p>
       </div>
+
+      {/* BUTTON + BADGE */}
+      <div className="flex items-center gap-3 text-sm shrink-0">
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            item.active
+              ? 'bg-green-100 text-green-700'
+              : 'bg-slate-200 text-slate-600'
+          }`}
+        >
+          {item.active ? 'Active' : 'Hidden'}
+        </span>
+
+        <AchievementFormButton achievement={item} onSaved={() => refetch()} />
+      </div>
+
+    </div>
+  ))}
+
+  {list.length === 0 && (
+    <p className="p-4 text-sm text-slate-500">No ticker items yet.</p>
+  )}
+</div>
+
     </div>
   )
 }
@@ -61,10 +94,36 @@ function AchievementFormButton({ achievement, onSaved }) {
       setSaving(false)
     }
   }
+  const [busy, setBusy] = useState(false)
+  const toggleDelete = async () => {
+    setBusy(true)
+    let payload = {};
+    try {
+      await adminApiFetch(`/achievements/${achievement.id}`, { token, method: 'DELETE', body: payload })
+      onSaved?.()
+    } finally { setBusy(false) }
+  }
 
   if (!open) {
     if (achievement) {
-      return <button onClick={() => setOpen(true)} className="px-3 py-2 text-sm border border-slate-300 rounded">Edit</button>
+      return (<>
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={() => setOpen(true)}
+            className="px-3 py-2 text-sm border border-slate-300 rounded"
+          >
+            Edit
+          </button>
+
+          <button
+            onClick={toggleDelete}
+            disabled={busy}
+            className="rounded border border-red-300 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60"
+          >
+            {busy ? 'Deleting…' : 'Delete'}
+          </button>
+        </div>
+      </>)
     }
     return <button onClick={() => setOpen(true)} className="px-3 py-2 text-sm bg-slate-900 text-white rounded">Add ticker item</button>
   }

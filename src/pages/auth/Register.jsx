@@ -152,6 +152,7 @@ const EDUCATION = {
     { value: 'postgraduate', label: 'Postgraduate' },
     { value: 'phd', label: 'PhD' },
   ],
+
   hi: [
     { value: 'high_school', label: 'हाई स्कूल' },
     { value: 'graduate', label: 'स्नातक' },
@@ -197,6 +198,7 @@ export default function Register() {
 
   const [showPwd, setShowPwd] = useState(false)
 
+  const [gotraform, setgotraform] = useState({})
   const [form, setForm] = useState({
     name: '', email: '', password: '',
     dob: '', gender: '', maritalStatus: '',
@@ -232,6 +234,11 @@ export default function Register() {
       village: ''
     },
   })
+
+  const handleChange = (field) => (event) => {
+    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value
+    setgotraform((prev) => ({ ...prev, [field]: value }))
+  }
 
   const [addr, setAddr] = useState({
     state: '', stateCode: '', district: '', districtCode: '', city: '', cityCode: '', pin: '', permanentaddress: ''
@@ -373,7 +380,7 @@ export default function Register() {
       setError(t.addressRequired);
       return
     }
-    
+
     setStep(5)
   }
 
@@ -401,7 +408,12 @@ export default function Register() {
         phone,
         refCode: normalizedRef || null,
         form,
-        gotra,
+        gotra: {
+          self: gotra?.self == '__custom' ? gotraform?.self : gotra?.self,
+          mother: gotra?.mother == '__custom' ? gotraform?.mother : gotra?.mother,
+          nani: gotra?.nani == '__custom' ? gotraform?.nani : gotra?.nani,
+          dadi: gotra?.dadi == '__custom' ? gotraform?.dadi : gotra?.dadi
+        },
 
         janAadharUrl: ja,
         janAadhaarUrl: ja,
@@ -428,7 +440,7 @@ export default function Register() {
 
   const gotraOpts = useMemo(() => gotraOptions(lang), [lang])
   const [sameAsCurrent, setSameAsCurrent] = useState(false)
-
+  const [sameAsOccupation, setSameAsOccupation] = useState(false)
   useEffect(() => {
     if (sameAsCurrent) {
       setForm(prev => ({
@@ -437,6 +449,24 @@ export default function Register() {
       }))
     }
   }, [sameAsCurrent, form.currentAddress])
+
+  useEffect(() => {
+    if (sameAsOccupation) {
+      setForm(prev => ({
+        ...prev,
+        currentAddress: { ...prev.occupationAddress }
+      }))
+    }
+  }, [sameAsOccupation, form.occupationAddress])
+
+  const checkReferral = async (code) => {
+    try {
+      const res = await post('/auth/check-referral', { code })
+      return res.exists
+    } catch {
+      return false
+    }
+  }
 
   return (
     <main className="bg-slate-50">
@@ -469,21 +499,6 @@ export default function Register() {
                   inputMode="tel"
                 />
 
-                {!OTP_ENABLED && (
-                  <>
-                    <label className="text-sm font-medium text-slate-700">{t.referral}</label>
-                    <input
-                      className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder={t.referral}
-                      value={ref}
-                      maxLength={6}
-                      onChange={(e) =>
-                        setRef(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))
-                      }
-                    />
-                  </>
-                )}
-
                 <div className="flex gap-2">
                   <button
                     onClick={startOtp}
@@ -505,14 +520,7 @@ export default function Register() {
             {/* STEP 2 (OTP) — hidden when bypassing */}
             {OTP_ENABLED && step === 2 && (
               <div className="space-y-3">
-                <label className="text-sm font-medium text-slate-700">{t.referral}</label>
-                <input
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder={t.referral}
-                  value={ref}
-                  maxLength={6}
-                  onChange={(e) => setRef(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
-                />
+
                 <label className="text-sm font-medium text-slate-700">{t.otp}</label>
                 <input
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -536,6 +544,43 @@ export default function Register() {
             {/* STEP 3 – Personal */}
             {step === 3 && (
               <div className="space-y-4">
+                <label className="text-sm font-medium text-slate-700">{t.referral}</label>
+                {/* <input
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder={t.referral}
+                  value={ref}
+                  maxLength={6}
+                  onChange={(e) => setRef(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
+                /> */}
+
+                <input
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base"
+                  placeholder={t.referral}
+                  value={ref}
+                  maxLength={6}
+                  onChange={(e) => {
+                    const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6)
+                    setRef(val)
+                  }}
+                  onBlur={async () => {
+                    if (!ref) return
+
+                    if (!/^[A-Z0-9]{6}$/.test(ref)) {
+                      setError(t.invalidReferral)
+                      return
+                    }
+
+                    const exists = await checkReferral(ref)
+                    if (!exists) {
+                      setError(
+                        t.referralNotFound)
+                    } else {
+                      setError('')
+                    }
+                  }}
+                />
+
+                {/* ---- */}
                 <input
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder={t.fullName}
@@ -639,14 +684,25 @@ export default function Register() {
                   setForm={setForm}
                   {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
                 />
-
-                <AddressBlock
-                  title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
-                  formKey="currentAddress"
-                  form={form}
-                  setForm={setForm}
-                  {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
-                />
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+                  <input
+                    type="checkbox"
+                    checked={sameAsOccupation}
+                    onChange={(e) => setSameAsOccupation(e.target.checked)}
+                    className="h-4 w-4"
+                  />
+                  {lang === 'hi'
+                    ? 'वर्तमान पता व्यवसाय के पते जैसा ही है' :
+                    'Current address is same as occupation address'}
+                </label>
+                {!sameAsOccupation && (
+                  <AddressBlock
+                    title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+                    formKey="currentAddress"
+                    form={form}
+                    setForm={setForm}
+                    {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+                  />)}
                 <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
                   <input
                     type="checkbox"
@@ -658,14 +714,15 @@ export default function Register() {
                     ? 'पैतृक पता वर्तमान पते जैसा ही है'
                     : 'Parental address is same as current address'}
                 </label>
-
-                <AddressBlock
-                  title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
-                  formKey="parentalAddress"
-                  form={form}
-                  setForm={setForm}
-                  {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
-                />
+                {!sameAsCurrent && (
+                  <AddressBlock
+                    title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+                    formKey="parentalAddress"
+                    form={form}
+                    setForm={setForm}
+                    {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+                  />
+                )}
 
                 <div className="flex gap-2">
                   <button onClick={prev} className="px-5 py-3 rounded-xl border">{t.back}</button>
@@ -678,35 +735,76 @@ export default function Register() {
 
             {/* STEP 5 – Gotra */}
             {step === 5 && (
+              ///
               <div className="grid gap-4 md:grid-cols-2">
-                <SelectField
-                  label={t.gotraSelf}
-                  value={gotra.self}
-                  onChange={(v) => setGotra({ ...gotra, self: v })}
-                  options={gotraOpts}
-                  placeholder={t.placeholders.gotra}
-                />
-                <SelectField
-                  label={t.gotraMother}
-                  value={gotra.mother}
-                  onChange={(v) => setGotra({ ...gotra, mother: v })}
-                  options={gotraOpts}
-                  placeholder={t.placeholders.gotra}
-                />
-                <SelectField
-                  label={t.gotraDadi}
-                  value={gotra.dadi}
-                  onChange={(v) => setGotra({ ...gotra, dadi: v })}
-                  options={gotraOpts}
-                  placeholder={t.placeholders.gotra}
-                />
-                <SelectField
-                  label={t.gotraNani}
-                  value={gotra.nani}
-                  onChange={(v) => setGotra({ ...gotra, nani: v })}
-                  options={gotraOpts}
-                  placeholder={t.placeholders.gotra}
-                />
+                <div className="space-y-2">
+                  <SelectField
+                    label={t.gotraSelf}
+                    value={gotra.self}
+                    onChange={(v) => setGotra({ ...gotra, self: v })}
+                    options={gotraOpts}
+                    placeholder={t.placeholders.gotra}
+                  />
+                  {gotra?.self == '__custom' && (
+                    <input
+                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                      value={gotraform.self}
+                      onChange={handleChange('self')}
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                    />
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <SelectField
+                    label={t.gotraMother}
+                    value={gotra.mother}
+                    onChange={(v) => setGotra({ ...gotra, mother: v })}
+                    options={gotraOpts}
+                    placeholder={t.placeholders.gotra}
+                  />
+                  {gotra?.mother == '__custom' && (
+                    <input
+                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                      value={gotraform.mother}
+                      onChange={handleChange('mother')}
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                    />
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <SelectField
+                    label={t.gotraDadi}
+                    value={gotra.dadi}
+                    onChange={(v) => setGotra({ ...gotra, dadi: v })}
+                    options={gotraOpts}
+                    placeholder={t.placeholders.gotra}
+                  />
+                  {gotra?.dadi == '__custom' && (
+                    <input
+                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                      value={gotraform.dadi}
+                      onChange={handleChange('dadi')}
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                    />
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <SelectField
+                    label={t.gotraNani}
+                    value={gotra.nani}
+                    onChange={(v) => setGotra({ ...gotra, nani: v })}
+                    options={gotraOpts}
+                    placeholder={t.placeholders.gotra}
+                  />
+                  {gotra?.nani == '__custom' && (
+                    <input
+                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                      value={gotraform.nani}
+                      onChange={handleChange('nani')}
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                    />
+                  )}
+                </div>
 
                 <div className="md:col-span-2 flex gap-2">
                   <button onClick={prev} className="px-5 py-3 rounded-xl border">{t.back}</button>

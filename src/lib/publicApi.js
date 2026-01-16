@@ -24,6 +24,9 @@ export const fetchPublicHistory = (category = 'history') => {
   const qs = new URLSearchParams({ category })
   return get(`/public/history?${qs.toString()}`)
 }
+export const fetchHistory = () => {
+  return get(`/public/history`)
+}
 
 export const fetchPublicPlans = () => get('/public/plans')
 

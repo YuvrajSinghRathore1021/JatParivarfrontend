@@ -9,6 +9,7 @@ import SelectField from '../../../components/SelectField'
 import DateField from '../../../components/DateField'
 import { useGeoOptions } from '../../../hooks/useGeoOptions'
 import { asOptions as gotraOptions } from '../../../constants/gotras'
+import AddressBlock from '../../../components/AddressBlock'
 let API_File = import.meta.env.VITE_API_File
 const spotlightLabels = {
   founder: { labelEn: 'Founder listing', labelHi: 'संस्थापक सूची' },
@@ -16,7 +17,7 @@ const spotlightLabels = {
   none: { labelEn: 'Hide from public listing', labelHi: 'सार्वजनिक सूची से छुपाएँ' }
 }
 
-const emptyAddress = { line1: '', line2: '', city: '', district: '', state: '', pin: '' }
+
 const emptyGotra = { self: '', mother: '', dadi: '', nani: '' }
 
 export default function ProfileEditor() {
@@ -55,7 +56,7 @@ export default function ProfileEditor() {
     alternatePhone: '',
     janAadhaarUrl: '',
     dateOfBirth: '',
-    address: emptyAddress,
+
     gotra: emptyGotra,
     avatarUrl: '',
     spotlightRole: 'none',
@@ -66,6 +67,36 @@ export default function ProfileEditor() {
     spotlightBannerUrl: '',
     spotlightVisible: true,
     referralCode: '',
+
+    occupationAddress: {
+      state: '',
+      stateCode: '',
+      district: '',
+      districtCode: '',
+      city: '',
+      cityCode: '',
+      village: ''
+    },
+
+    currentAddress: {
+      state: '',
+      stateCode: '',
+      district: '',
+      districtCode: '',
+      city: '',
+      cityCode: '',
+      village: ''
+    },
+
+    parentalAddress: {
+      state: '',
+      stateCode: '',
+      district: '',
+      districtCode: '',
+      city: '',
+      cityCode: '',
+      village: ''
+    },
   })
 
   const [passwordForm, setPasswordForm] = useState({ current: '', next: '', confirm: '' })
@@ -97,14 +128,7 @@ export default function ProfileEditor() {
       alternatePhone: user?.alternatePhone || '',
       janAadhaarUrl: user?.janAadhaarUrl || '',
       dateOfBirth: dobValue,
-      address: {
-        line1: user?.address?.line1 || '',
-        line2: user?.address?.line2 || '',
-        city: user?.address?.city || '',
-        district: user?.address?.district || '',
-        state: user?.address?.state || '',
-        pin: user?.address?.pin || '',
-      },
+
       gotra: {
         self: user?.gotra?.self || '',
         mother: user?.gotra?.mother || '',
@@ -120,38 +144,41 @@ export default function ProfileEditor() {
       spotlightBannerUrl: person?.bannerUrl || '',
       spotlightVisible: person?.visible ?? true,
       referralCode: user?.referralCode || '',
+
+
+      occupationAddress: {
+        state: user?.occupationAddress?.state,
+        stateCode: user?.occupationAddress?.stateCode,
+        district: user?.occupationAddress?.district,
+        districtCode: user?.occupationAddress?.districtCode,
+        city: user?.occupationAddress?.city,
+        cityCode: user?.occupationAddress?.cityCode,
+        village: user?.occupationAddress?.village
+      },
+
+      currentAddress: {
+        state: user?.currentAddress?.state,
+        stateCode: user?.currentAddress?.stateCode,
+        district: user?.currentAddress?.district,
+        districtCode: user?.currentAddress?.districtCode,
+        city: user?.currentAddress?.city,
+        cityCode: user?.currentAddress?.cityCode,
+        village: user?.currentAddress?.village
+      },
+
+      parentalAddress: {
+        state: user?.currentAddress?.state,
+        stateCode: user?.currentAddress?.stateCode,
+        district: user?.currentAddress?.district,
+        districtCode: user?.currentAddress?.districtCode,
+        city: user?.currentAddress?.city,
+        cityCode: user?.currentAddress?.cityCode,
+        village: user?.currentAddress?.village
+      },
     })
   }, [data])
 
-  useEffect(() => {
-    if (!form.address.state && (geoCodes.stateCode || geoCodes.districtCode || geoCodes.cityCode)) {
-      setGeoCodes({ stateCode: '', districtCode: '', cityCode: '' })
-    }
-  }, [form.address.state, geoCodes.stateCode, geoCodes.districtCode, geoCodes.cityCode])
 
-  useEffect(() => {
-    if (!form.address.state || geoCodes.stateCode || !states.length) return
-    const code = matchCodeByName(states, form.address.state)
-    if (code) {
-      setGeoCodes((prev) => ({ ...prev, stateCode: code }))
-    }
-  }, [form.address.state, states, geoCodes.stateCode])
-
-  useEffect(() => {
-    if (!form.address.district || geoCodes.districtCode || !districts.length) return
-    const code = matchCodeByName(districts, form.address.district)
-    if (code) {
-      setGeoCodes((prev) => ({ ...prev, districtCode: code }))
-    }
-  }, [form.address.district, districts, geoCodes.districtCode])
-
-  useEffect(() => {
-    if (!form.address.city || geoCodes.cityCode || !cities.length) return
-    const code = matchCodeByName(cities, form.address.city)
-    if (code) {
-      setGeoCodes((prev) => ({ ...prev, cityCode: code }))
-    }
-  }, [form.address.city, cities, geoCodes.cityCode])
 
   const mutation = useMutation({
     mutationFn: updateMyProfile,
@@ -159,6 +186,7 @@ export default function ProfileEditor() {
       qc.invalidateQueries(['profile', 'me'])
       qc.invalidateQueries(['public', 'people'])
       setMessage(lang === 'hi' ? 'प्रोफ़ाइल अपडेट हो गई।' : 'Profile updated successfully.')
+      alert(lang === 'hi' ? 'प्रोफ़ाइल अपडेट हो गई।' : 'Profile updated successfully.')
       setTimeout(() => setMessage(''), 4000)
     },
     onError: (err) => {
@@ -209,12 +237,7 @@ export default function ProfileEditor() {
     })
   }
 
-  const updateAddressField = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      address: { ...(prev.address || {}), [field]: value },
-    }))
-  }
+
 
   const updateGotraField = (field, value) => {
     setForm((prev) => ({
@@ -223,26 +246,7 @@ export default function ProfileEditor() {
     }))
   }
 
-  const onStateSelect = (code) => {
-    const selected = states.find((item) => item.code === code)
-    setGeoCodes({ stateCode: code, districtCode: '', cityCode: '' })
-    updateAddressField('state', selected?.name?.en || '')
-    updateAddressField('district', '')
-    updateAddressField('city', '')
-  }
 
-  const onDistrictSelect = (code) => {
-    const selected = districts.find((item) => item.code === code)
-    setGeoCodes((prev) => ({ ...prev, districtCode: code, cityCode: '' }))
-    updateAddressField('district', selected?.name?.en || '')
-    updateAddressField('city', '')
-  }
-
-  const onCitySelect = (code) => {
-    const selected = cities.find((item) => item.code === code)
-    setGeoCodes((prev) => ({ ...prev, cityCode: code }))
-    updateAddressField('city', selected?.name?.en || '')
-  }
 
   const displayAvatar = useMemo(() => {
     if (form.avatarUrl) return form.avatarUrl
@@ -346,7 +350,13 @@ export default function ProfileEditor() {
       alternatePhone: form.alternatePhone,
       janAadhaarUrl: form.janAadhaarUrl,
       dateOfBirth: form.dateOfBirth || undefined,
-      address: hasValues(form.address) ? form.address : undefined,
+
+      occupationAddress: hasValues(form.occupationAddress) ? form.occupationAddress : undefined,
+      currentAddress: hasValues(form.currentAddress) ? form.currentAddress : undefined,
+      parentalAddress: hasValues(form.parentalAddress) ? form.parentalAddress : undefined,
+
+
+
       gotra: hasValues(form.gotra) ? form.gotra : undefined,
       spotlightRole: form.spotlightRole === 'none' ? 'none' : form.spotlightRole,
       spotlightTitle: form.spotlightTitle,
@@ -371,6 +381,28 @@ export default function ProfileEditor() {
     }
     passwordMutation.mutate({ currentPassword: passwordForm.current, newPassword: passwordForm.next })
   }
+  const [sameAsCurrent, setSameAsCurrent] = useState(false)
+  const [sameAsOccupation, setSameAsOccupation] = useState(false)
+
+  useEffect(() => {
+    if (sameAsCurrent) {
+      setForm(prev => ({
+        ...prev,
+        parentalAddress: { ...prev.currentAddress }
+      }))
+    }
+  }, [sameAsCurrent, form.currentAddress])
+
+  useEffect(() => {
+    if (sameAsOccupation) {
+      setForm(prev => ({
+        ...prev,
+        currentAddress: { ...prev.occupationAddress }
+      }))
+    }
+  }, [sameAsOccupation, form.occupationAddress])
+
+
 
   return (
     <div className="space-y-6">
@@ -388,7 +420,7 @@ export default function ProfileEditor() {
         </header>
 
         <section className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center md:flex-row md:items-center md:gap-6 md:text-left">
-          <img src={API_File+displayAvatar} alt={form.displayName || form.name || 'Member avatar'} className="h-28 w-28 rounded-3xl object-cover" />
+          <img src={API_File + displayAvatar} alt={form.displayName || form.name || 'Member avatar'} className="h-28 w-28 rounded-3xl object-cover" />
           <div className="space-y-3">
             <div>
               <p className="text-sm font-semibold text-slate-700">{lang === 'hi' ? 'प्रोफ़ाइल फोटो' : 'Profile photo'}</p>
@@ -472,34 +504,57 @@ export default function ProfileEditor() {
           />
         </div>
 
-        <section className="grid gap-4 md:grid-cols-2">
-          <LabeledField label={lang === 'hi' ? 'पता पंक्ति 1' : 'Address line 1'} value={form.address.line1} onChange={(e) => updateAddressField('line1', e.target.value)} />
-          <LabeledField label={lang === 'hi' ? 'पता पंक्ति 2' : 'Address line 2'} value={form.address.line2} onChange={(e) => updateAddressField('line2', e.target.value)} />
-          <SelectField
-            label={lang === 'hi' ? 'राज्य' : 'State'}
-            value={geoCodes.stateCode}
-            onChange={onStateSelect}
-            options={stateOptions}
-            placeholder={lang === 'hi' ? 'राज्य चुनें' : 'Select state'}
+        {/* <address></address> */}
+
+        <AddressBlock
+          title={lang === 'hi' ? 'व्यवसाय का पता' : 'Occupation Address'}
+          formKey="occupationAddress"
+          form={form}
+          setForm={setForm}
+          {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+        />
+        <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+          <input
+            type="checkbox"
+            checked={sameAsOccupation}
+            onChange={(e) => setSameAsOccupation(e.target.checked)}
+            className="h-4 w-4"
           />
-          <SelectField
-            label={lang === 'hi' ? 'ज़िला' : 'District'}
-            value={geoCodes.districtCode}
-            onChange={onDistrictSelect}
-            options={districtOptions}
-            placeholder={lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}
-            disabled={!geoCodes.stateCode}
+          {lang === 'hi'
+            ? 'वर्तमान पता व्यवसाय के पते जैसा ही है' :
+            'Current address is same as occupation address'}
+        </label>
+        {!sameAsOccupation && (
+
+
+          <AddressBlock
+            title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+            formKey="currentAddress"
+            form={form}
+            setForm={setForm}
+            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
           />
-          <SelectField
-            label={lang === 'hi' ? 'शहर' : 'City'}
-            value={geoCodes.cityCode}
-            onChange={onCitySelect}
-            options={cityOptions}
-            placeholder={lang === 'hi' ? 'शहर चुनें' : 'Select city'}
-            disabled={!geoCodes.districtCode}
+        )}
+        <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+          <input
+            type="checkbox"
+            checked={sameAsCurrent}
+            onChange={(e) => setSameAsCurrent(e.target.checked)}
+            className="h-4 w-4"
           />
-          <LabeledField label={lang === 'hi' ? 'पिनकोड' : 'PIN'} value={form.address.pin} onChange={(e) => updateAddressField('pin', e.target.value)} />
-        </section>
+          {lang === 'hi'
+            ? 'पैतृक पता वर्तमान पते जैसा ही है'
+            : 'Parental address is same as current address'}
+        </label>
+        {!sameAsCurrent && (
+          <AddressBlock
+            title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+            formKey="parentalAddress"
+            form={form}
+            setForm={setForm}
+            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+          />
+        )}
 
         <section className="grid gap-4 md:grid-cols-2">
           <SelectField
@@ -616,7 +671,7 @@ export default function ProfileEditor() {
               <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 h-48 grid place-items-center">
                 {form.spotlightBannerUrl ? (
                   <img
-                    src={API_File+form.spotlightBannerUrl}
+                    src={API_File + form.spotlightBannerUrl}
                     alt="Organisation banner"
                     className="h-full w-full object-cover"
                   />

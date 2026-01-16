@@ -20,6 +20,7 @@ export default function MemberDetailPage() {
   const navigate = useNavigate()
   const { token } = useAdminAuth()
   const [sameAsCurrent, setSameAsCurrent] = useState(false);
+  const [sameAsOccupation, setSameAsOccupation] = useState(false)
   const [member, setMember] = useState(null)
   const [personForm, setPersonForm] = useState(null)
   const [error, setError] = useState('')
@@ -330,14 +331,47 @@ export default function MemberDetailPage() {
             setForm={setMember}
             {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
           />
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+              <input
+                type="checkbox"
+                checked={sameAsOccupation}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setSameAsOccupation(checked);
 
-          <AddressBlock
-            title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
-            formKey="currentAddress"
-            form={member}
-            setForm={setMember}
-            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
-          />
+                  if (checked) {
+                    // copy current -> parental
+                    setMember((prev) => ({
+                      ...prev,
+                      currentAddress: { ...(prev?.occupationAddress || {}) }
+                    }));
+                  } else {
+                    // reset parental
+                    setMember((prev) => ({
+                      ...prev,
+                      currentAddress: { state: "", district: "", city: "", address: "" }
+                    }));
+                  }
+                }}
+                className="h-4 w-4"
+              />
+              {lang === 'hi'
+                ? 'वर्तमान पता व्यवसाय के पते जैसा ही है' :
+                'Current address is same as occupation address'}
+            </label>
+
+          </label>
+          {!sameAsOccupation && (
+            <AddressBlock
+              title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+              formKey="currentAddress"
+              form={member}
+              setForm={setMember}
+              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+            />
+
+          )}
           <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
             <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
               <input
@@ -370,13 +404,15 @@ export default function MemberDetailPage() {
 
           </label>
 
-          <AddressBlock
-            title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
-            formKey="parentalAddress"
-            form={member}
-            setForm={setMember}
-            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
-          />
+          {!sameAsCurrent && (
+            <AddressBlock
+              title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+              formKey="parentalAddress"
+              form={member}
+              setForm={setMember}
+              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+            />
+          )}
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">

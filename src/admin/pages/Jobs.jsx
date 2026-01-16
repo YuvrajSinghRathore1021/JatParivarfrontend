@@ -96,9 +96,9 @@ function JobCard({ job, onSaved }) {
 
   return (
     <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
-      <h2 className="text-lg font-semibold">{job.title}</h2>
-      <p className="text-sm text-slate-500">{job.locationCity}, {job.locationState}</p>
-      <p className="text-xs text-slate-500 mt-1">{job.description?.slice(0, 140) || 'No description.'}</p>
+      <h2 className="text-lg font-semibold break-all">{job.title}</h2>
+      <p className="text-sm text-slate-500 ">{job.locationCity}, {job.locationState}</p>
+      <p className="text-xs text-slate-500 mt-1 break-all">{job.description?.slice(0, 140) || 'No description.'}</p>
 
       <div className="flex items-center gap-2 mt-3">
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${job.approved ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>

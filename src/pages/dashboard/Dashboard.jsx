@@ -12,6 +12,7 @@ import JobsRoutes from './jobs/JobsRoutes'
 import InstitutionRoutes from './institutions/InstitutionRoutes'
 import ProfileEditor from './profile/ProfileEditor'
 import Found from '../Found';
+import UserDetails from '../../pages/people/UserDetails'
 
 const navItems = [
   { key: 'overview', labelEn: 'Overview', labelHi: 'अवलोकन', to: 'dashboard' },
@@ -345,6 +346,7 @@ export default function Dashboard() {
         <Route index element={<Overview />} />
         <Route path="matrimony/*" element={<MatrimonyRoutes />} />
         <Route path="found" element={<Found />} />
+        <Route path="found/:personId" element={<UserDetails />} />
         <Route path="jobs/*" element={<JobsRoutes />} />
         <Route path="dharamshalaye/*" element={<InstitutionRoutes kind="dharamshala" />} />
         <Route path="sansthaye/*" element={<InstitutionRoutes kind="sanstha" />} />
