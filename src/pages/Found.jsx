@@ -303,13 +303,13 @@ export default function Found() {
                                     {/* DETAILS */}
                                     <div className="flex-1 space-y-1">
                                         {/* NAME */}
-                                        <h2 className="text-xl font-semibold text-slate-900">
+                                        <h2 className="text-xl font-semibold text-slate-900 break-all line-clamp-2">
                                             {p.name}
                                         </h2>
 
                                         {/* TITLE / DISPLAY NAME */}
                                         {p.title && (
-                                            <p className="text-sm font-medium text-blue-600">
+                                            <p className="text-sm font-medium text-blue-600 break-all line-clamp-2">
                                                 {p.title}
                                             </p>
                                         )}

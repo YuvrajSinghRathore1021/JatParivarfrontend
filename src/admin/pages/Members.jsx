@@ -187,8 +187,8 @@ export default function MembersPage() {
             {list.map((member) => (
               <tr key={member.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-slate-800">{member.name || '—'}</div>
-                  <div className="text-xs text-slate-500">{member.displayName}</div>
+                  <div className="font-medium text-slate-800 break-all line-clamp-2">{member.name || '—'}</div>
+                  <div className="text-xs text-slate-500 break-all line-clamp-2">{member.displayName}</div>
                   <div className="text-xs text-slate-400">{member.email || '—'}</div>
                 </td>
                 <td className="px-4 py-3 text-slate-700">
@@ -304,7 +304,7 @@ function MemberCreateButton({ onCreated }) {
     alternatePhone: '',
     avatarUrl: '',
     janAadhaarUrl: '',
-    gotra: { self: '', mother: '', dadi: '', nani: '' },
+    gotra: { self: '__custom', mother: '__custom', dadi: '__custom', nani: '__custom' },
 
     occupationAddress: {
       state: '',
@@ -359,7 +359,7 @@ function MemberCreateButton({ onCreated }) {
       alternatePhone: '',
       avatarUrl: '',
       janAadhaarUrl: '',
-      gotra: { self: '', mother: '', dadi: '', nani: '' },
+      gotra: { self: '__custom', mother: '__custom', dadi: '__custom', nani: '__custom' },
 
       occupationAddress: {
         state: '',

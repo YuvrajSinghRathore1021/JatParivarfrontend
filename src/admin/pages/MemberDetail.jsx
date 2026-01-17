@@ -355,13 +355,15 @@ export default function MemberDetailPage() {
                   const checked = e.target.checked;
                   setSameAsOccupation(checked);
 
+
                   if (checked) {
                     // copy current -> parental
                     setMember((prev) => ({
                       ...prev,
                       currentAddress: { ...(prev?.occupationAddress || {}) }
                     }));
-                  } else {
+                  }
+                   else {
                     // reset parental
                     setMember((prev) => ({
                       ...prev,

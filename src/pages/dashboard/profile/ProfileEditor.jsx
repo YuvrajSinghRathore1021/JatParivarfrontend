@@ -18,7 +18,7 @@ const spotlightLabels = {
 }
 
 
-const emptyGotra = { self: '', mother: '', dadi: '', nani: '' }
+const emptyGotra = { self: '__custom', mother: '__custom', dadi: '__custom', nani: '__custom' }
 
 export default function ProfileEditor() {
   const { lang } = useLang()

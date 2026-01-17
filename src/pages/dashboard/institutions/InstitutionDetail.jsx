@@ -178,11 +178,11 @@ export default function InstitutionDetail({ kind, web = false }) {
 
             {/* ===== Title + Description ===== */}
             <section className="px-4 space-y-3">
-                <h1 className="text-3xl font-bold text-slate-900">{title}</h1>
+                <h1 className="text-3xl font-bold text-slate-900 break-all  ">{title}</h1>
                 {kind == "sanstha" && (
-                    <p className="text-sm text-slate-500">{lang === 'hi' ? 'व्यवसाय:' : 'Business:'} {lang === 'hi' ? item?.businessHi || item?.businessEn : item?.businessEn || item?.businessHi}</p>
+                    <p className="text-sm text-slate-500 ">{lang === 'hi' ? 'व्यवसाय:' : 'Business:'} {lang === 'hi' ? item?.businessHi || item?.businessEn : item?.businessEn || item?.businessHi}</p>
                 )}
-                <p className="text-slate-600">{desc}</p>
+                <p className="text-slate-600 break-all">{desc}</p>
             </section>
 
             {/* ===== Address Card ===== */}

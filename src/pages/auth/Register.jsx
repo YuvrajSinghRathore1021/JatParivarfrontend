@@ -245,8 +245,9 @@ export default function Register() {
   })
 
   const [gotra, setGotra] = useState({
-    self: '', mother: '', nani: '', dadi: ''
+    self: '__custom', mother: '__custom', nani: '__custom', dadi: '__custom'
   })
+  
 
   const [janAadhar, setJanAadhar] = useState(null)
   const [profilePhoto, setProfilePhoto] = useState(null)

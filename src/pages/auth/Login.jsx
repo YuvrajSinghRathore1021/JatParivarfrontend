@@ -267,7 +267,7 @@ export default function Login() {
           {/* Forget Password */}
           <div className="text-right -mt-2">
             <Link
-              to={makePath('forgetPassword')}
+              to={makePath('forget-password')}
               className="text-sm font-semibold text-blue-600 hover:text-blue-500"
             >
               {t.forgetPassword}

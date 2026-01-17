@@ -98,10 +98,10 @@ function InstitutionCard({ item, onSaved }) {
 
   return (
     <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
-      <h2 className="text-lg font-semibold">{item.titleEn || item.titleHi}</h2>
-      <p className="text-sm text-slate-500">{item.city}, {item.state}</p>
-      <p className="text-xs text-slate-500 mt-1">{item.descriptionEn?.slice(0, 120) || 'No description provided.'}</p>
+      <h2 className="text-lg font-semibold break-all ">{item.titleEn || item.titleHi}</h2>
 
+      <p className="text-xs text-slate-500 mt-1 break-all ">{item.descriptionEn?.slice(0, 120) || 'No description provided.'}</p>
+      <br/><p className="text-sm text-slate-500">{item.city}, {item.state}</p>
       <div className="flex items-center gap-2 mt-3 text-xs">
         <span className={`px-2 py-1 rounded-full border ${item.approved ? 'bg-green-50 text-green-700 border-green-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
           {item.approved ? 'Approved' : 'Pending'}

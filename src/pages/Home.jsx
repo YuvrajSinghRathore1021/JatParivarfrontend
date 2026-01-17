@@ -9,7 +9,7 @@ import CardProduct from '../components/cards/CardProduct'
 import FeesCarousel from '../components/FeesCarousel'
 import AchievementsTicker from '../components/AchievementsTicker'
 import { useLang } from '../lib/useLang'
-import { fetchHomeImpact, fetchPublicNews, fetchPublicPeople, fetchPublicPlans } from '../lib/publicApi'
+import { fetchHomeImpact, fetchHomeImpactachievement, fetchPublicNews, fetchPublicPeople, fetchPublicPlans } from '../lib/publicApi'
 
 // ===== Avatar helpers (fallback when DB doesn't have avatarUrl) =====
 const AVATAR_COLORS = ['#3B82F6', '#EF4444', '#9CA3AF', '#22C55E']
@@ -421,19 +421,38 @@ export default function Home() {
     const source = Array.isArray(impactQ.data?.stats) && impactQ.data.stats.length
       ? impactQ.data.stats
       : DEFAULT_IMPACT.stats
+    
+
+
     return source.map((stat, idx) => {
       const fallback = DEFAULT_IMPACT.stats[idx % DEFAULT_IMPACT.stats.length]
+      
+      // return {
+      //   id: stat.id || fallback.id,
+      //   // value: stat.value || fallback.value,
+      //   value: stat.value || fallback.value,
+      //   label: {
+      //     en: stat.labelEn || stat.label?.en || fallback.label.en,
+      //     hi: stat.labelHi || stat.label?.hi || fallback.label.hi,
+      //   },
+      //   description: {
+      //     en: stat.descriptionEn || stat.description?.en || fallback.description.en,
+      //     hi: stat.descriptionHi || stat.description?.hi || fallback.description.hi,
+      //   },
+      // }
       return {
-        id: stat.id || fallback.id,
-        value: stat.value || fallback.value,
+        id: stat.id,
+        value: stat.value,
         label: {
-          en: stat.labelEn || stat.label?.en || fallback.label.en,
-          hi: stat.labelHi || stat.label?.hi || fallback.label.hi,
+          en: stat.labelEn,
+          hi: stat.labelEn,
         },
         description: {
-          en: stat.descriptionEn || stat.description?.en || fallback.description.en,
-          hi: stat.descriptionHi || stat.description?.hi || fallback.description.hi,
+          en: stat.descriptionEn,
+          hi: stat.descriptionHi,
         },
+
+        
       }
     })
   }, [impactQ.data])
@@ -464,12 +483,13 @@ export default function Home() {
 
   const tickerItems = useMemo(() => {
     if (impactStats.length) {
-      return impactStats.map((stat) => `${stat.label[langKey]} — ${stat.value}`)
+      // return impactStats.map((stat) => `${stat.label[langKey]} — ${stat.value}`)
+      return impactStats.map((stat) => `${stat.label[langKey]}`)
     }
     return langKey === 'hi' ? TICKER_FALLBACK.hi : TICKER_FALLBACK.en
   }, [impactStats, langKey])
 
-  
+
   const membershipPlans = useMemo(() => {
     const data = Array.isArray(plansQ.data) ? plansQ.data : []
     const planMap = new Map(data.map((plan) => [plan.code, plan]))
@@ -508,7 +528,7 @@ export default function Home() {
   )
 
   return (
-<main className="pb-20 bg-slate-50 overflow-x-hidden">
+    <main className="pb-20 bg-slate-50 overflow-x-hidden">
       <HeroScrollYouTube
         youtubeId="LyROt7AWuNo"
         stickyVh={60}

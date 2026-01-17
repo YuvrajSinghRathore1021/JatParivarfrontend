@@ -31,5 +31,6 @@ export const fetchHistory = () => {
 export const fetchPublicPlans = () => get('/public/plans')
 
 export const fetchHomeImpact = () => get('/public/site/home-impact')
+export const fetchHomeImpactachievement = () => get('/public/site/home-impact-achievement')
 
 export const fetchFooterInfo = () => get('/public/site/footer')

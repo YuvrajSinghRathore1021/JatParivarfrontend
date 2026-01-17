@@ -25,14 +25,51 @@ export default function UserDetails() {
   const email = member?.contactEmail || member?.email || '—'
   const occupation = member?.occupation || '—'
   const organisation = member?.company || '—'
-  const address = member?.address || {}
+
   const addressEntries = [
-    { key: 'line1', labelEn: 'Address line 1', labelHi: 'पता पंक्ति 1', value: address.line1 || '—' },
-    { key: 'line2', labelEn: 'Address line 2', labelHi: 'पता पंक्ति 2', value: address.line2 || '—' },
-    { key: 'city', labelEn: 'City', labelHi: 'शहर', value: address.city || '—' },
-    { key: 'district', labelEn: 'District', labelHi: 'ज़िला', value: address.district || '—' },
-    { key: 'state', labelEn: 'State', labelHi: 'राज्य', value: address.state || '—' },
-  ]
+  {
+    key: 'currentAddress',
+    labelEn: 'Current Address',
+    labelHi: 'वर्तमान पता',
+    value: member?.currentAddress
+      ? [
+          member.currentAddress.village,
+          member.currentAddress.city,
+          member.currentAddress.district,
+          member.currentAddress.state,
+          member.currentAddress.pincode
+        ].filter(Boolean).join(', ')
+      : '—'
+  },
+  {
+    key: 'parentalAddress',
+    labelEn: 'Parental Address',
+    labelHi: 'पैतृक पता',
+    value: member?.parentalAddress
+      ? [
+          member.parentalAddress.village,
+          member.parentalAddress.city,
+          member.parentalAddress.district,
+          member.parentalAddress.state,
+          member.parentalAddress.pincode
+        ].filter(Boolean).join(', ')
+      : '—'
+  },
+  {
+    key: 'occupationAddress',
+    labelEn: 'Occupation Address',
+    labelHi: 'कार्यस्थल का पता',
+    value: member?.occupationAddress
+      ? [
+          member.occupationAddress.village,
+          member.occupationAddress.city,
+          member.occupationAddress.district,
+          member.occupationAddress.state,
+          member.occupationAddress.pincode
+        ].filter(Boolean).join(', ')
+      : '—'
+  }
+]
   const image = useMemo(() => {
     if (!person) return null
     if (person.photo) return API_File + person.photo

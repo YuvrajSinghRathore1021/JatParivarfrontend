@@ -87,8 +87,8 @@ export default function JobBoard() {
               <article key={job.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900">{job.title}</h3>
-                    <p className="mt-1 text-sm text-slate-600">{job.description}</p>
+                    <h3 className="text-lg font-semibold text-slate-900 break-all line-clamp-2">{job.title}</h3>
+                    {/* <p className="mt-1 text-sm text-slate-600 break-all">{job.description}</p> */}
                     <p className="mt-2 text-xs uppercase tracking-wide text-slate-400">
                       {(() => {
                         const parts = [job.locationCity, job.locationDistrict, job.locationState].filter(Boolean)
@@ -101,20 +101,20 @@ export default function JobBoard() {
                       </p>
                     )}
                   </div>
-                  {!job.applied &&(
-                  <button
-                    type="button"
-                    onClick={() => setExpanded((prev) => (prev === job.id ? null : job.id))}
-                    className="self-start rounded-2xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 hover:border-blue-300"
-                  >
-                    {isExpanded
-                      ? lang === 'hi'
-                        ? 'आवेदन फॉर्म छिपाएँ'
-                        : 'Hide apply form'
-                      : lang === 'hi'
-                      ? 'आवेदन करें'
-                      : 'Apply now'}
-                  </button>
+                  {!job.applied && (
+                    <button
+                      type="button"
+                      onClick={() => setExpanded((prev) => (prev === job.id ? null : job.id))}
+                      className="self-start rounded-2xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 hover:border-blue-300"
+                    >
+                      {isExpanded
+                        ? lang === 'hi'
+                          ? 'आवेदन फॉर्म छिपाएँ'
+                          : 'Hide apply form'
+                        : lang === 'hi'
+                          ? 'आवेदन करें'
+                          : 'Apply now'}
+                    </button>
                   )}
                 </div>
 
@@ -138,8 +138,8 @@ export default function JobBoard() {
                           ? 'भेजा जा रहा है...'
                           : 'Submitting...'
                         : lang === 'hi'
-                        ? 'आवेदन भेजें'
-                        : 'Submit application'}
+                          ? 'आवेदन भेजें'
+                          : 'Submit application'}
                     </button>
                     {applied && (
                       <p className="text-sm text-blue-600">

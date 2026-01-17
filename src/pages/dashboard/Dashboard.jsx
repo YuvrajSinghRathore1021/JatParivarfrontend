@@ -163,9 +163,11 @@ function DashboardTopBar() {
             {/* <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               {lang === 'hi' ? 'स्वागत है' : 'Welcome back'}
             </p> */}
-            <p className="text-sm font-semibold text-slate-900">
+            <p className="text-sm font-semibold text-slate-900 break-words overflow-hidden line-clamp-1 max-w-[60px] break-all line-clamp-1">
               {user?.displayName || user?.name || user?.phone || 'Member'}
             </p>
+
+
           </div>
 
           <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-2 py-1 text-xs font-semibold uppercase text-slate-600">
@@ -221,7 +223,7 @@ function DashboardTopBar() {
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                       {lang === 'hi' ? 'सदस्य' : 'Signed in as'}
                     </p>
-                    <p className="mt-1 text-sm font-semibold text-slate-900">
+                    <p className="mt-1 text-sm font-semibold text-slate-900 break-all line-clamp-2">
                       {user?.displayName || user?.name || user?.phone}
                     </p>
                     {user?.referralCode && (

@@ -111,7 +111,7 @@ export default function Founders() {
 
                   {/* Content */}
                   <div className="flex-1 space-y-1 break-words">
-                    <h2 className=" break-words text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition">
+                    <h2 className=" break-words text-lg font-semibold text-slate-900 group-hover:text-blue-600 transition break-all line-clamp-2">
                       {profile.name}
                     </h2>
 
@@ -121,28 +121,21 @@ export default function Founders() {
                       </p>
                     )}
 
-                    {profile.place && (
+                    {/* {profile.place && (
                       <p className="text-xs text-slate-400 uppercase tracking-wide">
                         {profile.place}
                       </p>
-                    )}
+                    )} */}
 
-                    {(profile.occupation || profile.role) && (
-                      <p className="text-xs text-slate-500">
-                        {profile.occupation}
-                        {profile.occupation && profile.role && " • "}
-                        {profile.role}
-                      </p>
-                    )}
                   </div>
                 </div>
 
                 {/* Bio */}
-                {(lang === "hi" ? profile.bioHi : profile.bioEn) && (
-                  <p className="mt-3 text-sm text-slate-600 line-clamp-3">
-                    {lang === "hi" ? profile.bioHi : profile.bioEn}
-                  </p>
-                )}
+                  {/* {(lang === "hi" ? profile.bioHi : profile.bioEn) && (
+                    <p className="mt-3 text-sm text-slate-600 line-clamp-3">
+                      {lang === "hi" ? profile.bioHi : profile.bioEn}
+                    </p>
+                  )} */}
 
                 {/* Contact row */}
                 {(profile.phone || profile.contactEmail) && (

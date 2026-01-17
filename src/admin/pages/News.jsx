@@ -16,6 +16,7 @@ const EMPTY_FORM = {
   bodyHi: '',
   heroImageUrl: '',
   published: false,
+  publishHome: false,
 }
 
 const buildFormState = (item) => ({
@@ -29,6 +30,7 @@ const buildFormState = (item) => ({
   bodyHi: item?.bodyHi || '',
   heroImageUrl: item?.heroImageUrl || '',
   published: Boolean(item?.published),
+  publishHome: Boolean(item?.publishHome),
 })
 
 const formatDate = (value) => {
@@ -160,6 +162,7 @@ function NewsFormButton({ item, onSaved }) {
         bodyHi: form.bodyHi,
         heroImageUrl: form.heroImageUrl,
         published: form.published,
+        publishHome: form.publishHome,
       }
       if (item?.id) {
         await adminApiFetch(`/news/${item.id}`, { token, method: 'PATCH', body: payload })
@@ -339,6 +342,15 @@ function NewsFormButton({ item, onSaved }) {
               className="rounded border-slate-300"
             />
             <span>Published</span>
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              checked={form.publishHome}
+              onChange={(e) => setForm({ ...form, publishHome: e.target.checked })}
+              className="rounded border-slate-300"
+            />
+            <span>Publish On Home Page</span>
           </label>
 
           {/* Footer actions */}

@@ -157,8 +157,8 @@ export default function ManageJobs() {
               <article key={job.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 break-all">{job.title}</h3>
-                    <p className="text-sm text-slate-500 break-all">{job.description}</p>
+                    <h3 className="text-lg font-semibold text-slate-900 break-all line-clamp-1">{job.title}</h3>
+                    {/* <p className="text-sm text-slate-500 break-all">{job.description}</p> */}
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
                       <span className="rounded-full bg-slate-100 px-3 py-1">
                         {lang === 'hi' ? 'स्थिति:' : 'Status:'}{' '}

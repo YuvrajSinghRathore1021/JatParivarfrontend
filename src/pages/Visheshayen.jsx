@@ -149,12 +149,12 @@ export default function Visheshayen() {
               className="rounded-3xl border border-slate-200 bg-white shadow-sm p-6 hover:-translate-y-0.5 hover:shadow-md transition"
             >
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600 font-semibold">
+                {/* <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600 font-semibold">
                   {idx + 1}
-                </span>
+                </span> */}
                 <h2 className="text-lg font-semibold text-slate-900">{feature.heading[langKey]}</h2>
               </div>
-              <p className="mt-3 text-sm text-slate-600 leading-relaxed">{feature.body[langKey]}</p>
+              {/* <p className="mt-3 text-sm text-slate-600 leading-relaxed">{feature.body[langKey]}</p> */}
             </article>
           ))}
         </section>
