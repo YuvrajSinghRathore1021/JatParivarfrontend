@@ -752,7 +752,7 @@ export default function Register() {
                 <div className="space-y-2">
                   <SelectField
                     label={t.gotraSelf}
-                    value={gotra.self}
+                    value={gotra?.self}
                     onChange={(v) => setGotra({ ...gotra, self: v })}
                     options={gotraOpts}
                     placeholder={t.placeholders.gotra}
@@ -769,7 +769,7 @@ export default function Register() {
                 <div className="space-y-2">
                   <SelectField
                     label={t.gotraMother}
-                    value={gotra.mother}
+                    value={gotra?.mother}
                     onChange={(v) => setGotra({ ...gotra, mother: v })}
                     options={gotraOpts}
                     placeholder={t.placeholders.gotra}
@@ -786,7 +786,7 @@ export default function Register() {
                 <div className="space-y-2">
                   <SelectField
                     label={t.gotraDadi}
-                    value={gotra.dadi}
+                    value={gotra?.dadi}
                     onChange={(v) => setGotra({ ...gotra, dadi: v })}
                     options={gotraOpts}
                     placeholder={t.placeholders.gotra}
@@ -803,7 +803,7 @@ export default function Register() {
                 <div className="space-y-2">
                   <SelectField
                     label={t.gotraNani}
-                    value={gotra.nani}
+                    value={gotra?.nani}
                     onChange={(v) => setGotra({ ...gotra, nani: v })}
                     options={gotraOpts}
                     placeholder={t.placeholders.gotra}

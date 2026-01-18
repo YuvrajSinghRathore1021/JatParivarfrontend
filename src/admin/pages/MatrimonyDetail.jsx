@@ -287,7 +287,7 @@ export default function MatrimonyDetail() {
                         </select>
                     </label>
                     <label className="block text-sm">
-                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'लंबाई' : 'Hight'}</span>
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'लंबाई' : 'Height'}</span>
                         <input value={form.height} onChange={handleChange('height')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
                     </label>
                     <label className="block text-sm">

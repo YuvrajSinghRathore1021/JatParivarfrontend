@@ -28,6 +28,8 @@ export default function MembersPage() {
     search: '',
     status: '',
     role: '',
+
+
     sortBy: 'createdAt',
     sortDir: 'desc',
   })
@@ -296,6 +298,10 @@ function MemberCreateButton({ onCreated }) {
     name: '',
     displayName: '',
     phone: '',
+    education: '',
+    department: '',
+    designation: '',
+    occupation: '',
     email: '',
     password: '',
     role: 'sadharan',
@@ -354,6 +360,11 @@ function MemberCreateButton({ onCreated }) {
       email: '',
       password: '',
       role: 'sadharan',
+      education: '',
+      department: '',
+      designation: '',
+      occupation: '',
+
       status: 'active',
       dateOfBirth: '',
       alternatePhone: '',
@@ -444,6 +455,10 @@ function MemberCreateButton({ onCreated }) {
         name: form.name,
         displayName: form.displayName || form.name,
         phone: form.phone,
+        education: form?.education,
+        department: form?.department,
+        designation: form?.designation,
+        occupation: form?.occupation,
         email: form.email || undefined,
         password: form.password,
         role: form.role,
@@ -579,6 +594,8 @@ function MemberCreateButton({ onCreated }) {
               minYear={1920}
             />
           </div>
+
+
           <div>
             <label className="text-xs font-medium text-slate-600">Role</label>
             <select
@@ -592,6 +609,77 @@ function MemberCreateButton({ onCreated }) {
               <option value="admin">Admin</option>
             </select>
           </div>
+
+          <label className="block text-sm md:col-span-2">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
+
+            <select
+              value={form.occupation}
+              onChange={(e) => handleChange('occupation', e.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+            >
+              <option value="">
+                {lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}
+              </option>
+
+              <option value="government_job">
+                {lang === 'hi' ? 'सरकारी नौकरी' : 'Government Job'}
+              </option>
+
+              <option value="private_job">
+                {lang === 'hi' ? 'प्राइवेट नौकरी' : 'Private Job'}
+              </option>
+
+              <option value="business">
+                {lang === 'hi' ? 'व्यवसाय' : 'Business'}
+              </option>
+
+              <option value="student">
+                {lang === 'hi' ? 'छात्र' : 'Student'}
+              </option>
+            </select>
+          </label>
+
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">
+              {lang === 'hi' ? 'शिक्षा' : 'Education'}
+            </span>
+
+            <select
+              value={form.education}
+              onChange={(e) => handleChange('education', e.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+            >
+              <option value="">
+                {lang === 'hi' ? 'शिक्षा चुनें' : 'Select Education'}
+              </option>
+
+              <option value="high_school">
+                {lang === 'hi' ? 'हाई स्कूल' : 'High School'}
+              </option>
+
+              <option value="graduate">
+                {lang === 'hi' ? 'स्नातक' : 'Graduate'}
+              </option>
+
+              <option value="postgraduate">
+                {lang === 'hi' ? 'स्नातकोत्तर' : 'Postgraduate'}
+              </option>
+
+              <option value="phd">
+                {lang === 'hi' ? 'पीएचडी' : 'PhD'}
+              </option>
+            </select>
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
+            <input value={form.department} onChange={(e) => handleChange('department', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पद का नाम' : 'Designation'}</span>
+            <input value={form.designation} onChange={(e) => handleChange('designation', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+          </label>
+
           <div>
             <label className="text-xs font-medium text-slate-600">Status</label>
             <select
@@ -718,7 +806,7 @@ function MemberCreateButton({ onCreated }) {
             <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
             <div className="space-y-2"><SelectField
               label="Self"
-              value={form.gotra.self}
+              value={form.gotra?.self}
               onChange={(value) => handleNestedChange('gotra', 'self', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"
@@ -735,7 +823,7 @@ function MemberCreateButton({ onCreated }) {
 
             <div className="space-y-2"><SelectField
               label="Mother"
-              value={form.gotra.mother}
+              value={form.gotra?.mother}
               onChange={(value) => handleNestedChange('gotra', 'mother', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"
@@ -751,7 +839,7 @@ function MemberCreateButton({ onCreated }) {
 
             <div className="space-y-2"><SelectField
               label="Dadi"
-              value={form.gotra.dadi}
+              value={form.gotra?.dadi}
               onChange={(value) => handleNestedChange('gotra', 'dadi', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"
@@ -767,7 +855,7 @@ function MemberCreateButton({ onCreated }) {
 
             <div className="space-y-2"><SelectField
               label="Nani"
-              value={form.gotra.nani}
+              value={form.gotra?.nani}
               onChange={(value) => handleNestedChange('gotra', 'nani', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"

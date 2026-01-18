@@ -50,7 +50,10 @@ export default function ProfileEditor() {
     phone: '',
     role: '',
     occupation: '',
-    company: '',
+
+    education: '', department: '',
+    designation: '',
+
     publicNote: '',
     contactEmail: '',
     alternatePhone: '',
@@ -122,7 +125,9 @@ export default function ProfileEditor() {
       phone: user?.phone || '',
       role: user?.role || '',
       occupation: user?.occupation || '',
-      company: user?.company || '',
+      designation: user?.designation || '',
+      education: user?.education || '',
+      department: user?.department || '',
       publicNote: user?.publicNote || '',
       contactEmail: user?.contactEmail || '',
       alternatePhone: user?.alternatePhone || '',
@@ -344,7 +349,9 @@ export default function ProfileEditor() {
       name: form.name,
       displayName: form.displayName,
       occupation: form.occupation,
-      company: form.company,
+      designation: form.designation,
+      education: form?.education,
+      department: form?.department,
       publicNote: form.publicNote,
       contactEmail: form.contactEmail,
       alternatePhone: form.alternatePhone,
@@ -476,37 +483,53 @@ export default function ProfileEditor() {
             {/* <LabeledField label={lang === 'hi' ? 'प्रदर्शित नाम' : 'Display name'} value={form.displayName} onChange={handleChange('displayName')} /> */}
             <LabeledField label={lang === 'hi' ? 'मोबाइल नंबर' : 'Primary phone'} value={form.phone} disabled />
             <LabeledField label={lang === 'hi' ? 'भूमिका' : 'Membership role'} value={roleLabel(form.role, lang)} disabled />
-         
+
             <label  >
-                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
-                        <select
-                            value={form.occupation}
-                            onChange={handleChange('occupation')}
-                            className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
-                        >
-                            <option value="">
-                                {lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}
-                            </option>
+              <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
+              <select
+                value={form.occupation}
+                onChange={handleChange('occupation')}
+                className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+              >
+                <option value="">
+                  {lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}
+                </option>
 
-                            <option value="government_job">
-                                {lang === 'hi' ? 'सरकारी नौकरी' : 'Government Job'}
-                            </option>
+                <option value="government_job">
+                  {lang === 'hi' ? 'सरकारी नौकरी' : 'Government Job'}
+                </option>
 
-                            <option value="private_job">
-                                {lang === 'hi' ? 'प्राइवेट नौकरी' : 'Private Job'}
-                            </option>
+                <option value="private_job">
+                  {lang === 'hi' ? 'प्राइवेट नौकरी' : 'Private Job'}
+                </option>
 
-                            <option value="business">
-                                {lang === 'hi' ? 'व्यवसाय' : 'Business'}
-                            </option>
+                <option value="business">
+                  {lang === 'hi' ? 'व्यवसाय' : 'Business'}
+                </option>
 
-                            <option value="student">
-                                {lang === 'hi' ? 'छात्र' : 'Student'}
-                            </option>
-                        </select>
-                    </label>
-            
-            <LabeledField label={lang === 'hi' ? 'संस्था/कंपनी' : 'Organisation'} value={form.company} onChange={handleChange('company')} />
+                <option value="student">
+                  {lang === 'hi' ? 'छात्र' : 'Student'}
+                </option>
+              </select>
+            </label>
+            <label className="block text-sm">
+              <span className="font-semibold text-slate-600">
+                {lang === 'hi' ? 'शिक्षा' : 'Education'}
+              </span>
+
+              <select value={form.education} onChange={handleChange('education')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white">
+                <option value=""> {lang === 'hi' ? 'शिक्षा चुनें' : 'Select Education'} </option>
+                <option value="high_school"> {lang === 'hi' ? 'हाई स्कूल' : 'High School'} </option>
+                <option value="graduate"> {lang === 'hi' ? 'स्नातक' : 'Graduate'}</option>
+                <option value="postgraduate">{lang === 'hi' ? 'स्नातकोत्तर' : 'Postgraduate'}</option>
+                <option value="phd">{lang === 'hi' ? 'पीएचडी' : 'PhD'}</option>
+              </select>
+            </label>
+            <label className="block text-sm">
+              <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
+              <input value={form.department} onChange={handleChange('department')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+            </label>
+            <LabeledField label={lang === 'hi' ? 'पद नाम' : 'Designation'} value={form.designation} onChange={handleChange('designation')} />
             <LabeledField label={lang === 'hi' ? 'ईमेल' : 'Email'} value={form.contactEmail} onChange={handleChange('contactEmail')} />
             <LabeledField label={lang === 'hi' ? 'दूसरा फोन' : 'Alternate phone'} value={form.alternatePhone} onChange={handleChange('alternatePhone')} />
             <div>
@@ -588,28 +611,28 @@ export default function ProfileEditor() {
         <section className="grid gap-4 md:grid-cols-2">
           <SelectField
             label={lang === 'hi' ? 'गोत्र (स्व)' : 'Gotra (Self)'}
-            value={form.gotra.self}
+            value={form.gotra?.self}
             onChange={(value) => updateGotraField('self', value)}
             options={gotraOptionsList}
             placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
           />
           <SelectField
             label={lang === 'hi' ? 'गोत्र (माता)' : 'Gotra (Mother)'}
-            value={form.gotra.mother}
+            value={form.gotra?.mother}
             onChange={(value) => updateGotraField('mother', value)}
             options={gotraOptionsList}
             placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
           />
           <SelectField
             label={lang === 'hi' ? 'गोत्र (दादी)' : 'Gotra (Dadi)'}
-            value={form.gotra.dadi}
+            value={form.gotra?.dadi}
             onChange={(value) => updateGotraField('dadi', value)}
             options={gotraOptionsList}
             placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
           />
           <SelectField
             label={lang === 'hi' ? 'गोत्र (नानी)' : 'Gotra (Nani)'}
-            value={form.gotra.nani}
+            value={form.gotra?.nani}
             onChange={(value) => updateGotraField('nani', value)}
             options={gotraOptionsList}
             placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}

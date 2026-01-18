@@ -17,7 +17,9 @@ export default function Founders() {
 
   const cards = useMemo(() => {
     if (!data) return []
+    console.log("data", data)
     return data.map((person) => ({
+
       id: person.id || person._id,
       name: person.name,
       title: person.title,
@@ -33,6 +35,12 @@ export default function Founders() {
       role: person?.role,
       adimage: person?.adimage, //---url 
       message: person?.message,
+      department: person?.department,
+      designation: person?.designation,
+      designation: person?.designation,
+      address: person?.user?.currentAddress
+
+
     }))
   }, [data])
 
@@ -95,12 +103,6 @@ export default function Founders() {
                   </div>
                 </div>
 
-                {/* Bio */}
-                {/* {(lang === "hi" ? profile.bioHi : profile.bioEn) && (
-                    <p className="mt-3 text-sm text-slate-600 line-clamp-3">
-                      {lang === "hi" ? profile.bioHi : profile.bioEn}
-                    </p>
-                  )} */}
 
                 {/* Contact row */}
                 {(profile.phone || profile.contactEmail) && (
@@ -124,6 +126,12 @@ export default function Founders() {
                     {profile?.designation && (
                       <span className="flex items-center gap-1 truncate">
                         🧑‍💼 {profile.designation}
+                      </span>
+                    )}
+                    {profile?.address && (
+                      <span className="flex items-center gap-1 truncate">
+                        Address:- 
+                        {profile.address?.village}, {profile.address?.city}, {profile.address?.district}, {profile.address?.state}
                       </span>
                     )}
 

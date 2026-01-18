@@ -9,7 +9,7 @@ import CardProduct from '../components/cards/CardProduct'
 import FeesCarousel from '../components/FeesCarousel'
 import AchievementsTicker from '../components/AchievementsTicker'
 import { useLang } from '../lib/useLang'
-import { fetchHomeImpact, fetchHomeImpactachievement, fetchPublicNews, fetchPublicPeople, fetchPublicPlans } from '../lib/publicApi'
+import { fetchHomeImpact, fetchHomeImpactachievement, fetchPublicNewsTop, fetchPublicPeople, fetchPublicPlans } from '../lib/publicApi'
 
 // ===== Avatar helpers (fallback when DB doesn't have avatarUrl) =====
 const AVATAR_COLORS = ['#3B82F6', '#EF4444', '#9CA3AF', '#22C55E']
@@ -380,7 +380,7 @@ export default function Home() {
 
   const newsQ = useQuery({
     queryKey: ['public', 'news'],
-    queryFn: fetchPublicNews,
+    queryFn: fetchPublicNewsTop,
     staleTime: 60_000,
   })
 

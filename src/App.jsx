@@ -121,7 +121,6 @@ export default function App() {
         <Route path="sanstha" element={<InstitutionBrowse kind={"sanstha"} web={true} />} />
         <Route path="dharamshala/:id" element={<InstitutionDetail kind={"dharamshala"} web={true} />} />
         <Route path="sanstha/:id" element={<InstitutionDetail kind={"sanstha"} web={true} />} />
-
         <Route path="*" element={<Navigate to="." replace />} />
       </Route>
       <Route element={<RequireAuth />}>

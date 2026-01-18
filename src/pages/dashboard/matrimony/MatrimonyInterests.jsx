@@ -52,7 +52,7 @@ export default function MatrimonyInterests() {
                       <img src={avatar} alt="image" className="h-14 w-14 rounded-2xl object-cover" />
                       <div>
                         <h3 className="text-lg font-semibold text-slate-900">{user.name || 'Member'}</h3>
-                        <p className="text-sm text-slate-500">{user.occupation || user.company || '—'}</p>
+                        <p className="text-sm text-slate-500">{user.occupation || user.designation || '—'}</p>
                         {user.phone && (
                           <p className="text-sm text-slate-700">{lang === 'hi' ? 'फ़ोन:' : 'Phone:'} {user.phone}</p>
                         )}
@@ -105,7 +105,7 @@ export default function MatrimonyInterests() {
                     <img src={avatar} alt="image" className="h-14 w-14 rounded-2xl object-cover" />
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold text-slate-900">{user.name || 'Member'}</h3>
-                      <p className="text-sm text-slate-500">{user.occupation || user.company || '—'}</p>
+                      <p className="text-sm text-slate-500">{user.occupation || user.designation || '—'}</p>
                       {item.status === 'accepted' && (
                         <p className="text-sm text-slate-700">{lang === 'hi' ? 'संपर्क:' : 'Contact:'} {user.phone || '—'}</p>
                       )}

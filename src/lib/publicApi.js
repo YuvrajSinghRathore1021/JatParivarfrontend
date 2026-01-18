@@ -17,6 +17,7 @@ export const fetchPublicPeople = (role, limit = 10) => {
 export const fetchPublicPage = (slug) => get(`/public/pages/${slug}`)
 
 export const fetchPublicNews = () => get('/public/news')
+export const fetchPublicNewsTop = () => get('/public/newstop')
 
 export const fetchPublicNewsDetail = (slug) => get(`/public/news/${slug}`)
 

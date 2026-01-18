@@ -42,7 +42,7 @@ export default function MemberDetailPage() {
     districtOptions,
     cityOptions,
   } = useGeoOptions(addressCodes?.stateCode, addressCodes?.districtCode, 'en')
-const [gotraform, setgotraform] = useState({})
+  const [gotraform, setgotraform] = useState({})
   const handleChangeNew = (field) => (event) => {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value
     setgotraform((prev) => ({ ...prev, [field]: value }))
@@ -199,12 +199,15 @@ const [gotraform, setgotraform] = useState({})
         status: member.status,
         alternatePhone: member.alternatePhone,
         occupation: member.occupation,
-        company: member.company,
+        designation: member.designation,
+        department: member.department,
+        education: member.education,
+
         publicNote: member.publicNote,
         avatarUrl: member.avatarUrl,
         janAadhaarUrl: member.janAadhaarUrl,
         gotra: hasValues(member.gotra) ? member.gotra : undefined,
-         gotra: {
+        gotra: {
           self: member.gotra?.self == '__custom' ? gotraform?.self : member.gotra?.self,
           mother: member.gotra?.mother == '__custom' ? gotraform?.mother : member.gotra?.mother,
           nani: member.gotra?.nani == '__custom' ? gotraform?.nani : member.gotra?.nani,
@@ -255,6 +258,8 @@ const [gotraform, setgotraform] = useState({})
           name: personForm.name,
           title: personForm.title,
           designation: personForm.designation,
+          department: personForm?.department,
+          education: personForm?.education,
           place: personForm.place,
           bioEn: personForm.bioEn,
           bioHi: personForm.bioHi,
@@ -270,7 +275,7 @@ const [gotraform, setgotraform] = useState({})
       setSavingSpotlight(false)
     }
   }
-  
+
 
   return (
     <div className="space-y-6">
@@ -320,8 +325,24 @@ const [gotraform, setgotraform] = useState({})
             </select>
           </div>
 
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">
+              {lang === 'hi' ? 'शिक्षा' : 'Education'}
+            </span>
 
-          <Field label="Company" value={member.company || ''} onChange={(val) => updateMemberField('company', val)} />
+            <select value={member.education} onChange={(e) => updateMemberField('education', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white">
+              <option value=""> {lang === 'hi' ? 'शिक्षा चुनें' : 'Select Education'} </option>
+              <option value="high_school"> {lang === 'hi' ? 'हाई स्कूल' : 'High School'} </option>
+              <option value="graduate"> {lang === 'hi' ? 'स्नातक' : 'Graduate'}</option>
+              <option value="postgraduate">{lang === 'hi' ? 'स्नातकोत्तर' : 'Postgraduate'}</option>
+              <option value="phd">{lang === 'hi' ? 'पीएचडी' : 'PhD'}</option>
+            </select>
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
+            <input value={member.department} onChange={(e) => updateMemberField('department', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+          </label>
+          <Field label="Designation" value={member.designation || ''} onChange={(val) => updateMemberField('designation', val)} />
           <div>
             <label className="text-xs font-medium text-slate-600">Status</label>
             <select
@@ -458,7 +479,7 @@ const [gotraform, setgotraform] = useState({})
           <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
           <div className="space-y-2"><SelectField
             label="Self"
-            value={member.gotra.self}
+            value={member.gotra?.self}
             onChange={(value) => updateNested('gotra', 'self', value)}
             options={gotraOptionsList}
             placeholder="Select gotra"
@@ -475,7 +496,7 @@ const [gotraform, setgotraform] = useState({})
 
           <div className="space-y-2"><SelectField
             label="Mother"
-            value={member.gotra.mother}
+            value={member.gotra?.mother}
             onChange={(value) => updateNested('gotra', 'mother', value)}
             options={gotraOptionsList}
             placeholder="Select gotra"
@@ -491,7 +512,7 @@ const [gotraform, setgotraform] = useState({})
 
           <div className="space-y-2"><SelectField
             label="Dadi"
-            value={member.gotra.dadi}
+            value={member.gotra?.dadi}
             onChange={(value) => updateNested('gotra', 'dadi', value)}
             options={gotraOptionsList}
             placeholder="Select gotra"
@@ -507,7 +528,7 @@ const [gotraform, setgotraform] = useState({})
 
           <div className="space-y-2"><SelectField
             label="Nani"
-            value={member.gotra.nani}
+            value={member.gotra?.nani}
             onChange={(value) => updateNested('gotra', 'nani', value)}
             options={gotraOptionsList}
             placeholder="Select gotra"

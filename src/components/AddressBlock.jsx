@@ -287,7 +287,7 @@ export default function AddressBlock(props) {
 
             {/* VILLAGE */}
             <label className="block text-sm">
-                <span className="font-semibold text-slate-600">{lang === 'hi' ? 'गाँव' : 'Village'}</span>
+                <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पता' : 'Address'}</span>
                 <input
                     value={f?.village}
                     onChange={(e) =>

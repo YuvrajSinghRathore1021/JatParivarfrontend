@@ -22,9 +22,11 @@ export default function PersonDetail() {
   const person = data || null
   const member = person?.user || person?.userId || null
   const phone = member?.phone || member?.alternatePhone || '—'
-  const email = member?.contactEmail || member?.email || '—'
+  const email = member?.contactEmail || person?.email || '—'
   const occupation = member?.occupation || '—'
-  const organisation = member?.company || '—'
+  const designation = member?.designation || '—'
+  const education = member?.education || '—'
+  const department = member?.Department || '—'
   
 const addressEntries = [
   {
@@ -171,7 +173,9 @@ const addressEntries = [
                 <InfoTile labelEn="Phone" labelHi="फ़ोन" lang={lang} value={phone} />
                 <InfoTile labelEn="Email" labelHi="ईमेल" lang={lang} value={email} />
                 <InfoTile labelEn="Occupation" labelHi="व्यवसाय" lang={lang} value={occupation} />
-                <InfoTile labelEn="Organisation" labelHi="संस्था/कंपनी" lang={lang} value={organisation} />
+                <InfoTile labelEn="Education" labelHi="शिक्षा" lang={lang} value={education} />
+                <InfoTile labelEn="Department" labelHi="डिपार्टमेंट" lang={lang} value={department} />
+                <InfoTile labelEn="Designation" labelHi="पद नाम" lang={lang} value={designation} />
               </div>
             </section>
 
