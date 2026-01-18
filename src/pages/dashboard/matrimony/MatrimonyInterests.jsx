@@ -44,14 +44,14 @@ export default function MatrimonyInterests() {
           <div className="mt-4 space-y-3">
             {incoming.map((item) => {
               const user = item.user || {}
-              const avatar = API_File+user.avatarUrl || makeInitialAvatar(user.displayName || 'Member', { size: 80, radius: 24 })
+              const avatar = API_File+user.avatarUrl || makeInitialAvatar(user.name || 'Member', { size: 80, radius: 24 })
               return (
                 <article key={item.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-center gap-4">
                       <img src={avatar} alt="image" className="h-14 w-14 rounded-2xl object-cover" />
                       <div>
-                        <h3 className="text-lg font-semibold text-slate-900">{user.displayName || 'Member'}</h3>
+                        <h3 className="text-lg font-semibold text-slate-900">{user.name || 'Member'}</h3>
                         <p className="text-sm text-slate-500">{user.occupation || user.company || '—'}</p>
                         {user.phone && (
                           <p className="text-sm text-slate-700">{lang === 'hi' ? 'फ़ोन:' : 'Phone:'} {user.phone}</p>
@@ -98,13 +98,13 @@ export default function MatrimonyInterests() {
           <div className="mt-4 space-y-3">
             {outgoing.map((item) => {
               const user = item.user || {}
-              const avatar = API_File+user.avatarUrl || makeInitialAvatar(user.displayName || 'Member', { size: 80, radius: 24 })
+              const avatar = API_File+user.avatarUrl || makeInitialAvatar(user.name || 'Member', { size: 80, radius: 24 })
               return (
                 <article key={item.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-center gap-4">
                     <img src={avatar} alt="image" className="h-14 w-14 rounded-2xl object-cover" />
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-slate-900">{user.displayName || 'Member'}</h3>
+                      <h3 className="text-lg font-semibold text-slate-900">{user.name || 'Member'}</h3>
                       <p className="text-sm text-slate-500">{user.occupation || user.company || '—'}</p>
                       {item.status === 'accepted' && (
                         <p className="text-sm text-slate-700">{lang === 'hi' ? 'संपर्क:' : 'Contact:'} {user.phone || '—'}</p>

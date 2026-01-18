@@ -205,7 +205,7 @@ export default function MembersPage() {
                   <StatusBadge status={member.status} />
                 </td>
                 <td className="px-4 py-3 text-slate-700">
-                  {member.address?.city ? `${member.address.city}, ${member.address?.state || ''}` : '—'}
+                  {member.currentAddress?.city ? `${member.currentAddress.city}, ${member.currentAddress?.state || ''}` : '—'}
                 </td>
                 <td className="px-4 py-3 text-sm">
                   <div className="flex items-center gap-2">
@@ -548,12 +548,12 @@ function MemberCreateButton({ onCreated }) {
             onChange={(value) => handleChange('name', value)}
             required
           />
-          <Field
+          {/* <Field
             label="Display name"
             value={form.displayName}
             onChange={(value) => handleChange('displayName', value)}
             placeholder="Shown publicly (optional)"
-          />
+          /> */}
           <Field
             label="Primary phone"
             value={form.phone}

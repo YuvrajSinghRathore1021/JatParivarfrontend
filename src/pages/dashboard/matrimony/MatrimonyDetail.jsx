@@ -31,6 +31,8 @@ export default function MatrimonyDetail() {
         );
     }
 
+    console.log("itemitemitem==", item)
+
     return (
         <div className="space-y-8 pb-20">
 
@@ -62,7 +64,6 @@ export default function MatrimonyDetail() {
                     <p className="text-slate-700 break-all">{item.education}</p>
                 </div>
             </section>
-
             {/* ===== Occupation ===== */}
             <section className="px-4">
                 <div className="rounded-xl bg-white shadow-sm border p-6 space-y-1">
@@ -70,21 +71,29 @@ export default function MatrimonyDetail() {
                     <p className="text-slate-700 break-all" >{item.occupation}</p>
                 </div>
             </section>
+            <section className="px-4">
+                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-1">
+                    <h2 className="text-lg font-semibold">Designation</h2>
+                    <p className="text-slate-700 break-all">{item?.designation}</p>
+                </div>
+            </section>
+            <section className="px-4">
+                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-1">
+                    <h2 className="text-lg font-semibold">Department</h2>
+                    <p className="text-slate-700 break-all">{item?.department}</p>
+                </div>
+            </section>
+
+
+
+
 
             {/* ===== Address ===== */}
             <section className="px-4">
                 <div className="rounded-xl bg-white shadow-sm border p-6 space-y-2">
-                    <h2 className="text-lg font-semibold">Location</h2>
+                    <h2 className="text-lg font-semibold">Current Address</h2>
                     <p className="text-slate-800">
-                        {item.village}, {item.city}, {item.district}, {item.state}
-                    </p>
-                </div>
-            </section> 
-            <section className="px-4">
-                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-2">
-                    <h2 className="text-lg font-semibold">Address</h2>
-                    <p className="text-slate-800">
-                        {item?.address}
+                        {item?.currentAddress?.village}, {item?.currentAddress?.city}, {item?.currentAddress?.district}, {item?.currentAddress?.state}
                     </p>
                 </div>
             </section>
@@ -92,7 +101,8 @@ export default function MatrimonyDetail() {
                 <div className="rounded-xl bg-white shadow-sm border p-6 space-y-2">
                     <h2 className="text-lg font-semibold">Parental Address</h2>
                     <p className="text-slate-800">
-                        {item?.parentaladdress}
+                        {/* {item?.parentaladdress} */}
+                        {item?.parentalAddress?.village}, {item?.parentalAddress?.city}, {item?.parentalAddress?.district}, {item?.parentalAddress?.state}
                     </p>
                 </div>
             </section>

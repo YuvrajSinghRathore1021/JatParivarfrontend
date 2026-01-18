@@ -203,6 +203,8 @@ export default function Register() {
     name: '', email: '', password: '',
     dob: '', gender: '', maritalStatus: '',
     education: '', occupation: '',
+      department: '',
+    designation: '',
 
     occupationAddress: {
       state: '',
@@ -629,13 +631,22 @@ export default function Register() {
                   placeholder={t.placeholders.education}
                 />
 
+
                 <SelectField
                   label={t.occupation}
                   value={form.occupation}
                   onChange={(v) => setForm({ ...form, occupation: v })}
                   options={OCCUPATION[lang]}
                   placeholder={t.placeholders.occupation}
-                />
+                /><label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
+                        <input value={form.department} 
+                        onChange={(e) => setForm({ ...form, department: e.target.value })} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label> 
+                   <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पद का नाम' : 'Designation'}</span>
+                        <input value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label> 
 
                 <div className="relative">
                   <input

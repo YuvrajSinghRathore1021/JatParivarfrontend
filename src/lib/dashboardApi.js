@@ -12,7 +12,7 @@ export const saveMatrimony = (payload) => post('/admin/matrimony/save', payload)
 
 export const sendMatrimonyInterest = (userId) => post(`/matrimony/interest/${userId}`, {})
 
-export const fetchMatrimonyInterests = () => get('/matrimony/interests')
+export const fetchMatrimonyInterests = () => get('/matrimony/interests/user')
 
 export const acceptMatrimonyInterest = (interestId) => post(`/matrimony/interest/${interestId}/accept`, {})
 

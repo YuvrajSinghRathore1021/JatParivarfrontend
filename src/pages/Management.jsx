@@ -82,7 +82,7 @@ export default function Management() {
                 )}
                 {profile.place && (
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    {lang === 'hi' ? 'प्रमुख क्षेत्र' : 'Focus region'}: {profile.place}
+                    {lang === 'hi' ? 'प्रमुख क्षेत्र' : 'Department'}: {profile.place}
                   </p>
                 )}
               </Link>

@@ -1,13 +1,14 @@
 // frontend/src/admin/pages/MemberDetail.jsx
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
 import { upload } from '../../lib/api.js'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
 import AddressBlock from '../../components/AddressBlock.jsx'
-
+import SelectField from '../../components/SelectField'
+import { asOptions as gotraOptions } from '../../constants/gotras'
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
   { value: 'disabled', label: 'Disabled' },
@@ -32,7 +33,7 @@ export default function MemberDetailPage() {
   const [spotlightBannerUploading, setSpotlightBannerUploading] = useState(false)
 
   const [addressCodes, setAddressCodes] = useState({ stateCode: '', districtCode: '', cityCode: '' })
-
+  const gotraOptionsList = useMemo(() => gotraOptions('en'), [])
   const {
     states,
     districts,
@@ -41,6 +42,11 @@ export default function MemberDetailPage() {
     districtOptions,
     cityOptions,
   } = useGeoOptions(addressCodes?.stateCode, addressCodes?.districtCode, 'en')
+const [gotraform, setgotraform] = useState({})
+  const handleChangeNew = (field) => (event) => {
+    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value
+    setgotraform((prev) => ({ ...prev, [field]: value }))
+  }
 
   useEffect(() => {
     const fetchMember = async () => {
@@ -198,6 +204,12 @@ export default function MemberDetailPage() {
         avatarUrl: member.avatarUrl,
         janAadhaarUrl: member.janAadhaarUrl,
         gotra: hasValues(member.gotra) ? member.gotra : undefined,
+         gotra: {
+          self: member.gotra?.self == '__custom' ? gotraform?.self : member.gotra?.self,
+          mother: member.gotra?.mother == '__custom' ? gotraform?.mother : member.gotra?.mother,
+          nani: member.gotra?.nani == '__custom' ? gotraform?.nani : member.gotra?.nani,
+          dadi: member.gotra?.dadi == '__custom' ? gotraform?.dadi : member.gotra?.dadi
+        },
         occupationAddress: member?.occupationAddress,
         currentAddress: member?.currentAddress,
         parentalAddress: member?.parentalAddress,
@@ -258,9 +270,7 @@ export default function MemberDetailPage() {
       setSavingSpotlight(false)
     }
   }
-
-
-
+  
 
   return (
     <div className="space-y-6">
@@ -286,26 +296,30 @@ export default function MemberDetailPage() {
         <h2 className="text-lg font-semibold text-slate-900">Profile information</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Full name" value={member.name || ''} onChange={(val) => updateMemberField('name', val)} required />
-          <Field label="Display name" value={member.displayName || ''} onChange={(val) => updateMemberField('displayName', val)} />
+          {/* <Field label="Display name" value={member.displayName || ''} onChange={(val) => updateMemberField('displayName', val)} /> */}
           <Field label="Primary phone" value={member.phone || ''} disabled />
           <Field label="Secondary phone" value={member.alternatePhone || ''} onChange={(val) => updateMemberField('alternatePhone', val)} />
           <Field label="Email" value={member.email || ''} onChange={(val) => updateMemberField('email', val)} />
           <Field label="Contact email" value={member.contactEmail || ''} onChange={(val) => updateMemberField('contactEmail', val)} />
-          {/* <Field label="Occupation" value={member.occupation || ''} onChange={(val) => updateMemberField('occupation', val)} /> */}
 
-          <Field
-            label="Occupation"
-            type="select"
-            value={member.occupation || ''}
-            onChange={(val) => updateMemberField('occupation', val)}
-            options={[
-              { value: '', label: 'Select Occupation' },
-              { value: 'government_job', label: 'Government Job' },
-              { value: 'private_job', label: 'Private Job' },
-              { value: 'business', label: 'Business' },
-              { value: 'student', label: 'Student' },
-            ]}
-          />
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">
+              Occupation
+            </label>
+
+            <select
+              className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={member.occupation || ""}
+              onChange={(e) => updateMemberField("occupation", e.target.value)}
+            >
+              <option value="">Select Occupation</option>
+              <option value="government_job">Government Job</option>
+              <option value="private_job">Private Job</option>
+              <option value="business">Business</option>
+              <option value="student">Student</option>
+            </select>
+          </div>
+
 
           <Field label="Company" value={member.company || ''} onChange={(val) => updateMemberField('company', val)} />
           <div>
@@ -363,7 +377,7 @@ export default function MemberDetailPage() {
                       currentAddress: { ...(prev?.occupationAddress || {}) }
                     }));
                   }
-                   else {
+                  else {
                     // reset parental
                     setMember((prev) => ({
                       ...prev,
@@ -432,12 +446,86 @@ export default function MemberDetailPage() {
           )}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        {/* <div className="grid gap-4 md:grid-cols-2">
           <Field label="Gotra (Self)" value={member.gotra?.self || ''} onChange={(val) => updateNested('gotra', 'self', val)} />
           <Field label="Gotra (Mother)" value={member.gotra?.mother || ''} onChange={(val) => updateNested('gotra', 'mother', val)} />
           <Field label="Gotra (Dadi)" value={member.gotra?.dadi || ''} onChange={(val) => updateNested('gotra', 'dadi', val)} />
           <Field label="Gotra (Nani)" value={member.gotra?.nani || ''} onChange={(val) => updateNested('gotra', 'nani', val)} />
+        </div> */}
+
+
+        <div className="md:col-span-2 grid gap-3 md:grid-cols-2 rounded-xl border border-slate-200 p-4">
+          <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
+          <div className="space-y-2"><SelectField
+            label="Self"
+            value={member.gotra.self}
+            onChange={(value) => updateNested('gotra', 'self', value)}
+            options={gotraOptionsList}
+            placeholder="Select gotra"
+          />
+            {member.gotra?.self == '__custom' && (
+              <input
+                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                value={member.self}
+                onChange={handleChangeNew('self')}
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              />
+            )}
+          </div>
+
+          <div className="space-y-2"><SelectField
+            label="Mother"
+            value={member.gotra.mother}
+            onChange={(value) => updateNested('gotra', 'mother', value)}
+            options={gotraOptionsList}
+            placeholder="Select gotra"
+          />
+            {member.gotra?.mother == '__custom' && (
+              <input
+                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                value={member.mother}
+                onChange={handleChangeNew('mother')}
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              />
+            )}</div>
+
+          <div className="space-y-2"><SelectField
+            label="Dadi"
+            value={member.gotra.dadi}
+            onChange={(value) => updateNested('gotra', 'dadi', value)}
+            options={gotraOptionsList}
+            placeholder="Select gotra"
+          />
+            {member.gotra?.dadi == '__custom' && (
+              <input
+                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                value={member.dadi}
+                onChange={handleChangeNew('dadi')}
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              />
+            )}</div>
+
+          <div className="space-y-2"><SelectField
+            label="Nani"
+            value={member.gotra.nani}
+            onChange={(value) => updateNested('gotra', 'nani', value)}
+            options={gotraOptionsList}
+            placeholder="Select gotra"
+          />
+            {member.gotra?.nani == '__custom' && (
+              <input
+                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+                value={member.nani}
+                onChange={handleChangeNew('nani')}
+                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              />
+            )}</div>
+
+
         </div>
+
+
+
 
         <div className="grid gap-4 md:grid-cols-2">
           <UploadField
@@ -519,11 +607,11 @@ export default function MemberDetailPage() {
             </a>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Display name" value={personForm.name} onChange={(val) => setPersonForm((prev) => ({ ...prev, name: val }))} />
+            {/* <Field label="Display name" value={personForm.name} onChange={(val) => setPersonForm((prev) => ({ ...prev, name: val }))} /> */}
             <Field label="Title / Designation" value={personForm.title} onChange={(val) => setPersonForm((prev) => ({ ...prev, title: val }))} />
             <Field label="Role title" value={personForm.designation || ''} onChange={(val) => setPersonForm((prev) => ({ ...prev, designation: val }))} />
             <Field label="Order (homepage priority)" type="number" value={personForm.order ?? 1} onChange={(val) => setPersonForm((prev) => ({ ...prev, order: Number(val || 0) }))} />
-            <Field label="Focus place" value={personForm.place || ''} onChange={(val) => setPersonForm((prev) => ({ ...prev, place: val }))} />
+            <Field label="department" value={personForm.place || ''} onChange={(val) => setPersonForm((prev) => ({ ...prev, place: val }))} />
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"

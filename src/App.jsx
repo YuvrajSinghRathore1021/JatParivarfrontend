@@ -95,7 +95,7 @@ export default function App() {
       <Route element={<PublicShell />}>
         <Route index element={<Home />} />
         <Route path="uddeshay" element={<Uddeshay />} />
-        <Route path="founders" element={<Founders />} />  
+        <Route path="founders" element={<Founders />} />
         <Route path="founders/:personId" element={<PersonDetail />} />
         <Route path="management" element={<Management />} />
         <Route path="management/:personId" element={<PersonDetail />} />

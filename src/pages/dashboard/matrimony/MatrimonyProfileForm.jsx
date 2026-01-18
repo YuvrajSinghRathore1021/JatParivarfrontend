@@ -29,10 +29,13 @@ const emptyForm = {
   height: '',
   maritalStatus: 'never_married',
   education: '',
+
   occupation: '',
   gotraSelf: '',
   gotraMother: '',
   gotraNani: '',
+  department: '',
+  designation: '',
   gotraDadi: '',
   visible: true,
   photos: [],
@@ -104,6 +107,8 @@ export default function MatrimonyProfileForm() {
         gender: data.gender || 'male',
         maritalStatus: data.maritalStatus || 'never_married',
         education: data.education || '',
+        designation: data.designation || '',
+        department: data.department || '',
         occupation: data.occupation || '',
 
         height: data.height || '',
@@ -148,6 +153,8 @@ export default function MatrimonyProfileForm() {
       name: form.name,
       maritalStatus: form.maritalStatus,
       education: form.education,
+      department: form.department,
+      designation: form.designation,
       occupation: form.occupation,
       height: form.height,
       visible: form.visible,
@@ -284,36 +291,45 @@ export default function MatrimonyProfileForm() {
           <label className="block text-sm">
             <span className="font-semibold text-slate-600">{lang === 'hi' ? 'शिक्षा' : 'Education'}</span>
             {/* <input value={form.education} onChange={handleChange('education')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" /> */}
-         
-         
-         
-         <select
-                            value={form.education}
-                            onChange={handleChange('education')}
-                            className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
-                        >   
-                          <option value="">
-                                {lang === 'hi' ? 'शिक्षा चुनें' : 'Select Education'}
-                            </option>
 
-                           
-                       
-                            <option value="high_school">
-                                {lang === 'hi' ? 'हाई स्कूल' : 'High School'}
-                            </option>
 
-                            <option value="graduate">
-                                {lang === 'hi' ? 'स्नातक' : 'Graduate'}
-                            </option>
 
-                            <option value="postgraduate">
-                                {lang === 'hi' ? 'स्नातकोत्तर' : 'Postgraduate'}
-                            </option>
+            <select
+              value={form.education}
+              onChange={handleChange('education')}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+            >
+              <option value="">
+                {lang === 'hi' ? 'शिक्षा चुनें' : 'Select Education'}
+              </option>
 
-                            <option value="phd">
-                                {lang === 'hi' ? 'पीएचडी' : 'PhD'}
-                            </option>
-                        </select> </label>
+
+
+              <option value="high_school">
+                {lang === 'hi' ? 'हाई स्कूल' : 'High School'}
+              </option>
+
+              <option value="graduate">
+                {lang === 'hi' ? 'स्नातक' : 'Graduate'}
+              </option>
+
+              <option value="postgraduate">
+                {lang === 'hi' ? 'स्नातकोत्तर' : 'Postgraduate'}
+              </option>
+
+              <option value="phd">
+                {lang === 'hi' ? 'पीएचडी' : 'PhD'}
+              </option>
+            </select> </label>
+
+            <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
+                        <input value={form.department} onChange={handleChange('department')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label> 
+                   <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पद का नाम' : 'Designation'}</span>
+                        <input value={form.designation} onChange={handleChange('designation')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label> 
 
 
           <AddressBlock

@@ -85,12 +85,7 @@ function InstitutionCard({ item, onSaved }) {
                 {item.city}, {item.district}, {item.state}
             </p>
 
-            {/* Education + Occupation */}
-            {/* <div className="mt-2 text-sm text-slate-700 space-y-1">
-            <p><b>Education:</b> {item.education || "Not provided"}</p>
-            <p><b>Occupation:</b> {item.occupation || "Not provided"}</p>
-        </div> */}
-
+            
             {/* Height + Marital Status */}
             <div className="mt-2 text-sm text-slate-700 space-y-1">
                 <p><b>Height:</b> {item.hight ? item.hight + " inch" : "Not provided"}</p>

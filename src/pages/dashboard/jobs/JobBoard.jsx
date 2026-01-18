@@ -1,19 +1,74 @@
+// // frontend/src/pages/dashboard/jobs/JobBoard.jsx
+// import { useMemo, useState } from 'react'
+// import { useMutation, useQuery } from '@tanstack/react-query'
+// import { fetchJobs, applyToJob } from '../../../lib/dashboardApi'
+// import { useLang } from '../../../lib/useLang'
+
+// export default function JobBoard() {
+//   const { lang } = useLang()
+//   const [search, setSearch] = useState('')
+//   const [typeFilter, setTypeFilter] = useState('')
+//   const [expanded, setExpanded] = useState(null)
+
+//   const { data, isLoading } = useQuery({ queryKey: ['jobs', 'public'], queryFn: fetchJobs })
+
+//   const applyMutation = useMutation({ mutationFn: ({ jobId, payload }) => applyToJob(jobId, payload) })
+
+//   const filtered = useMemo(() => {
+//     const list = data || []
+//     return list.filter((job) => {
+//       const matchesType = typeFilter ? job.type === typeFilter : true
+//       const text = `${job.title} ${job.description} ${job.locationCity} ${job.locationDistrict} ${job.locationState}`.toLowerCase()
+//       const matchesSearch = search ? text.includes(search.toLowerCase()) : true
+//       return matchesType && matchesSearch
+//     })
+//   }, [data, search, typeFilter])
+
+//   const onApply = (jobId, event) => {
+//     event.preventDefault()
+//     const form = new FormData(event.currentTarget)
+//     const payload = {
+//       coverLetter: form.get('coverLetter') || '',
+//       expectedSalary: form.get('expectedSalary') || '',
+//     }
+//     applyMutation.mutate({ jobId, payload })
+//   }
+
+
+
+
+
+
 // frontend/src/pages/dashboard/jobs/JobBoard.jsx
 import { useMemo, useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchJobs, applyToJob } from '../../../lib/dashboardApi'
 import { useLang } from '../../../lib/useLang'
 
 export default function JobBoard() {
   const { lang } = useLang()
+  const qc = useQueryClient()
+
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [expanded, setExpanded] = useState(null)
 
-  const { data, isLoading } = useQuery({ queryKey: ['jobs', 'public'], queryFn: fetchJobs })
+  // 🔹 Fetch jobs
+  const { data, isLoading } = useQuery({
+    queryKey: ['jobs', 'public'],
+    queryFn: fetchJobs,
+  })
 
-  const applyMutation = useMutation({ mutationFn: ({ jobId, payload }) => applyToJob(jobId, payload) })
+  // 🔹 Apply job + auto refresh
+  const applyMutation = useMutation({
+    mutationFn: ({ jobId, payload }) => applyToJob(jobId, payload),
+    onSuccess: () => {
+      qc.invalidateQueries(['jobs', 'public']) // ✅ refresh list
+      setExpanded(null) // close form
+    },
+  })
 
+  // 🔹 Filter jobs
   const filtered = useMemo(() => {
     const list = data || []
     return list.filter((job) => {
@@ -24,16 +79,19 @@ export default function JobBoard() {
     })
   }, [data, search, typeFilter])
 
+  // 🔹 Submit handler
   const onApply = (jobId, event) => {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
-    const payload = {
-      coverLetter: form.get('coverLetter') || '',
-      expectedSalary: form.get('expectedSalary') || '',
-    }
-    applyMutation.mutate({ jobId, payload })
-  }
 
+    applyMutation.mutate({
+      jobId,
+      payload: {
+        coverLetter: form.get('coverLetter') || '',
+        expectedSalary: form.get('expectedSalary') || '',
+      },
+    })
+  }
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

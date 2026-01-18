@@ -245,29 +245,6 @@ export default function InstitutionDetail({ kind, web = false }) {
                 </div>
             </section>
 
-            {/* ===== Amenities ===== */}
-            <section className="px-4">
-                <div className="rounded-2xl bg-white shadow-sm border border-slate-200 p-6 space-y-3">
-                    <h2 className="text-lg font-semibold text-slate-900">
-                        {lang === "hi" ? "सुविधाएं" : "Amenities"}
-                    </h2>
-
-                    {item.amenities?.length ? (
-                        <div className="flex flex-wrap gap-2">
-                            {item.amenities.map((a, i) => (
-                                <span key={i} className="px-3 py-1 rounded-full bg-slate-100 text-sm text-slate-600">
-                                    {a.label}
-                                </span>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-slate-500">
-                            {lang === "hi" ? "कोई सुविधा उपलब्ध नहीं" : "No amenities listed"}
-                        </p>
-                    )}
-                </div>
-            </section>
-
             {/* ===== Gallery ===== */}
             {item.images?.length > 1 && (
                 <section className="px-4">

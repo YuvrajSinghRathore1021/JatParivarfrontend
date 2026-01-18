@@ -33,6 +33,8 @@ const emptyForm = {
     height: '',
     maritalStatus: 'never_married',
     education: '',
+    department: '',
+    designation: '',
     occupation: '',
     gotraSelf: '',
     gotraMother: '',
@@ -126,6 +128,9 @@ export default function MatrimonyDetail() {
             maritalStatus: data?.maritalStatus || 'never_married',
             education: data?.education || '',
             occupation: data?.occupation || '',
+            department: data?.department || '',
+            designation: data?.designation || '',
+         
             state: data?.state || '',
             height: data?.height || '',
 
@@ -171,6 +176,9 @@ export default function MatrimonyDetail() {
             name: form.name,
             maritalStatus: form.maritalStatus,
             education: form.education,
+            designation: form.designation,
+            department: form.education,
+            
             occupation: form.occupation,
             height: form.height,
 
@@ -331,36 +339,44 @@ export default function MatrimonyDetail() {
                             </option>
                         </select>
                     </label>
+                    <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
+                        <input value={form.department} onChange={handleChange('department')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label> 
+                   <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पद का नाम' : 'Designation'}</span>
+                        <input value={form.designation} onChange={handleChange('designation')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label> 
 
                     <label className="block text-sm md:col-span-2">
                         <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
                         {/* <input value={form.occupation} onChange={handleChange('occupation')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" /> */}
-                   
-                   <select
-        value={form.occupation}
-        onChange={handleChange('occupation')}
-        className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
-    >
-        <option value="">
-            {lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}
-        </option>
 
-        <option value="government_job">
-            {lang === 'hi' ? 'सरकारी नौकरी' : 'Government Job'}
-        </option>
+                        <select
+                            value={form.occupation}
+                            onChange={handleChange('occupation')}
+                            className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+                        >
+                            <option value="">
+                                {lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}
+                            </option>
 
-        <option value="private_job">
-            {lang === 'hi' ? 'प्राइवेट नौकरी' : 'Private Job'}
-        </option>
+                            <option value="government_job">
+                                {lang === 'hi' ? 'सरकारी नौकरी' : 'Government Job'}
+                            </option>
 
-        <option value="business">
-            {lang === 'hi' ? 'व्यवसाय' : 'Business'}
-        </option>
+                            <option value="private_job">
+                                {lang === 'hi' ? 'प्राइवेट नौकरी' : 'Private Job'}
+                            </option>
 
-        <option value="student">
-            {lang === 'hi' ? 'छात्र' : 'Student'}
-        </option>
-    </select>
+                            <option value="business">
+                                {lang === 'hi' ? 'व्यवसाय' : 'Business'}
+                            </option>
+
+                            <option value="student">
+                                {lang === 'hi' ? 'छात्र' : 'Student'}
+                            </option>
+                        </select>
                     </label>
 
 

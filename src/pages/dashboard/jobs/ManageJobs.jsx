@@ -313,16 +313,21 @@ export default function ManageJobs() {
                       <ul className="space-y-3">
                         {applicantsQuery.data.map((app) => (
                           <li key={app.id} className="rounded-2xl bg-white p-3 shadow-sm">
-                            <p className="text-sm font-semibold text-slate-900">{app.applicant?.displayName || 'Member'}</p>
+                            <p className="text-sm font-semibold text-slate-900">{app.applicant?.name || 'Member'}</p>
                             <p className="text-xs text-slate-500">
                               {app.applicant?.phone ? `${lang === 'hi' ? 'फोन:' : 'Phone:'} ${app.applicant.phone}` : ''}
                             </p>
                             {app.applicant?.email && (
                               <p className="text-xs text-slate-500">{app.applicant.email}</p>
                             )}
+
                             {app.coverLetter && (
                               <p className="mt-2 text-sm text-slate-600">{app.coverLetter}</p>
                             )}
+                            {app.expectedSalary && (
+                              <p className="mt-2 text-sm text-slate-600">{app.expectedSalary}</p>
+                            )}
+
                           </li>
                         ))}
                       </ul>

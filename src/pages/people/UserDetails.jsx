@@ -154,9 +154,9 @@ export default function UserDetails() {
                   </p>
                 )}
 
-                {(person.place || member?.address?.city) && (
+                {(person.place || member?.currentAddress?.city) && (
                   <p className="text-sm text-slate-600">
-                    {person.place || member?.address?.city}
+                    {person.place || member?.currentAddress?.city}
                   </p>
                 )}
               </div>
@@ -200,13 +200,6 @@ export default function UserDetails() {
                   labelHi="पदनाम"
                   lang={lang}
                   value={person.designation || person.title || "—"}
-                />
-
-                <InfoTile
-                  labelEn="Focus region"
-                  labelHi="मुख्य क्षेत्र"
-                  lang={lang}
-                  value={person.place || member?.address?.district || "—"}
                 />
               </div>
             </section>

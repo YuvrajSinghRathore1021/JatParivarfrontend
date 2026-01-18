@@ -61,38 +61,7 @@ export default function Founders() {
             {lang === 'hi' ? 'अभी तक कोई संस्थापक प्रोफ़ाइल प्रकाशित नहीं है।' : 'No founder profiles are published yet.'}
           </div>
         ) : (
-          // <section className="grid gap-6 md:grid-cols-2">
-          //   {cards.map((profile) => (
-          //     <Link
-          //       key={profile.id}
-          //       to={makePath(`founders/${profile.id}`)}
-          //       className="rounded-3xl border border-slate-200 bg-white shadow-sm p-6 flex gap-5 items-start transition hover:border-blue-200 hover:shadow-md"
-          //     >
-          //       <img
-          //         src={profile.image}
-          //         alt="image"
-          //         className="h-20 w-20 rounded-2xl object-cover"
-          //         loading="lazy"
-          //         decoding="async"
-          //       />
-          //       <div className="space-y-2">
-          //         <h2 className="text-xl font-semibold text-slate-900">{profile.name}</h2>
-          //         {profile.title && (
-          //           <p className="text-sm font-medium text-blue-600">{profile.title}</p>
-          //         )}
-          //         {profile.place && (
-          //           <p className="text-xs uppercase tracking-wide text-slate-400">{profile.place}</p>
-          //         )}
-          //         {(lang === 'hi' ? profile.bioHi : profile.bioEn) && (
-          //           <p className="text-sm text-slate-600 leading-relaxed">
-          //             {lang === 'hi' ? profile.bioHi : profile.bioEn}
-          //           </p>
-          //         )}
-          //       </div>
-          //     </Link>
-          //   ))}
-          // </section>
-          
+
           <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {cards.map((profile) => (
               <Link
@@ -121,17 +90,13 @@ export default function Founders() {
                       </p>
                     )}
 
-                    {/* {profile.place && (
-                      <p className="text-xs text-slate-400 uppercase tracking-wide">
-                        {profile.place}
-                      </p>
-                    )} */}
+
 
                   </div>
                 </div>
 
                 {/* Bio */}
-                  {/* {(lang === "hi" ? profile.bioHi : profile.bioEn) && (
+                {/* {(lang === "hi" ? profile.bioHi : profile.bioEn) && (
                     <p className="mt-3 text-sm text-slate-600 line-clamp-3">
                       {lang === "hi" ? profile.bioHi : profile.bioEn}
                     </p>
@@ -150,6 +115,18 @@ export default function Founders() {
                         ✉️ {profile.contactEmail}
                       </span>
                     )}
+                    {profile?.department && (
+                      <span className="flex items-center gap-1 truncate">
+                        🏢 {profile.department}
+                      </span>
+                    )}
+
+                    {profile?.designation && (
+                      <span className="flex items-center gap-1 truncate">
+                        🧑‍💼 {profile.designation}
+                      </span>
+                    )}
+
                   </div>
                 )}
               </Link>

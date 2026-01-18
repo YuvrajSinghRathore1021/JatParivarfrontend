@@ -473,10 +473,39 @@ export default function ProfileEditor() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
             <LabeledField label={lang === 'hi' ? 'पूरा नाम' : 'Full name'} value={form.name} onChange={handleChange('name')} />
-            <LabeledField label={lang === 'hi' ? 'प्रदर्शित नाम' : 'Display name'} value={form.displayName} onChange={handleChange('displayName')} />
+            {/* <LabeledField label={lang === 'hi' ? 'प्रदर्शित नाम' : 'Display name'} value={form.displayName} onChange={handleChange('displayName')} /> */}
             <LabeledField label={lang === 'hi' ? 'मोबाइल नंबर' : 'Primary phone'} value={form.phone} disabled />
             <LabeledField label={lang === 'hi' ? 'भूमिका' : 'Membership role'} value={roleLabel(form.role, lang)} disabled />
-            <LabeledField label={lang === 'hi' ? 'व्यवसाय' : 'Occupation'} value={form.occupation} onChange={handleChange('occupation')} />
+         
+            <label  >
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
+                        <select
+                            value={form.occupation}
+                            onChange={handleChange('occupation')}
+                            className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+                        >
+                            <option value="">
+                                {lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}
+                            </option>
+
+                            <option value="government_job">
+                                {lang === 'hi' ? 'सरकारी नौकरी' : 'Government Job'}
+                            </option>
+
+                            <option value="private_job">
+                                {lang === 'hi' ? 'प्राइवेट नौकरी' : 'Private Job'}
+                            </option>
+
+                            <option value="business">
+                                {lang === 'hi' ? 'व्यवसाय' : 'Business'}
+                            </option>
+
+                            <option value="student">
+                                {lang === 'hi' ? 'छात्र' : 'Student'}
+                            </option>
+                        </select>
+                    </label>
+            
             <LabeledField label={lang === 'hi' ? 'संस्था/कंपनी' : 'Organisation'} value={form.company} onChange={handleChange('company')} />
             <LabeledField label={lang === 'hi' ? 'ईमेल' : 'Email'} value={form.contactEmail} onChange={handleChange('contactEmail')} />
             <LabeledField label={lang === 'hi' ? 'दूसरा फोन' : 'Alternate phone'} value={form.alternatePhone} onChange={handleChange('alternatePhone')} />
@@ -654,7 +683,7 @@ export default function ProfileEditor() {
               <input value={form.spotlightTitle} onChange={handleChange('spotlightTitle')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
             </label>
             <label className="text-sm text-slate-600">
-              <span>{lang === 'hi' ? 'मुख्य क्षेत्र' : 'Focus region'}</span>
+              <span>{lang === 'hi' ? 'मुख्य क्षेत्र' : 'Department'}</span>
               <input value={form.spotlightPlace} onChange={handleChange('spotlightPlace')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
             </label>
             <div className="md:col-span-2 rounded-2xl border border-dashed border-slate-300 p-4 space-y-3 bg-white/50">

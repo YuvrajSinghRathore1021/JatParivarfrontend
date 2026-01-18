@@ -159,9 +159,9 @@ const addressEntries = [
                   </p>
                 )}
 
-                {(person.place || member?.address?.city) && (
+                {(person.place || member?.currentAddress?.city) && (
                   <p className="text-sm text-slate-600">
-                    {person.place || member?.address?.city}
+                    {person.place || member?.currentAddress?.city}
                   </p>
                 )}
               </div>
@@ -208,10 +208,10 @@ const addressEntries = [
                 />
 
                 <InfoTile
-                  labelEn="Focus region"
+                  labelEn="Department"
                   labelHi="मुख्य क्षेत्र"
                   lang={lang}
-                  value={person.place || member?.address?.district || "—"}
+                  value={person.place || member?.currentAddress?.district || "—"}
                 />
               </div>
             </section>
