@@ -5,6 +5,7 @@ import SelectField from '../../../components/SelectField'
 import { useGeoOptions } from '../../../hooks/useGeoOptions'
 import { createJobPost } from '../../../lib/dashboardApi'
 import { useLang } from '../../../lib/useLang'
+import AddressBlock from '../../../components/AddressBlock.jsx'
 
 const jobTypes = [
   { value: 'full_time', labelEn: 'Full time', labelHi: 'पूर्णकालिक' },
@@ -16,16 +17,22 @@ const jobTypes = [
 const emptyForm = {
   title: '',
   description: '',
-  locationState: '',
-  locationStateCode: '',
-  locationDistrict: '',
-  locationDistrictCode: '',
-  locationCity: '',
-  locationCityCode: '',
+
   type: 'full_time',
   salaryRange: '',
   contactPhone: '',
+  address: {
+    state: '',
+    stateCode: '',
+    district: '',
+    districtCode: '',
+    city: '',
+    cityCode: '',
+    village: ''
+  },
 }
+
+
 
 export default function PostJob() {
   const { lang } = useLang()
@@ -33,8 +40,8 @@ export default function PostJob() {
   const [message, setMessage] = useState('')
 
   const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(
-    form.locationStateCode,
-    form.locationDistrictCode,
+    form.address?.stateCode,
+    form.address?.districtCode,
     lang,
   )
 
@@ -56,9 +63,13 @@ export default function PostJob() {
     const payload = {
       title: form.title,
       description: form.description,
-      locationState: form.locationState,
-      locationDistrict: form.locationDistrict,
-      locationCity: form.locationCity,
+      locationState: form.address?.state,
+      locationStateCode: form.address?.stateCode,
+      locationDistrict: form.address?.district,
+      locationDistrictCode: form.address?.districtCode,
+      locationCity: form.address?.city,
+      locationCityCode: form.address?.cityCode,
+      locationVillage: form.address?.village,
       type: form.type,
       salaryRange: form.salaryRange,
       contactPhone: form.contactPhone,
@@ -105,56 +116,16 @@ export default function PostJob() {
             required
           />
         </label>
-        <SelectField
-          label={lang === 'hi' ? 'राज्य' : 'State'}
-          value={form.locationStateCode}
-          onChange={(code) => {
-            const selected = states.find((item) => item.code === code)
-            setForm((prev) => ({
-              ...prev,
-              locationStateCode: code,
-              locationState: selected?.name.en || '',
-              locationDistrictCode: '',
-              locationDistrict: '',
-              locationCityCode: '',
-              locationCity: '',
-            }))
-          }}
-          options={stateOptions}
-          placeholder={lang === 'hi' ? 'राज्य चुनें' : 'Select state'}
+
+
+        <AddressBlock
+          title={lang === 'hi' ? 'पता' : 'Address'}
+          formKey="address"
+          form={form}
+          setForm={setForm}
+          {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
         />
-        <SelectField
-          label={lang === 'hi' ? 'ज़िला' : 'District'}
-          value={form.locationDistrictCode}
-          onChange={(code) => {
-            const selected = districts.find((item) => item.code === code)
-            setForm((prev) => ({
-              ...prev,
-              locationDistrictCode: code,
-              locationDistrict: selected?.name.en || '',
-              locationCityCode: '',
-              locationCity: '',
-            }))
-          }}
-          options={districtOptions}
-          placeholder={lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}
-          disabled={!form.locationStateCode}
-        />
-        <SelectField
-          label={lang === 'hi' ? 'शहर' : 'City'}
-          value={form.locationCityCode}
-          onChange={(code) => {
-            const selected = cities.find((item) => item.code === code)
-            setForm((prev) => ({
-              ...prev,
-              locationCityCode: code,
-              locationCity: selected?.name.en || '',
-            }))
-          }}
-          options={cityOptions}
-          placeholder={lang === 'hi' ? 'शहर चुनें' : 'Select city'}
-          disabled={!form.locationDistrictCode}
-        />
+
         <label className="block text-sm">
           <span className="font-semibold text-slate-600">{lang === 'hi' ? 'वेतन सीमा' : 'Salary range'}</span>
           <input value={form.salaryRange} onChange={handleChange('salaryRange')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />

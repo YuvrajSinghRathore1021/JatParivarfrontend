@@ -21,15 +21,12 @@ const sortOptions = [
 ]
 
 export default function MembersPage() {
-
   const [filters, setFilters] = useState({
     page: 1,
     pageSize: 20,
     search: '',
     status: '',
     role: '',
-
-
     sortBy: 'createdAt',
     sortDir: 'desc',
   })

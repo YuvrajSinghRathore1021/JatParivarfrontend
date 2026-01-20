@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import SelectField from '../../../components/SelectField'
+import AddressBlock from '../../../components/AddressBlock.jsx'
+
 import { useGeoOptions } from '../../../hooks/useGeoOptions'
 import {
   fetchMyJobs,
@@ -37,7 +39,9 @@ export default function ManageJobs() {
     stateOptions,
     districtOptions,
     cityOptions,
-  } = useGeoOptions(editingForm?.locationStateCode || '', editingForm?.locationDistrictCode || '', lang)
+  } = useGeoOptions(editingForm?.address?.stateCode || '',
+    editingForm?.address?.districtCode || '',
+    lang)
 
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }) => updateJobPost(id, payload),
@@ -48,29 +52,7 @@ export default function ManageJobs() {
     },
   })
 
-  useEffect(() => {
-    if (!editingForm || editingForm.locationStateCode || !editingForm.locationState || !states.length) return
-    const match = states.find((s) => s.name.en === editingForm.locationState)
-    if (match) {
-      setEditingForm((prev) => (prev ? { ...prev, locationStateCode: match.code } : prev))
-    }
-  }, [editingForm, states])
-
-  useEffect(() => {
-    if (!editingForm || editingForm.locationDistrictCode || !editingForm.locationDistrict || !districts.length) return
-    const match = districts.find((d) => d.name.en === editingForm.locationDistrict)
-    if (match) {
-      setEditingForm((prev) => (prev ? { ...prev, locationDistrictCode: match.code } : prev))
-    }
-  }, [districts, editingForm])
-
-  useEffect(() => {
-    if (!editingForm || editingForm.locationCityCode || !editingForm.locationCity || !cities.length) return
-    const match = cities.find((c) => c.name.en === editingForm.locationCity)
-    if (match) {
-      setEditingForm((prev) => (prev ? { ...prev, locationCityCode: match.code } : prev))
-    }
-  }, [cities, editingForm])
+  
 
   const closeEditor = () => {
     setEditingId(null)
@@ -82,15 +64,20 @@ export default function ManageJobs() {
     event.preventDefault()
     if (!editingForm) return
     const payload = {
-      title: editingForm.title || '',
-      description: editingForm.description || '',
-      locationState: editingForm.locationState || '',
-      locationDistrict: editingForm.locationDistrict || '',
-      locationCity: editingForm.locationCity || '',
-      type: editingForm.type || 'full_time',
-      salaryRange: editingForm.salaryRange || '',
-      contactPhone: editingForm.contactPhone || '',
+      title: editingForm.title,
+      description: editingForm.description,
+      locationState: editingForm.address?.state,
+      locationStateCode: editingForm.address?.stateCode,
+      locationDistrict: editingForm.address?.district,
+      locationDistrictCode: editingForm.address?.districtCode,
+      locationCity: editingForm.address?.city,
+      locationCityCode: editingForm.address?.cityCode,
+      locationVillage: editingForm.address?.village,
+      type: editingForm.type,
+      salaryRange: editingForm.salaryRange,
+      contactPhone: editingForm.contactPhone,
     }
+
     updateMutation.mutate({ id: jobId, payload })
   }
 
@@ -100,16 +87,20 @@ export default function ManageJobs() {
     setEditingForm({
       title: job.title || '',
       description: job.description || '',
-      locationState: job.locationState || '',
-      locationStateCode: '',
-      locationDistrict: job.locationDistrict || '',
-      locationDistrictCode: '',
-      locationCity: job.locationCity || '',
-      locationCityCode: '',
       type: job.type || 'full_time',
       salaryRange: job.salaryRange || '',
       contactPhone: job.contactPhone || '',
+      address: {
+        state: job.locationState || '',
+        stateCode: job.locationStateCode || '',
+        district: job.locationDistrict || '',
+        districtCode: job.locationDistrictCode || '',
+        city: job.locationCity || '',
+        cityCode: job.locationCityCode || '',
+        village: job.locationVillage || '',
+      },
     })
+
   }
 
   const handleEditingField = (field) => (event) => {
@@ -119,10 +110,16 @@ export default function ManageJobs() {
 
   const jobs = data || []
 
-  const locationLabel = (job) => {
-    const parts = [job.locationCity, job.locationDistrict, job.locationState].filter(Boolean)
-    return parts.length ? parts.join(', ') : '—'
-  }
+ const locationLabel = (job) => {
+  const parts = [
+    job.locationVillage,
+    job.locationCity,
+    job.locationDistrict,
+    job.locationState,
+  ].filter(Boolean)
+  return parts.length ? parts.join(', ') : '—'
+}
+
 
   return (
     <div className="space-y-6">
@@ -219,56 +216,14 @@ export default function ManageJobs() {
                         <span>{lang === 'hi' ? 'विवरण' : 'Description'}</span>
                         <textarea value={editingForm.description} onChange={handleEditingField('description')} rows={4} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" required />
                       </label>
-                      <SelectField
-                        label={lang === 'hi' ? 'राज्य' : 'State'}
-                        value={editingForm.locationStateCode}
-                        onChange={(code) => {
-                          const selected = states.find((s) => s.code === code)
-                          setEditingForm((prev) => (prev ? {
-                            ...prev,
-                            locationStateCode: code,
-                            locationState: selected?.name.en || '',
-                            locationDistrictCode: '',
-                            locationDistrict: '',
-                            locationCityCode: '',
-                            locationCity: '',
-                          } : prev))
-                        }}
-                        options={stateOptions}
-                        placeholder={lang === 'hi' ? 'राज्य चुनें' : 'Select state'}
+                      <AddressBlock
+                        title={lang === 'hi' ? 'पता' : 'Address'}
+                        formKey="address"
+                        form={editingForm}
+                        setForm={setEditingForm}
+                        {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
                       />
-                      <SelectField
-                        label={lang === 'hi' ? 'ज़िला' : 'District'}
-                        value={editingForm.locationDistrictCode}
-                        onChange={(code) => {
-                          const selected = districts.find((d) => d.code === code)
-                          setEditingForm((prev) => (prev ? {
-                            ...prev,
-                            locationDistrictCode: code,
-                            locationDistrict: selected?.name.en || '',
-                            locationCityCode: '',
-                            locationCity: '',
-                          } : prev))
-                        }}
-                        options={districtOptions}
-                        placeholder={lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}
-                        disabled={!editingForm.locationStateCode}
-                      />
-                      <SelectField
-                        label={lang === 'hi' ? 'शहर' : 'City'}
-                        value={editingForm.locationCityCode}
-                        onChange={(code) => {
-                          const selected = cities.find((c) => c.code === code)
-                          setEditingForm((prev) => (prev ? {
-                            ...prev,
-                            locationCityCode: code,
-                            locationCity: selected?.name.en || '',
-                          } : prev))
-                        }}
-                        options={cityOptions}
-                        placeholder={lang === 'hi' ? 'शहर चुनें' : 'Select city'}
-                        disabled={!editingForm.locationDistrictCode}
-                      />
+
                       <label className="text-sm text-slate-600">
                         <span>{lang === 'hi' ? 'वेतन सीमा' : 'Salary range'}</span>
                         <input value={editingForm.salaryRange} onChange={handleEditingField('salaryRange')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
@@ -313,21 +268,16 @@ export default function ManageJobs() {
                       <ul className="space-y-3">
                         {applicantsQuery.data.map((app) => (
                           <li key={app.id} className="rounded-2xl bg-white p-3 shadow-sm">
-                            <p className="text-sm font-semibold text-slate-900">{app.applicant?.name || 'Member'}</p>
+                            <p className="text-sm font-semibold text-slate-900">{app.applicant?.displayName || 'Member'}</p>
                             <p className="text-xs text-slate-500">
                               {app.applicant?.phone ? `${lang === 'hi' ? 'फोन:' : 'Phone:'} ${app.applicant.phone}` : ''}
                             </p>
                             {app.applicant?.email && (
                               <p className="text-xs text-slate-500">{app.applicant.email}</p>
                             )}
-
                             {app.coverLetter && (
                               <p className="mt-2 text-sm text-slate-600">{app.coverLetter}</p>
                             )}
-                            {app.expectedSalary && (
-                              <p className="mt-2 text-sm text-slate-600">{app.expectedSalary}</p>
-                            )}
-
                           </li>
                         ))}
                       </ul>

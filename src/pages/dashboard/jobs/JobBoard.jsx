@@ -1,42 +1,3 @@
-// // frontend/src/pages/dashboard/jobs/JobBoard.jsx
-// import { useMemo, useState } from 'react'
-// import { useMutation, useQuery } from '@tanstack/react-query'
-// import { fetchJobs, applyToJob } from '../../../lib/dashboardApi'
-// import { useLang } from '../../../lib/useLang'
-
-// export default function JobBoard() {
-//   const { lang } = useLang()
-//   const [search, setSearch] = useState('')
-//   const [typeFilter, setTypeFilter] = useState('')
-//   const [expanded, setExpanded] = useState(null)
-
-//   const { data, isLoading } = useQuery({ queryKey: ['jobs', 'public'], queryFn: fetchJobs })
-
-//   const applyMutation = useMutation({ mutationFn: ({ jobId, payload }) => applyToJob(jobId, payload) })
-
-//   const filtered = useMemo(() => {
-//     const list = data || []
-//     return list.filter((job) => {
-//       const matchesType = typeFilter ? job.type === typeFilter : true
-//       const text = `${job.title} ${job.description} ${job.locationCity} ${job.locationDistrict} ${job.locationState}`.toLowerCase()
-//       const matchesSearch = search ? text.includes(search.toLowerCase()) : true
-//       return matchesType && matchesSearch
-//     })
-//   }, [data, search, typeFilter])
-
-//   const onApply = (jobId, event) => {
-//     event.preventDefault()
-//     const form = new FormData(event.currentTarget)
-//     const payload = {
-//       coverLetter: form.get('coverLetter') || '',
-//       expectedSalary: form.get('expectedSalary') || '',
-//     }
-//     applyMutation.mutate({ jobId, payload })
-//   }
-
-
-
-
 
 
 // frontend/src/pages/dashboard/jobs/JobBoard.jsx
@@ -52,6 +13,9 @@ export default function JobBoard() {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [expanded, setExpanded] = useState(null)
+  const [openDetails, setOpenDetails] = useState(null)
+  const [openApply, setOpenApply] = useState(null)
+
 
   // 🔹 Fetch jobs
   const { data, isLoading } = useQuery({
@@ -158,26 +122,110 @@ export default function JobBoard() {
                         {lang === 'hi' ? 'वेतन सीमा:' : 'Salary:'} {job.salaryRange}
                       </p>
                     )}
+                    {openDetails == job.id && (
+                      <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+                        <p className="text-sm text-slate-700 break-words break-all">
+                          <span className="font-semibold ">
+                            {lang === 'hi' ? 'विवरण:' : 'Description:'}
+                          </span>{' '}
+                          {job.description}
+                        </p>
+
+                        <p className="text-sm text-slate-600">
+                          <span className="font-semibold">
+                            {lang === 'hi' ? 'नौकरी प्रकार:' : 'Job type:'}
+                          </span>{' '}
+                          {job.type.replace('_', ' ')}
+                        </p>
+
+                        <p className="text-sm text-slate-600">
+                          <span className="font-semibold">
+                            {lang === 'hi' ? 'स्थान:' : 'Location:'}
+                          </span>{' '}
+                          {[job.locationCity, job.locationDistrict, job.locationState]
+                            .filter(Boolean)
+                            .join(', ')}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          <span className="font-semibold">
+                            {lang === 'hi' ? 'पता:' : 'Address:'}
+                          </span>{' '}
+                          {job?.locationVillage}
+                        </p>
+
+                        <p className="text-xs text-slate-400">
+                          {lang === 'hi' ? 'पोस्ट तिथि:' : 'Posted on:'}{' '}
+                          {new Date(job.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    )}
+
                   </div>
                   {!job.applied && (
-                    <button
-                      type="button"
-                      onClick={() => setExpanded((prev) => (prev === job.id ? null : job.id))}
-                      className="self-start rounded-2xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 hover:border-blue-300"
-                    >
-                      {isExpanded
-                        ? lang === 'hi'
-                          ? 'आवेदन फॉर्म छिपाएँ'
-                          : 'Hide apply form'
-                        : lang === 'hi'
-                          ? 'आवेदन करें'
-                          : 'Apply now'}
-                    </button>
+                    <>
+                      <div className="flex gap-2">
+                        {/* View Details */}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOpenDetails((prev) => (prev === job.id ? null : job.id))
+                          }
+                          className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                        >
+                          {openDetails === job.id
+                            ? lang === 'hi'
+                              ? 'विवरण छिपाएँ'
+                              : 'Hide details'
+                            : lang === 'hi'
+                              ? 'पूरा विवरण देखें'
+                              : 'View details'}
+                        </button>
+
+                        {/* Apply */}
+                        {!job.applied && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setOpenApply((prev) => (prev === job.id ? null : job.id))
+                            }
+                            className="rounded-2xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 hover:border-blue-300"
+                          >
+                            {openApply === job.id
+                              ? lang === 'hi'
+                                ? 'फॉर्म बंद करें'
+                                : 'Hide form'
+                              : lang === 'hi'
+                                ? 'आवेदन करें'
+                                : 'Apply now'}
+                          </button>
+                        )}
+                      </div>
+
+
+                      {/* // <button
+                    //   type="button"
+                    //   onClick={() => setExpanded((prev) => (prev === job.id ? null : job.id))}
+                    //   className="self-start rounded-2xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 hover:border-blue-300"
+                    // >
+                    //   {isExpanded
+                    //     ? lang === 'hi'
+                    //       ? 'आवेदन फॉर्म छिपाएँ'
+                    //       : 'Hide apply form'
+                    //     : lang === 'hi'
+                    //       ? 'आवेदन करें'
+                    //       : 'Apply now'}
+                    // </button> */}
+                    </>
                   )}
                 </div>
 
-                {isExpanded && (
-                  <form className="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4" onSubmit={(event) => onApply(job.id, event)}>
+                {/* {isExpanded && (
+                  <form className="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4" onSubmit={(event) => onApply(job.id, event)}> */}
+                {openApply === job.id && (
+                  <form
+                    className="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                    onSubmit={(event) => onApply(job.id, event)}
+                  >
                     <label className="block text-sm text-slate-600">
                       <span>{lang === 'hi' ? 'संक्षिप्त परिचय' : 'Cover letter'}</span>
                       <textarea name="coverLetter" rows={3} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />

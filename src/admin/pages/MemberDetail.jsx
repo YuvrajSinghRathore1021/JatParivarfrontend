@@ -357,7 +357,21 @@ export default function MemberDetailPage() {
               ))}
             </select>
           </div>
-          <Field label="Role" value={member.role} disabled />
+          {/* <Field label="Role" value={member.role}  /> */}
+          <div>
+            <label className="text-xs font-medium text-slate-600">Role</label>
+            <select
+              value={member.role}
+              onChange={(e) => updateMemberField('role', e.target.value)}
+              className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
+            >
+              <option value="">All roles</option>
+              <option value="sadharan">Sadharan</option>
+              <option value="member">Management</option>
+              <option value="founder">Founder</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
           <Field label="Referral code" value={member.referralCode || ''} disabled />
         </div>
 
