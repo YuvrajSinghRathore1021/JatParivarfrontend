@@ -1,5 +1,5 @@
 // frontend/src/lib/dashboardApi.js
-import { get, post, put, patch } from './api'
+import { get, post, put, patch, del } from './api'
 
 // Matrimony
 export const fetchMatrimonyProfiles = (sort = 'recent') =>
@@ -8,6 +8,7 @@ export const fetchMatrimonyProfiles = (sort = 'recent') =>
 export const fetchMyMatrimonyProfile = () => get('/matrimony/profiles/me')
 
 export const saveMatrimonyProfile = (payload) => post('/matrimony/profiles', payload)
+export const deleteMatrimonyProfile = () => del('/matrimony/profiles')
 export const saveMatrimony = (payload) => post('/admin/matrimony/save', payload)
 
 export const sendMatrimonyInterest = (userId) => post(`/matrimony/interest/${userId}`, {})
@@ -26,6 +27,7 @@ export const fetchJobDetail = (jobId) => get(`/jobs/${jobId}`)
 export const createJobPost = (payload) => post('/jobs', payload)
 
 export const updateJobPost = (jobId, payload) => patch(`/jobs/${jobId}`, payload)
+export const deleteJobPost = (jobId) => del(`/jobs/${jobId}`)
 
 export const applyToJob = (jobId, payload) => post(`/jobs/${jobId}/applications`, payload)
 
@@ -43,6 +45,7 @@ export const fetchMyInstitutions = () => get('/institutions/mine')
 export const createInstitution = (payload) => post('/institutions', payload)
 
 export const updateInstitution = (id, payload) => patch(`/institutions/${id}`, payload)
+export const deleteInstitution = (id) => del(`/institutions/${id}`)
 
 // Profile
 export const fetchMyProfile = () => get('/me/profile')

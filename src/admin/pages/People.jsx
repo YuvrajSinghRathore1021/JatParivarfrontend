@@ -90,11 +90,18 @@ export default function PeoplePage({ role = 'founder' }) {
           <ul className="space-y-2">
             {list.map((p) => {
               const displayName = p.name || p.user?.displayName || p.user?.name || 'Member'
-              const avatar = API_File+p.photo || API_File+p.user?.avatarUrl ||
-                makeInitialAvatar(displayName, { size: 80, radius: 20 })
+              const avatar = API_File + (p.photo || p.user?.avatarUrl || '')
               return (
                 <li key={p.id} className="rounded-2xl border bg-white p-3 flex items-center gap-3">
-                  <img src={avatar} alt="" className="h-12 w-12 rounded-xl object-cover " />
+                  <img
+                    src={avatar}
+                    alt="avatar"
+                    className="h-12 w-12 rounded-xl object-cover bg-slate-100"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null
+                      e.currentTarget.src = makeInitialAvatar(displayName, { size: 80, radius: 20 })
+                    }}
+                  />
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="font-semibold truncate break-words">{displayName}</div><br/>
                     <div className="text-xs text-slate-500 truncate">

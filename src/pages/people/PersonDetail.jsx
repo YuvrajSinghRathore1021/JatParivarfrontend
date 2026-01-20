@@ -329,6 +329,23 @@ import { get } from '../../lib/api'
 import { useLang } from '../../lib/useLang'
 import { makeInitialAvatar } from '../../lib/avatar'
 let API_File = import.meta.env.VITE_API_File
+
+const OCCUPATION_LABELS = {
+  govt: 'Government job',
+  government_job: 'Government job',
+  private: 'Private job',
+  private_job: 'Private job',
+  business: 'Business',
+  student: 'Student'
+}
+
+const EDUCATION_LABELS = {
+  high_school: 'High school',
+  graduate: 'Graduate',
+  postgraduate: 'Postgraduate',
+  phd: 'PhD'
+}
+
 const fetchPerson = (id) => get(`/public/people/${id}`)
 
 export default function PersonDetail() {
@@ -346,55 +363,40 @@ export default function PersonDetail() {
   const member = person?.user || person?.userId || null
   const phone = member?.phone || member?.alternatePhone || '—'
   const email = member?.contactEmail || person?.email || '—'
-  const occupation = member?.occupation || '—'
-  const designation = member?.designation || '—'
-  const education = member?.education || '—'
-  const department = member?.Department || '—'
+  const occupation = getOccupationLabel(person?.occupation || member?.occupation)
+  const designation = person?.designation || member?.designation || person?.title || '—'
+  const education = getEducationLabel(person?.education || member?.education)
+  const department = person?.department || member?.department || '—'
+
+  const primaryAddress =
+    person?.currentAddress ||
+    member?.currentAddress ||
+    person?.occupationAddress ||
+    member?.occupationAddress ||
+    person?.parentalAddress ||
+    member?.parentalAddress
+  const location = formatLocation(primaryAddress) || person?.place || member?.address?.city || '—'
   
-const addressEntries = [
-  {
-    key: 'currentAddress',
-    labelEn: 'Current Address',
-    labelHi: 'वर्तमान पता',
-    value: member?.currentAddress
-      ? [
-          member.currentAddress.village,
-          member.currentAddress.city,
-          member.currentAddress.district,
-          member.currentAddress.state,
-          member.currentAddress.pincode
-        ].filter(Boolean).join(', ')
-      : '—'
-  },
-  {
-    key: 'parentalAddress',
-    labelEn: 'Parental Address',
-    labelHi: 'पैतृक पता',
-    value: member?.parentalAddress
-      ? [
-          member.parentalAddress.village,
-          member.parentalAddress.city,
-          member.parentalAddress.district,
-          member.parentalAddress.state,
-          member.parentalAddress.pincode
-        ].filter(Boolean).join(', ')
-      : '—'
-  },
-  {
-    key: 'occupationAddress',
-    labelEn: 'Occupation Address',
-    labelHi: 'कार्यस्थल का पता',
-    value: member?.occupationAddress
-      ? [
-          member.occupationAddress.village,
-          member.occupationAddress.city,
-          member.occupationAddress.district,
-          member.occupationAddress.state,
-          member.occupationAddress.pincode
-        ].filter(Boolean).join(', ')
-      : '—'
-  }
-]
+  const addressEntries = [
+    {
+      key: 'currentAddress',
+      labelEn: 'Current Address',
+      labelHi: 'वर्तमान पता',
+      value: formatLocation(person?.currentAddress || member?.currentAddress)
+    },
+    {
+      key: 'parentalAddress',
+      labelEn: 'Parental Address',
+      labelHi: 'पैतृक पता',
+      value: formatLocation(person?.parentalAddress || member?.parentalAddress)
+    },
+    {
+      key: 'occupationAddress',
+      labelEn: 'Occupation Address',
+      labelHi: 'कार्यस्थल का पता',
+      value: formatLocation(person?.occupationAddress || member?.occupationAddress)
+    }
+  ]
 
   const image = useMemo(() => {
     if (!person) return null
@@ -472,6 +474,11 @@ const addressEntries = [
                   src={image}
                   alt="image"
                   className="h-32 w-32 rounded-full object-cover border-4 border-white shadow-xl ring-4 ring-blue-500/20"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null
+                    const fallbackName = person?.name || member?.displayName || member?.name || member?.phone || 'Member'
+                    e.currentTarget.src = makeInitialAvatar(fallbackName, { size: 120, radius: 36 })
+                  }}
                 />
               </div>
 
@@ -484,9 +491,9 @@ const addressEntries = [
                   </p>
                 )}
 
-                {(person.place || member?.currentAddress?.city) && (
+                {location && location !== '—' && (
                   <p className="text-sm text-slate-600">
-                    {person.place || member?.currentAddress?.city}
+                    {location}
                   </p>
                 )}
               </div>
@@ -520,28 +527,6 @@ const addressEntries = [
               </div>
             </section>
 
-            {/* ROLE DETAILS */}
-            <section className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm space-y-4">
-              <h2 className="text-lg font-semibold text-slate-900">
-                {lang === "hi" ? "भूमिका विवरण" : "Role details"}
-              </h2>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <InfoTile
-                  labelEn="Designation"
-                  labelHi="पदनाम"
-                  lang={lang}
-                  value={person.designation || person.title || "—"}
-                />
-
-                <InfoTile
-                  labelEn="Department"
-                  labelHi="मुख्य क्षेत्र"
-                  lang={lang}
-                  value={person.place || member?.currentAddress?.district || "—"}
-                />
-              </div>
-            </section>
             {/* message DETAILS */}
             <section className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm space-y-4">
               <h2 className="text-lg font-semibold text-slate-900">
@@ -559,17 +544,24 @@ const addressEntries = [
               </div>
             </section>
 
-            <section className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm space-y-4">
-              <h2 className="text-lg font-semibold text-slate-900">
-                {lang === "hi" ? "व्यापार विवरण" : "Business details"}
-              </h2>
-              {/* AD Image,Bussiness Details (URL) */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <a href={person?.bussinessurl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                  <img src={API_File + person?.adimage} alt="Business Ad" className="w-full h-auto rounded-lg mb-2" />
-                </a>
-              </div>
-            </section>
+            {person?.adimage && (
+              <section className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm space-y-4">
+                <h2 className="text-lg font-semibold text-slate-900">
+                  {lang === "hi" ? "संगठन" : "Organisation"}
+                </h2>
+                <div className="overflow-hidden rounded-2xl border">
+                  <img
+                    src={API_File + person.adimage}
+                    alt="Organisation"
+                    className="w-full h-auto object-cover"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null
+                      e.currentTarget.src = makeInitialAvatar(person.name || 'Org', { size: 320, radius: 18 })
+                    }}
+                  />
+                </div>
+              </section>
+            )}
 
             {/* BIO ENGLISH */}
             {person.bioEn && (
@@ -608,6 +600,22 @@ const addressEntries = [
     </main>
 
   )
+}
+
+function getOccupationLabel(value) {
+  if (!value) return '—'
+  return OCCUPATION_LABELS[value] || value
+}
+
+function getEducationLabel(value) {
+  if (!value) return '—'
+  return EDUCATION_LABELS[value] || value
+}
+
+function formatLocation(addr) {
+  if (!addr || typeof addr !== 'object') return '—'
+  const parts = [addr.city, addr.district, addr.state].filter(Boolean)
+  return parts.length ? parts.join(', ') : '—'
 }
 
 function InfoTile({ labelEn, labelHi, value, lang }) {

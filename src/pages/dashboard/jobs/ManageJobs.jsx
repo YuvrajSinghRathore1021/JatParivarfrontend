@@ -9,6 +9,7 @@ import {
   fetchMyJobs,
   updateJobPost,
   fetchJobApplicants,
+  deleteJobPost,
 } from '../../../lib/dashboardApi'
 import { useLang } from '../../../lib/useLang'
 
@@ -49,6 +50,14 @@ export default function ManageJobs() {
       qc.invalidateQueries(['jobs', 'mine'])
       setEditingId(null)
       setEditingForm(null)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteJobPost(id),
+    onSuccess: () => {
+      qc.invalidateQueries(['jobs', 'mine'])
+      if (editingId) closeEditor()
     },
   })
 
@@ -184,6 +193,18 @@ export default function ManageJobs() {
                       className="rounded-2xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 hover:border-blue-300"
                     >
                       {isEditing ? (lang === 'hi' ? 'संपादन बंद करें' : 'Close editor') : lang === 'hi' ? 'संपादन करें' : 'Edit'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (deleteMutation.isPending) return
+                        if (window.confirm(lang === 'hi' ? 'नौकरी हटाएँ?' : 'Delete this job posting?')) {
+                          deleteMutation.mutate(job.id)
+                        }
+                      }}
+                      className="rounded-2xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:border-red-300"
+                    >
+                      {deleteMutation.isPending ? (lang === 'hi' ? 'हटा रहे हैं...' : 'Deleting...') : (lang === 'hi' ? 'हटाएँ' : 'Delete')}
                     </button>
                     <button
                       type="button"

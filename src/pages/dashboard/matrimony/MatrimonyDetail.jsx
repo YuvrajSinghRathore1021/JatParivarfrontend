@@ -2,7 +2,43 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { fetchMatrimonyDetail } from "../../../lib/dashboardApi";
 import { useLang } from "../../../lib/useLang";
+import { makeInitialAvatar } from "../../../lib/avatar";
 let API_File = import.meta.env.VITE_API_File
+
+const EDUCATION_LABELS = {
+    high_school: 'High school',
+    graduate: 'Graduate',
+    postgraduate: 'Postgraduate',
+    phd: 'PhD',
+}
+
+const OCCUPATION_LABELS = {
+    government_job: 'Government job',
+    private_job: 'Private job',
+    business: 'Business',
+    student: 'Student',
+    govt: 'Government job',
+    private: 'Private job',
+}
+
+const MARITAL_LABELS = {
+    never_married: 'Never married',
+    divorced: 'Divorced',
+    widowed: 'Widowed',
+}
+
+const GENDER_LABELS = {
+    male: 'Male',
+    female: 'Female',
+    other: 'Other',
+}
+
+const formatAddress = (addr) => {
+    if (!addr) return '—'
+    const parts = [addr.address || addr.village, addr.city, addr.district, addr.state].filter(Boolean)
+    return parts.length ? parts.join(', ') : '—'
+}
+
 export default function MatrimonyDetail() {
 
     const { id } = useParams();
@@ -31,7 +67,16 @@ export default function MatrimonyDetail() {
         );
     }
 
-    console.log("itemitemitem==", item)
+    const heroSrc = item.photos?.[0]
+        ? API_File + item.photos[0]
+        : makeInitialAvatar(item.name || 'Member', { size: 640, radius: 40 })
+
+    const education = EDUCATION_LABELS[item.education] || item.education || '—'
+    const occupation = OCCUPATION_LABELS[item.occupation] || item.occupation || '—'
+    const maritalStatus = MARITAL_LABELS[item.maritalStatus] || item.maritalStatus || '—'
+    const gender = GENDER_LABELS[item.gender] || item.gender || '—'
+    const designation = item?.designation || '—'
+    const department = item?.department || '—'
 
     return (
         <div className="space-y-8 pb-20">
@@ -39,72 +84,43 @@ export default function MatrimonyDetail() {
             {/* ===== Photo ===== */}
             <section className="px-4">
                 <img
-                    src={API_File + item.photos?.[0]}
-                    alt="image"
+                    src={heroSrc}
+                    alt="Profile"
                     className="w-full h-60 object-cover rounded-2xl shadow"
+                    onError={(e) => {
+                        e.currentTarget.onerror = null
+                        e.currentTarget.src = makeInitialAvatar(item.name || 'Member', { size: 640, radius: 40 })
+                    }}
                 />
             </section>
 
             {/* ===== Basic Info ===== */}
             <section className="px-4">
-                <h1 className="text-3xl font-bold text-slate-900">{item.name}</h1>
+                <h1 className="text-3xl font-bold text-slate-900">{item.name || '—'}</h1>
 
-                <div className="text-slate-700 mt-2 space-y-1">
-                    <p><b>Age:</b> {item.age}</p>
-                    <p><b>Gender:</b> {item.gender}</p>
-                    <p><b>Height:</b> {item.height}</p>
-                    <p><b>Marital Status:</b> {item.maritalStatus}</p>
+                <div className="text-slate-700 mt-3 grid gap-3 sm:grid-cols-2">
+                    <InfoRow label="Age" value={item.age ?? '—'} />
+                    <InfoRow label="Gender" value={gender} />
+                    <InfoRow label="Height" value={item.height || '—'} />
+                    <InfoRow label="Marital Status" value={maritalStatus} />
+                    <InfoRow label="Education" value={education} />
+                    <InfoRow label="Occupation" value={occupation} />
+                    <InfoRow label="Designation" value={designation} />
+                    <InfoRow label="Department" value={department} />
                 </div>
             </section>
-
-            {/* ===== Education ===== */}
-            <section className="px-4">
-                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-1">
-                    <h2 className="text-lg font-semibold">Education</h2>
-                    <p className="text-slate-700 break-all">{item.education}</p>
-                </div>
-            </section>
-            {/* ===== Occupation ===== */}
-            <section className="px-4">
-                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-1">
-                    <h2 className="text-lg font-semibold">Occupation</h2>
-                    <p className="text-slate-700 break-all" >{item.occupation}</p>
-                </div>
-            </section>
-            <section className="px-4">
-                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-1">
-                    <h2 className="text-lg font-semibold">Designation</h2>
-                    <p className="text-slate-700 break-all">{item?.designation}</p>
-                </div>
-            </section>
-            <section className="px-4">
-                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-1">
-                    <h2 className="text-lg font-semibold">Department</h2>
-                    <p className="text-slate-700 break-all">{item?.department}</p>
-                </div>
-            </section>
-
-
-
-
 
             {/* ===== Address ===== */}
-            <section className="px-4">
-                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-2">
-                    <h2 className="text-lg font-semibold">Current Address</h2>
-                    <p className="text-slate-800">
-                        {item?.currentAddress?.village}, {item?.currentAddress?.city}, {item?.currentAddress?.district}, {item?.currentAddress?.state}
-                    </p>
-                </div>
-            </section>
-            <section className="px-4">
-                <div className="rounded-xl bg-white shadow-sm border p-6 space-y-2">
-                    <h2 className="text-lg font-semibold">Parental Address</h2>
-                    <p className="text-slate-800">
-                        {/* {item?.parentaladdress} */}
-                        {item?.parentalAddress?.village}, {item?.parentalAddress?.city}, {item?.parentalAddress?.district}, {item?.parentalAddress?.state}
-                    </p>
-                </div>
+            <section className="px-4 grid gap-4 md:grid-cols-2">
+                <CardBlock title="Current Address">
+                    <p className="text-slate-800">{formatAddress(item?.currentAddress)}</p>
+                </CardBlock>
+                <CardBlock title="Parental Address">
+                    <p className="text-slate-800">{formatAddress(item?.parentalAddress)}</p>
+                </CardBlock>
+                <CardBlock title="Occupation Address">
+                    <p className="text-slate-800">{formatAddress(item?.occupationAddress)}</p>
+                </CardBlock>
             </section>
 
             {/* ===== Gotra ===== */}
@@ -112,10 +128,10 @@ export default function MatrimonyDetail() {
                 <div className="rounded-xl bg-white shadow-sm border p-6 space-y-2">
                     <h2 className="text-lg font-semibold">Gotra</h2>
                     <ul className="text-slate-700 space-y-1">
-                        <li><b>Self:</b> {item.gotra?.self}</li>
-                        <li><b>Mother:</b> {item.gotra?.mother}</li>
-                        <li><b>Nani:</b> {item.gotra?.nani}</li>
-                        <li><b>Dadi:</b> {item.gotra?.dadi}</li>
+                        <li><b>Self:</b> {item.gotra?.self || '—'}</li>
+                        <li><b>Mother:</b> {item.gotra?.mother || '—'}</li>
+                        <li><b>Nani:</b> {item.gotra?.nani || '—'}</li>
+                        <li><b>Dadi:</b> {item.gotra?.dadi || '—'}</li>
                     </ul>
                 </div>
             </section>
@@ -133,6 +149,10 @@ export default function MatrimonyDetail() {
                                 src={API_File + img}
                                 alt={`Gallery ${i + 1}`}
                                 className="h-32 w-full object-cover rounded-xl shadow"
+                                onError={(e) => {
+                                    e.currentTarget.onerror = null
+                                    e.currentTarget.src = makeInitialAvatar(item.name || 'Member', { size: 240, radius: 24 })
+                                }}
                             />
                         ))}
                     </div>
@@ -143,11 +163,28 @@ export default function MatrimonyDetail() {
                 <div className="rounded-xl bg-white shadow-sm border p-6 space-y-1">
                     <h2 className="text-lg font-semibold">Record Info</h2>
 
-                    <p><b>Created:</b> {new Date(item.createdAt).toLocaleString()}</p>
-                    <p><b>Updated:</b> {new Date(item.updatedAt).toLocaleString()}</p>
+                    <p><b>Created:</b> {item.createdAt ? new Date(item.createdAt).toLocaleString() : '—'}</p>
+                    <p><b>Updated:</b> {item.updatedAt ? new Date(item.updatedAt).toLocaleString() : '—'}</p>
                 </div>
             </section>
 
         </div>
     );
+}
+
+function InfoRow({ label, value }) {
+    return (
+        <p className="text-slate-700">
+            <b>{label}:</b> <span className="break-words">{value}</span>
+        </p>
+    )
+}
+
+function CardBlock({ title, children }) {
+    return (
+        <div className="rounded-xl bg-white shadow-sm border p-6 space-y-2">
+            <h2 className="text-lg font-semibold">{title}</h2>
+            {children}
+        </div>
+    )
 }

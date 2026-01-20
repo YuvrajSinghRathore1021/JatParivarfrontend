@@ -83,16 +83,16 @@ export default function InstitutionBrowse({ kind, web = false }) {
       ) : (
         <>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {filtered.map((item) => (
-              <article
-                key={item._id}
-                className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition"
-              >
+        <div className={`grid gap-4 md:grid-cols-2 ${web ? '' : 'md:max-h-[70vh] overflow-y-auto pr-1'}`}>
+          {filtered.map((item) => (
+            <article
+              key={item._id}
+              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition"
+            >
                 <Link to={urlmake(item)} className="block space-y-3">
 
                   {/* Title */}
-                  <h3 className="text-lg font-semibold text-slate-900 break-words line-clamp-2">
+                  <h3 className="text-lg font-semibold text-slate-900 text-wrap-anywhere line-clamp-2">
                     {lang === 'hi'
                       ? item.titleHi || item.titleEn
                       : item.titleEn || item.titleHi}
@@ -100,7 +100,7 @@ export default function InstitutionBrowse({ kind, web = false }) {
 
                   {/* Business (if sanstha) */}
                   {kind === "sanstha" && (
-                    <p className="text-sm text-slate-600 break-words line-clamp-1">
+                    <p className="text-sm text-slate-600 text-wrap-anywhere line-clamp-2">
                       <span className="font-medium">
                         {lang === 'hi' ? 'व्यवसाय:' : 'Business:'}
                       </span>{' '}
@@ -111,9 +111,9 @@ export default function InstitutionBrowse({ kind, web = false }) {
                   )}
 
                   {/* Description / Long Text (IMPORTANT FIX) */}
-                  {item.description && (
-                    <p className="text-sm text-slate-700 break-words overflow-hidden line-clamp-4">
-                      {item.description}
+                  {(item.descriptionEn || item.descriptionHi) && (
+                    <p className="text-sm text-slate-700 text-wrap-anywhere overflow-hidden line-clamp-4 whitespace-pre-wrap">
+                      {lang === 'hi' ? item.descriptionHi || item.descriptionEn : item.descriptionEn || item.descriptionHi}
                     </p>
                   )}
 

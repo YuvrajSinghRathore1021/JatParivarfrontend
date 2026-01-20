@@ -110,6 +110,7 @@
 
 import SelectField from './SelectField'
 import { useGeoOptions } from '../hooks/useGeoOptions'
+import { useEffect } from 'react'
 
 export default function AddressBlock(props) {
     const OTHER = '__OTHER__'
@@ -120,6 +121,39 @@ export default function AddressBlock(props) {
 
     // ⭐ Correct Hook Call
     const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(f?.stateCode, f?.districtCode, lang)
+
+    // If we already have a typed value but no code (from earlier saves), show manual inputs by forcing OTHER
+    useEffect(() => {
+        if (!f) return
+        if (!f.stateCode && f.state) {
+            setForm(prev => ({
+                ...prev,
+                [formKey]: {
+                    ...prev[formKey],
+                    stateCode: OTHER,
+                }
+            }))
+        }
+        if (!f.districtCode && f.district) {
+            setForm(prev => ({
+                ...prev,
+                [formKey]: {
+                    ...prev[formKey],
+                    districtCode: OTHER,
+                }
+            }))
+        }
+        if (!f.cityCode && f.city) {
+            setForm(prev => ({
+                ...prev,
+                [formKey]: {
+                    ...prev[formKey],
+                    cityCode: OTHER,
+                }
+            }))
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [f?.state, f?.district, f?.city])
 
     return (
         <div className="rounded-2xl border border-slate-200 p-4 space-y-4 md:col-span-2">

@@ -8,6 +8,22 @@ import { makeInitialAvatar } from '../../lib/avatar'
 let API_File = import.meta.env.VITE_API_File
 const fetchPerson = (id) => get(`/public/user/${id}`)
 
+const OCCUPATION_LABELS = {
+  govt: 'Government job',
+  government_job: 'Government job',
+  private: 'Private job',
+  private_job: 'Private job',
+  business: 'Business',
+  student: 'Student'
+}
+
+const EDUCATION_LABELS = {
+  high_school: 'High school',
+  graduate: 'Graduate',
+  postgraduate: 'Postgraduate',
+  phd: 'PhD'
+}
+
 export default function UserDetails() {
   const { personId } = useParams()
   const navigate = useNavigate()
@@ -20,26 +36,26 @@ export default function UserDetails() {
   })
 
   const person = data?.person || null
-  const member = person?.user || person?.userId || null
-  const phone = member?.phone || member?.alternatePhone || '—'
-  const email = member?.contactEmail || member?.email || '—'
-  const occupation = member?.occupation || '—'
-  const designation = member?.designation || '—'
-  const education = member?.education || '—'
-  const department = member?.Department || '—'
+  const phone = person?.phone || person?.alternatePhone || '—'
+  const email = person?.contactEmail || person?.email || '—'
+  const occupation = OCCUPATION_LABELS[person?.occupation] || person?.occupation || '—'
+  const designation = person?.designation || person?.title || '—'
+  const educationRaw = person?.education?.highestQualification || person?.education
+  const education = EDUCATION_LABELS[educationRaw] || educationRaw || '—'
+  const department = person?.department || '—'
 
   const addressEntries = [
   {
     key: 'currentAddress',
     labelEn: 'Current Address',
     labelHi: 'वर्तमान पता',
-    value: member?.currentAddress
+    value: person?.currentAddress
       ? [
-          member.currentAddress.village,
-          member.currentAddress.city,
-          member.currentAddress.district,
-          member.currentAddress.state,
-          member.currentAddress.pincode
+          person.currentAddress.village,
+          person.currentAddress.city,
+          person.currentAddress.district,
+          person.currentAddress.state,
+          person.currentAddress.pincode
         ].filter(Boolean).join(', ')
       : '—'
   },
@@ -47,13 +63,13 @@ export default function UserDetails() {
     key: 'parentalAddress',
     labelEn: 'Parental Address',
     labelHi: 'पैतृक पता',
-    value: member?.parentalAddress
+    value: person?.parentalAddress
       ? [
-          member.parentalAddress.village,
-          member.parentalAddress.city,
-          member.parentalAddress.district,
-          member.parentalAddress.state,
-          member.parentalAddress.pincode
+          person.parentalAddress.village,
+          person.parentalAddress.city,
+          person.parentalAddress.district,
+          person.parentalAddress.state,
+          person.parentalAddress.pincode
         ].filter(Boolean).join(', ')
       : '—'
   },
@@ -61,13 +77,13 @@ export default function UserDetails() {
     key: 'occupationAddress',
     labelEn: 'Occupation Address',
     labelHi: 'कार्यस्थल का पता',
-    value: member?.occupationAddress
+    value: person?.occupationAddress
       ? [
-          member.occupationAddress.village,
-          member.occupationAddress.city,
-          member.occupationAddress.district,
-          member.occupationAddress.state,
-          member.occupationAddress.pincode
+          person.occupationAddress.village,
+          person.occupationAddress.city,
+          person.occupationAddress.district,
+          person.occupationAddress.state,
+          person.occupationAddress.pincode
         ].filter(Boolean).join(', ')
       : '—'
   }
@@ -77,12 +93,11 @@ export default function UserDetails() {
     if (person.photo) return API_File + person.photo
     const fallbackName =
       person.name ||
-      member?.displayName ||
-      member?.name ||
-      member?.phone ||
+      person?.displayName ||
+      person?.phone ||
       'Member'
     return makeInitialAvatar(fallbackName, { size: 120, radius: 36 })
-  }, [member?.displayName, member?.name, member?.phone, person])
+  }, [person?.displayName, person?.name, person?.phone, person])
 
   const backToList = () => {
     navigate(makePath('dashboard/found'))
@@ -144,6 +159,11 @@ export default function UserDetails() {
                   src={image}
                   alt="image"
                   className="h-32 w-32 rounded-full object-cover border-4 border-white shadow-xl ring-4 ring-blue-500/20"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null
+                    const fallbackName = person?.name || person?.displayName || person?.phone || 'Member'
+                    e.currentTarget.src = makeInitialAvatar(fallbackName, { size: 120, radius: 36 })
+                  }}
                 />
               </div>
 
@@ -156,9 +176,9 @@ export default function UserDetails() {
                   </p>
                 )}
 
-                {(person.place || member?.currentAddress?.city) && (
+                {(person.place || person?.currentAddress?.city) && (
                   <p className="text-sm text-slate-600">
-                    {person.place || member?.currentAddress?.city}
+                    {person.place || person?.currentAddress?.city}
                   </p>
                 )}
               </div>
@@ -168,7 +188,7 @@ export default function UserDetails() {
                 <InfoTile labelEn="Phone" labelHi="फ़ोन" lang={lang} value={phone} />
                 <InfoTile labelEn="Email" labelHi="ईमेल" lang={lang} value={email} />
                 <InfoTile labelEn="Occupation" labelHi="व्यवसाय" lang={lang} value={occupation} />
-                 <InfoTile labelEn="Education" labelHi="शिक्षा" lang={lang} value={education} />
+                <InfoTile labelEn="Education" labelHi="शिक्षा" lang={lang} value={education} />
                 <InfoTile labelEn="Department" labelHi="डिपार्टमेंट" lang={lang} value={department} />
                 <InfoTile labelEn="Designation" labelHi="पद नाम" lang={lang} value={designation} />
               </div>
@@ -192,50 +212,6 @@ export default function UserDetails() {
               </div>
             </section>
 
-            {/* ROLE DETAILS */}
-            <section className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm space-y-4">
-              <h2 className="text-lg font-semibold text-slate-900">
-                {lang === "hi" ? "भूमिका विवरण" : "Role details"}
-              </h2>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <InfoTile
-                  labelEn="Designation"
-                  labelHi="पदनाम"
-                  lang={lang}
-                  value={person.designation || person.title || "—"}
-                />
-              </div>
-            </section>
-            {/* message DETAILS */}
-            <section className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm space-y-4">
-              <h2 className="text-lg font-semibold text-slate-900">
-                {lang === "hi" ? "संदेश" : "Message"}
-              </h2>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-
-                <InfoTile
-                  labelEn="Message"
-                  labelHi="संदेश"
-                  lang={lang}
-                  value={person?.message || "—"}
-                />
-              </div>
-            </section>
-
-            <section className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm space-y-4">
-              <h2 className="text-lg font-semibold text-slate-900">
-                {lang === "hi" ? "व्यापार विवरण" : "Business details"}
-              </h2>
-              {/* AD Image,Bussiness Details (URL) */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <a href={person?.bussinessurl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                  <img src={API_File + person?.adimage} alt="Business Ad" className="w-full h-auto rounded-lg mb-2" />
-                </a>
-              </div>
-            </section>
-
             {/* BIO ENGLISH */}
             {person.bioEn && (
               <section className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm space-y-3">
@@ -254,15 +230,6 @@ export default function UserDetails() {
               </section>
             )}
 
-            {/* PUBLIC NOTE */}
-            {person.publicNote && (
-              <section className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm space-y-3">
-                <h2 className="text-lg font-semibold text-slate-900">
-                  {lang === "hi" ? "संदेश" : "Community note"}
-                </h2>
-                <p className="text-slate-700 leading-relaxed">{person.publicNote}</p>
-              </section>
-            )}
           </article>
         ) : (
           <div className="rounded-3xl border border-yellow-200 bg-yellow-50 p-6 text-sm text-yellow-800">

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import SelectField from '../../../components/SelectField'
 import { useGeoOptions } from '../../../hooks/useGeoOptions'
-import { fetchMyInstitutions, updateInstitution } from '../../../lib/dashboardApi'
+import { fetchMyInstitutions, updateInstitution, deleteInstitution } from '../../../lib/dashboardApi'
 import { useLang } from '../../../lib/useLang'
 
 const copy = {
@@ -25,6 +25,16 @@ export default function InstitutionManage({ kind }) {
   const [editingForm, setEditingForm] = useState(null)
   const mutation = useMutation({
     mutationFn: ({ id, payload }) => updateInstitution(id, payload),
+    onSuccess: () => {
+      qc.invalidateQueries(['institutions', 'mine'])
+      qc.invalidateQueries(['institutions', kind])
+      setEditingId(null)
+      setEditingForm(null)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteInstitution(id),
     onSuccess: () => {
       qc.invalidateQueries(['institutions', 'mine'])
       qc.invalidateQueries(['institutions', kind])
@@ -194,6 +204,18 @@ export default function InstitutionManage({ kind }) {
                     className="self-start rounded-2xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 hover:border-blue-300"
                   >
                     {isEditing ? (lang === 'hi' ? 'संपादन बंद करें' : 'Close editor') : lang === 'hi' ? 'संपादन करें' : 'Edit'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (deleteMutation.isPending) return
+                      if (window.confirm(lang === 'hi' ? 'प्रविष्टि हटाएँ?' : 'Delete this listing?')) {
+                        deleteMutation.mutate(item._id)
+                      }
+                    }}
+                    className="self-start rounded-2xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:border-red-300"
+                  >
+                    {deleteMutation.isPending ? (lang === 'hi' ? 'हटा रहे हैं...' : 'Deleting...') : (lang === 'hi' ? 'हटाएँ' : 'Delete')}
                   </button>
                 </div>
 

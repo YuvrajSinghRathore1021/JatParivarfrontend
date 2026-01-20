@@ -8,7 +8,7 @@ import { upload } from '../../../lib/api'
 import SelectField from '../../../components/SelectField'
 import DateField from '../../../components/DateField'
 import { useGeoOptions } from '../../../hooks/useGeoOptions'
-import { asOptions as gotraOptions } from '../../../constants/gotras'
+import { useGotraOptions } from '../../../hooks/useGotraOptions'
 import AddressBlock from '../../../components/AddressBlock'
 let API_File = import.meta.env.VITE_API_File
 const spotlightLabels = {
@@ -25,7 +25,7 @@ export default function ProfileEditor() {
   const qc = useQueryClient()
 
   const { data, isLoading } = useQuery({ queryKey: ['profile', 'me'], queryFn: fetchMyProfile })
-  const gotraOptionsList = useMemo(() => gotraOptions(lang), [lang])
+  const { gotraOptions: gotraOptionsList, gotraValueSet } = useGotraOptions(lang)
   const [geoCodes, setGeoCodes] = useState({ stateCode: '', districtCode: '', cityCode: '' })
   const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(
     geoCodes.stateCode,
@@ -258,6 +258,10 @@ export default function ProfileEditor() {
     const baseName = form.displayName || form.name || data?.user?.phone || 'Member'
     return makeInitialAvatar(baseName, { size: 160, radius: 48 })
   }, [form.avatarUrl, form.displayName, form.name, data?.user])
+  const avatarSrc = useMemo(() => {
+    if (!displayAvatar) return ''
+    return displayAvatar.startsWith('data:') ? displayAvatar : `${API_File}${displayAvatar}`
+  }, [displayAvatar])
 
   const triggerFilePicker = () => {
     if (avatarUploading || avatarMutation.isPending) return
@@ -366,8 +370,8 @@ export default function ProfileEditor() {
 
       gotra: hasValues(form.gotra) ? form.gotra : undefined,
       spotlightRole: form.spotlightRole === 'none' ? 'none' : form.spotlightRole,
-      spotlightTitle: form.spotlightTitle,
-      spotlightPlace: form.spotlightPlace,
+      spotlightTitle: form.designation || form.spotlightTitle,
+      spotlightPlace: form.department || form.currentAddress?.city || form.occupationAddress?.city || form.spotlightPlace,
       spotlightBioEn: form.spotlightBioEn,
       spotlightBioHi: form.spotlightBioHi,
       spotlightBannerUrl: form.spotlightBannerUrl,
@@ -427,7 +431,16 @@ export default function ProfileEditor() {
         </header>
 
         <section className="flex flex-col items-center gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-center md:flex-row md:items-center md:gap-6 md:text-left">
-          <img src={API_File + displayAvatar} alt="image" className="h-28 w-28 rounded-3xl object-cover" />
+          <img
+            src={avatarSrc}
+            alt="image"
+            className="h-28 w-28 rounded-3xl object-cover bg-slate-100"
+            onError={(e) => {
+              e.currentTarget.onerror = null
+              const baseName = form.displayName || form.name || data?.user?.phone || 'Member'
+              e.currentTarget.src = makeInitialAvatar(baseName, { size: 160, radius: 48 })
+            }}
+          />
           <div className="space-y-3">
             <div>
               <p className="text-sm font-semibold text-slate-700">{lang === 'hi' ? 'प्रोफ़ाइल फोटो' : 'Profile photo'}</p>
@@ -611,32 +624,64 @@ export default function ProfileEditor() {
         <section className="grid gap-4 md:grid-cols-2">
           <SelectField
             label={lang === 'hi' ? 'गोत्र (स्व)' : 'Gotra (Self)'}
-            value={form.gotra?.self}
-            onChange={(value) => updateGotraField('self', value)}
+            value={gotraValueSet.has(form.gotra?.self) ? form.gotra?.self : '__custom'}
+            onChange={(value) => updateGotraField('self', value === '__custom' ? '' : value)}
             options={gotraOptionsList}
             placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
           />
+          {!gotraValueSet.has(form.gotra?.self) && (
+            <input
+              value={form.gotra?.self || ''}
+              onChange={(e) => updateGotraField('self', e.target.value)}
+              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            />
+          )}
           <SelectField
             label={lang === 'hi' ? 'गोत्र (माता)' : 'Gotra (Mother)'}
-            value={form.gotra?.mother}
-            onChange={(value) => updateGotraField('mother', value)}
+            value={gotraValueSet.has(form.gotra?.mother) ? form.gotra?.mother : '__custom'}
+            onChange={(value) => updateGotraField('mother', value === '__custom' ? '' : value)}
             options={gotraOptionsList}
             placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
           />
+          {!gotraValueSet.has(form.gotra?.mother) && (
+            <input
+              value={form.gotra?.mother || ''}
+              onChange={(e) => updateGotraField('mother', e.target.value)}
+              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            />
+          )}
           <SelectField
             label={lang === 'hi' ? 'गोत्र (दादी)' : 'Gotra (Dadi)'}
-            value={form.gotra?.dadi}
-            onChange={(value) => updateGotraField('dadi', value)}
+            value={gotraValueSet.has(form.gotra?.dadi) ? form.gotra?.dadi : '__custom'}
+            onChange={(value) => updateGotraField('dadi', value === '__custom' ? '' : value)}
             options={gotraOptionsList}
             placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
           />
+          {(form.gotra?.dadi && !gotraValueSet.has(form.gotra?.dadi)) && (
+            <input
+              value={form.gotra?.dadi || ''}
+              onChange={(e) => updateGotraField('dadi', e.target.value)}
+              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            />
+          )}
           <SelectField
             label={lang === 'hi' ? 'गोत्र (नानी)' : 'Gotra (Nani)'}
-            value={form.gotra?.nani}
-            onChange={(value) => updateGotraField('nani', value)}
+            value={gotraValueSet.has(form.gotra?.nani) ? form.gotra?.nani : '__custom'}
+            onChange={(value) => updateGotraField('nani', value === '__custom' ? '' : value)}
             options={gotraOptionsList}
             placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
           />
+          {(form.gotra?.nani && !gotraValueSet.has(form.gotra?.nani)) && (
+            <input
+              value={form.gotra?.nani || ''}
+              onChange={(e) => updateGotraField('nani', e.target.value)}
+              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            />
+          )}
         </section>
 
         <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5 space-y-4">
@@ -701,14 +746,11 @@ export default function ProfileEditor() {
               />
               <span>{lang === 'hi' ? 'सार्वजनिक सूची में दिखाएँ' : 'Show on public listing'}</span>
             </label>
-            <label className="text-sm text-slate-600">
-              <span>{lang === 'hi' ? 'पदनाम' : 'Title/designation'}</span>
-              <input value={form.spotlightTitle} onChange={handleChange('spotlightTitle')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
-            </label>
-            <label className="text-sm text-slate-600">
-              <span>{lang === 'hi' ? 'मुख्य क्षेत्र' : 'Department'}</span>
-              <input value={form.spotlightPlace} onChange={handleChange('spotlightPlace')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
-            </label>
+            <div className="md:col-span-2 text-xs text-slate-500">
+              {lang === 'hi'
+                ? 'पदनाम और विभाग आपकी प्रोफ़ाइल जानकारी से स्वतः उपयोग होंगे।'
+                : 'Designation and department are taken from your profile details automatically.'}
+            </div>
             <div className="md:col-span-2 rounded-2xl border border-dashed border-slate-300 p-4 space-y-3 bg-white/50">
               <div>
                 <p className="text-sm font-semibold text-slate-700">

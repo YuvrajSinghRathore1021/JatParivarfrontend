@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { makeInitialAvatar } from "../lib/avatar";
 import { get, patch } from "../lib/api";
 import { useGeoOptions } from "../hooks/useGeoOptions";
-import { asOptions as gotraOptions } from "../constants/gotras";
+import { useGotraOptions } from "../hooks/useGotraOptions";
 import NumberRequestButton from "./NumberRequestButton";
 
 let API_File = import.meta.env.VITE_API_File;
@@ -33,6 +33,7 @@ export default function Found() {
     // ---------------- GEO HOOK ----------------
     const { stateOptions, districtOptions, cityOptions } =
         useGeoOptions(stateCode, districtCode, lang);
+    const { gotraOptions: gotraChoices } = useGotraOptions(lang);
 
     // ---------------- MAIN DATA ----------------
     const [data, setData] = useState([]);
@@ -51,6 +52,12 @@ export default function Found() {
     // ---------------- MAP PROFILES ----------------
     const cards = useMemo(() => {
         if (!data) return [];
+        const OCC_LABELS = {
+            government_job: lang === 'hi' ? 'सरकारी नौकरी' : 'Government job',
+            private_job: lang === 'hi' ? 'निजी नौकरी' : 'Private job',
+            business: lang === 'hi' ? 'व्यवसाय' : 'Business',
+            student: lang === 'hi' ? 'छात्र' : 'Student'
+        };
 
         return data.map((p) => {
             const addr = p.currentAddress || p.occupationAddress || {};
@@ -59,14 +66,18 @@ export default function Found() {
                 id: p.id,
                 name: p.name,
                 title: p.displayName,
-                image: makeInitialAvatar(p.name, { size: 100, radius: 28 }),
+                designation: p.designation || p.title,
+                department: p.department,
+                image: p.avatarUrl ? API_File + p.avatarUrl : makeInitialAvatar(p.name, { size: 100, radius: 28 }),
+                phone: p.phone || p.alternatePhone,
+                contactEmail: p.contactEmail,
 
-                stateCode: addr.stateCode || "",
-                districtCode: addr.districtCode || "",
-                cityCode: addr.cityCode || "",
+                state: addr.state || "",
+                district: addr.district || "",
+                city: addr.city || "",
 
                 gotra: p.gotra?.self || "",
-                occupation: p.occupation || "",
+                occupation: OCC_LABELS[p.occupation] || p.occupation || "",
             };
         });
     }, [data]);
@@ -112,8 +123,6 @@ export default function Found() {
             );
         });
     }, [cards, isSearchClicked, stateCode, districtCode, cityCode, gotra, occupation]);
-
-    const gotraChoices = useMemo(() => gotraOptions(lang), [lang]);
 
     const OCCUPATION = {
     
@@ -297,7 +306,11 @@ export default function Found() {
                                     <img
                                         src={p.image}
                                         alt="image"
-                                        className="h-20 w-20 rounded-2xl object-cover"
+                                        className="h-20 w-20 rounded-2xl object-cover bg-slate-100"
+                                        onError={(e) => {
+                                            e.currentTarget.onerror = null;
+                                            e.currentTarget.src = makeInitialAvatar(p.name || 'Member', { size: 100, radius: 28 });
+                                        }}
                                     />
 
                                     {/* DETAILS */}
@@ -308,10 +321,13 @@ export default function Found() {
                                         </h2>
 
                                         {/* TITLE / DISPLAY NAME */}
-                                        {p.title && (
+                                        {p.designation && (
                                             <p className="text-sm font-medium text-blue-600 break-all line-clamp-2">
-                                                {p.title}
+                                                {p.designation}
                                             </p>
+                                        )}
+                                        {p.department && (
+                                            <p className="text-xs text-slate-600 break-all line-clamp-2">{p.department}</p>
                                         )}
 
                                         {/* GOTRA */}
@@ -331,9 +347,7 @@ export default function Found() {
                                         {/* ADDRESS */}
                                         <p className="text-sm text-slate-700">
                                             <span className="font-medium">Address:</span>{" "}
-                                            {p.cityCode ? p.cityCode.split("-").pop() : ""},{" "}
-                                            {p.districtCode ? p.districtCode.split("-").pop() : ""},{" "}
-                                            {p.stateCode}
+                                            {[p.city, p.district, p.state].filter(Boolean).join(", ") || "—"}
                                         </p>
 
                                         {/* VIEW MORE */}

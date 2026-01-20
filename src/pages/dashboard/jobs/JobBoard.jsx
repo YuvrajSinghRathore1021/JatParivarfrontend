@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchJobs, applyToJob } from '../../../lib/dashboardApi'
 import { useLang } from '../../../lib/useLang'
+import { Link } from 'react-router-dom'
 
 export default function JobBoard() {
   const { lang } = useLang()
@@ -103,169 +104,143 @@ export default function JobBoard() {
       ) : (
         <div className="space-y-4">
           {filtered.map((job) => {
-            const isExpanded = expanded === job.id
             const applied = applyMutation.isSuccess && applyMutation.variables?.jobId === job.id
+            const locationText = [job.locationCity, job.locationDistrict, job.locationState].filter(Boolean).join(', ')
             return (
               <article key={job.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-900 break-all line-clamp-2">{job.title}</h3>
-                    {/* <p className="mt-1 text-sm text-slate-600 break-all">{job.description}</p> */}
-                    <p className="mt-2 text-xs uppercase tracking-wide text-slate-400">
-                      {(() => {
-                        const parts = [job.locationCity, job.locationDistrict, job.locationState].filter(Boolean)
-                        return parts.length ? parts.join(', ') : '—'
-                      })()}
-                    </p>
-                    {job.salaryRange && (
-                      <p className="text-xs font-semibold text-slate-500">
-                        {lang === 'hi' ? 'वेतन सीमा:' : 'Salary:'} {job.salaryRange}
-                      </p>
-                    )}
-                    {openDetails == job.id && (
-                      <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-2">
-                        <p className="text-sm text-slate-700 break-words break-all">
-                          <span className="font-semibold ">
-                            {lang === 'hi' ? 'विवरण:' : 'Description:'}
-                          </span>{' '}
-                          {job.description}
-                        </p>
-
-                        <p className="text-sm text-slate-600">
-                          <span className="font-semibold">
-                            {lang === 'hi' ? 'नौकरी प्रकार:' : 'Job type:'}
-                          </span>{' '}
-                          {job.type.replace('_', ' ')}
-                        </p>
-
-                        <p className="text-sm text-slate-600">
-                          <span className="font-semibold">
-                            {lang === 'hi' ? 'स्थान:' : 'Location:'}
-                          </span>{' '}
-                          {[job.locationCity, job.locationDistrict, job.locationState]
-                            .filter(Boolean)
-                            .join(', ')}
-                        </p>
-                        <p className="text-sm text-slate-600">
-                          <span className="font-semibold">
-                            {lang === 'hi' ? 'पता:' : 'Address:'}
-                          </span>{' '}
-                          {job?.locationVillage}
-                        </p>
-
-                        <p className="text-xs text-slate-400">
-                          {lang === 'hi' ? 'पोस्ट तिथि:' : 'Posted on:'}{' '}
-                          {new Date(job.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    )}
-
+                <div className="flex flex-col gap-3">
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold text-slate-900 break-words">{job.title}</h3>
+                    <div className="grid sm:grid-cols-2 gap-2 text-sm text-slate-700">
+                      <Info label={lang === 'hi' ? 'नौकरी प्रकार' : 'Job type'} value={job.type?.replace('_',' ') || '—'} />
+                      <Info label={lang === 'hi' ? 'वेतन सीमा' : 'Salary'} value={job.salaryRange || '—'} />
+                      <Info label={lang === 'hi' ? 'संपर्क फोन' : 'Contact phone'} value={job.contactPhone || '—'} />
+                      <Info label={lang === 'hi' ? 'पता' : 'Address'} value={job.locationVillage || '—'} />
+                      <Info label={lang === 'hi' ? 'राज्य' : 'State'} value={job.locationState || '—'} />
+                      <Info label={lang === 'hi' ? 'ज़िला' : 'District'} value={job.locationDistrict || '—'} />
+                      <Info label={lang === 'hi' ? 'शहर' : 'City'} value={job.locationCity || '—'} />
+                    </div>
                   </div>
-                  {!job.applied && (
-                    <>
-                      <div className="flex gap-2">
-                        {/* View Details */}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setOpenDetails((prev) => (prev === job.id ? null : job.id))
-                          }
-                          className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                        >
-                          {openDetails === job.id
-                            ? lang === 'hi'
-                              ? 'विवरण छिपाएँ'
-                              : 'Hide details'
-                            : lang === 'hi'
-                              ? 'पूरा विवरण देखें'
-                              : 'View details'}
-                        </button>
 
-                        {/* Apply */}
-                        {!job.applied && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setOpenApply((prev) => (prev === job.id ? null : job.id))
-                            }
-                            className="rounded-2xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 hover:border-blue-300"
-                          >
-                            {openApply === job.id
-                              ? lang === 'hi'
-                                ? 'फॉर्म बंद करें'
-                                : 'Hide form'
-                              : lang === 'hi'
-                                ? 'आवेदन करें'
-                                : 'Apply now'}
-                          </button>
-                        )}
-                      </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      to={job.id}
+                      state={{ job }}
+                      className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 w-full sm:w-auto text-center"
+                    >
+                      {lang === 'hi' ? 'पूरा विवरण' : 'Open detail'}
+                    </Link>
 
+                    {!job.applied && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenApply((prev) => (prev === job.id ? null : job.id))
+                        }
+                        className="rounded-2xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 hover:border-blue-300"
+                      >
+                        {openApply === job.id
+                          ? lang === 'hi'
+                            ? 'फॉर्म बंद करें'
+                            : 'Hide form'
+                          : lang === 'hi'
+                            ? 'आवेदन करें'
+                            : 'Apply now'}
+                      </button>
+                    )}
+                  </div>
 
-                      {/* // <button
-                    //   type="button"
-                    //   onClick={() => setExpanded((prev) => (prev === job.id ? null : job.id))}
-                    //   className="self-start rounded-2xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 hover:border-blue-300"
-                    // >
-                    //   {isExpanded
-                    //     ? lang === 'hi'
-                    //       ? 'आवेदन फॉर्म छिपाएँ'
-                    //       : 'Hide apply form'
-                    //     : lang === 'hi'
-                    //       ? 'आवेदन करें'
-                    //       : 'Apply now'}
-                    // </button> */}
-                    </>
+                  {openDetails === job.id && (
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+                      <p className="text-sm text-slate-700 break-words whitespace-pre-wrap">
+                        <span className="font-semibold ">
+                          {lang === 'hi' ? 'विवरण:' : 'Description:'}
+                        </span>{' '}
+                        {job.description || '—'}
+                      </p>
+
+                      <p className="text-sm text-slate-600">
+                        <span className="font-semibold">
+                          {lang === 'hi' ? 'नौकरी प्रकार:' : 'Job type:'}
+                        </span>{' '}
+                        {job.type?.replace('_', ' ') || '—'}
+                      </p>
+
+                      <p className="text-sm text-slate-600">
+                        <span className="font-semibold">
+                          {lang === 'hi' ? 'स्थान:' : 'Location:'}
+                        </span>{' '}
+                        {locationText || '—'}
+                      </p>
+                      <p className="text-sm text-slate-600 break-words">
+                        <span className="font-semibold">
+                          {lang === 'hi' ? 'पता:' : 'Address:'}
+                        </span>{' '}
+                        {job?.locationVillage || '—'}
+                      </p>
+
+                      <p className="text-xs text-slate-400">
+                        {lang === 'hi' ? 'पोस्ट तिथि:' : 'Posted on:'}{' '}
+                        {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : '—'}
+                      </p>
+                    </div>
+                  )}
+
+                  {openApply === job.id && (
+                    <form
+                      className="rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-4"
+                      onSubmit={(event) => onApply(job.id, event)}
+                    >
+                      <label className="block text-sm text-slate-600">
+                        <span>{lang === 'hi' ? 'संक्षिप्त परिचय' : 'Cover letter'}</span>
+                        <textarea name="coverLetter" rows={3} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+                      </label>
+                      <label className="block text-sm text-slate-600">
+                        <span>{lang === 'hi' ? 'अपेक्षित वेतन' : 'Expected salary'}</span>
+                        <input name="expectedSalary" className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+                      </label>
+                      <button
+                        type="submit"
+                        disabled={applyMutation.isPending}
+                        className="rounded-2xl bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+                      >
+                        {applyMutation.isPending
+                          ? lang === 'hi'
+                            ? 'भेजा जा रहा है...'
+                            : 'Submitting...'
+                          : lang === 'hi'
+                            ? 'आवेदन भेजें'
+                            : 'Submit application'}
+                      </button>
+                      {applied && (
+                        <p className="text-sm text-blue-600">
+                          {lang === 'hi'
+                            ? 'आपका आवेदन भेज दिया गया है। सदस्य आपसे संपर्क करेगा।'
+                            : 'Your application has been shared with the poster.'}
+                        </p>
+                      )}
+                      {applyMutation.isError && (
+                        <p className="text-sm text-red-600">
+                          {lang === 'hi' ? 'आवेदन भेजने में त्रुटि हुई। कृपया पुनः प्रयास करें।' : 'Failed to submit application. Please try again.'}
+                        </p>
+                      )}
+                    </form>
                   )}
                 </div>
-
-                {/* {isExpanded && (
-                  <form className="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4" onSubmit={(event) => onApply(job.id, event)}> */}
-                {openApply === job.id && (
-                  <form
-                    className="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4"
-                    onSubmit={(event) => onApply(job.id, event)}
-                  >
-                    <label className="block text-sm text-slate-600">
-                      <span>{lang === 'hi' ? 'संक्षिप्त परिचय' : 'Cover letter'}</span>
-                      <textarea name="coverLetter" rows={3} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                    </label>
-                    <label className="block text-sm text-slate-600">
-                      <span>{lang === 'hi' ? 'अपेक्षित वेतन' : 'Expected salary'}</span>
-                      <input name="expectedSalary" className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-                    </label>
-                    <button
-                      type="submit"
-                      disabled={applyMutation.isPending}
-                      className="rounded-2xl bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
-                    >
-                      {applyMutation.isPending
-                        ? lang === 'hi'
-                          ? 'भेजा जा रहा है...'
-                          : 'Submitting...'
-                        : lang === 'hi'
-                          ? 'आवेदन भेजें'
-                          : 'Submit application'}
-                    </button>
-                    {applied && (
-                      <p className="text-sm text-blue-600">
-                        {lang === 'hi'
-                          ? 'आपका आवेदन भेज दिया गया है। सदस्य आपसे संपर्क करेगा।'
-                          : 'Your application has been shared with the poster.'}
-                      </p>
-                    )}
-                    {applyMutation.isError && (
-                      <p className="text-sm text-red-600">
-                        {lang === 'hi' ? 'आवेदन भेजने में त्रुटि हुई। कृपया पुनः प्रयास करें।' : 'Failed to submit application. Please try again.'}
-                      </p>
-                    )}
-                  </form>
-                )}
               </article>
             )
           })}
         </div>
       )}
+    </div>
+  )
+}
+
+function Info({ label, value }) {
+  return (
+    <div className="text-sm text-slate-700">
+      <div className="text-xs uppercase tracking-wide text-slate-500">{label}</div>
+      <div className="mt-0.5 break-words break-all font-semibold">{value}</div>
     </div>
   )
 }

@@ -8,7 +8,7 @@ import { upload } from '../../lib/api.js'
 import DateField from '../../components/DateField'
 import SelectField from '../../components/SelectField'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
-import { asOptions as gotraOptions } from '../../constants/gotras'
+import { useGotraOptions } from '../../hooks/useGotraOptions'
 import AddressBlock from '../../components/AddressBlock.jsx'
 const pageSizes = [20, 50, 100]
 const sortOptions = [
@@ -70,6 +70,15 @@ export default function MembersPage() {
   }
 
   const currentSortValue = `${meta.sortBy}:${meta.sortDir}`
+
+  const copyToClipboard = async (value) => {
+    if (!value) return
+    try {
+      await navigator.clipboard.writeText(value)
+    } catch {
+      // ignore
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -161,6 +170,7 @@ export default function MembersPage() {
               <th className="px-4 py-2 font-medium text-slate-600">Phone</th>
               <th className="px-4 py-2 font-medium text-slate-600">Role</th>
               <th className="px-4 py-2 font-medium text-slate-600">Referral</th>
+              <th className="px-4 py-2 font-medium text-slate-600">IDs</th>
               <th className="px-4 py-2 font-medium text-slate-600">Status</th>
               <th className="px-4 py-2 font-medium text-slate-600">City</th>
               <th className="px-4 py-2 font-medium text-slate-600">Actions</th>
@@ -198,7 +208,30 @@ export default function MembersPage() {
                 </td>
                 <td className="px-4 py-3 text-slate-700 capitalize">{member.role || '—'}</td>
                 <td className="px-4 py-3 text-slate-700 font-mono text-xs">
-                  {member.referralCode || '—'}
+                  <div className="flex items-center gap-2">
+                    <span>{member.referralCode || '—'}</span>
+                    {member.referralCode && (
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(member.referralCode)}
+                        className="text-blue-600 text-[11px] underline"
+                      >
+                        copy
+                      </button>
+                    )}
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-xs text-slate-700 font-mono">
+                  <div className="flex items-center gap-2">
+                    <span className="break-all">{member.id}</span>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(member.id)}
+                      className="text-blue-600 text-[11px] underline"
+                    >
+                      copy
+                    </button>
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={member.status} />
@@ -347,7 +380,7 @@ function MemberCreateButton({ onCreated }) {
     addressCodes.districtCode,
     'en'
   )
-  const gotraOptionsList = useMemo(() => gotraOptions('en'), [])
+  const { gotraOptions: gotraOptionsList, gotraValueSet } = useGotraOptions('en')
 
   const resetForm = () => {
     setForm({
@@ -442,6 +475,25 @@ function MemberCreateButton({ onCreated }) {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value
     setgotraform((prev) => ({ ...prev, [field]: value }))
   }
+  useEffect(() => {
+    const fields = ['self', 'mother', 'dadi', 'nani']
+    const nextGotra = { ...(form.gotra || {}) }
+    const nextForm = {}
+    let changed = false
+    fields.forEach((field) => {
+      const val = (nextGotra[field] || '').toString().trim()
+      if (val && val !== '__custom' && gotraValueSet && !gotraValueSet.has(val)) {
+        nextGotra[field] = '__custom'
+        nextForm[field] = val
+        changed = true
+      }
+    })
+    if (changed) {
+      setForm((prev) => ({ ...prev, gotra: nextGotra }))
+      setgotraform((prev) => ({ ...prev, ...nextForm }))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gotraValueSet])
 
   const submit = async (e) => {
     e.preventDefault()
@@ -465,7 +517,6 @@ function MemberCreateButton({ onCreated }) {
         alternatePhone: form.alternatePhone || undefined,
         avatarUrl: form.avatarUrl || undefined,
         janAadhaarUrl: form.janAadhaarUrl || undefined,
-        gotra: hasValues(form.gotra) ? form.gotra : undefined,
         gotra: {
           self: form.gotra?.self == '__custom' ? gotraform?.self : form.gotra?.self,
           mother: form.gotra?.mother == '__custom' ? gotraform?.mother : form.gotra?.mother,
@@ -804,7 +855,7 @@ function MemberCreateButton({ onCreated }) {
             <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
             <div className="space-y-2"><SelectField
               label="Self"
-              value={form.gotra?.self}
+              value={gotraValueSet.has(form.gotra?.self) ? form.gotra?.self : '__custom'}
               onChange={(value) => handleNestedChange('gotra', 'self', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"
@@ -821,7 +872,7 @@ function MemberCreateButton({ onCreated }) {
 
             <div className="space-y-2"><SelectField
               label="Mother"
-              value={form.gotra?.mother}
+              value={gotraValueSet.has(form.gotra?.mother) ? form.gotra?.mother : '__custom'}
               onChange={(value) => handleNestedChange('gotra', 'mother', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"
@@ -837,7 +888,7 @@ function MemberCreateButton({ onCreated }) {
 
             <div className="space-y-2"><SelectField
               label="Dadi"
-              value={form.gotra?.dadi}
+              value={gotraValueSet.has(form.gotra?.dadi) ? form.gotra?.dadi : '__custom'}
               onChange={(value) => handleNestedChange('gotra', 'dadi', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"
@@ -853,7 +904,7 @@ function MemberCreateButton({ onCreated }) {
 
             <div className="space-y-2"><SelectField
               label="Nani"
-              value={form.gotra?.nani}
+              value={gotraValueSet.has(form.gotra?.nani) ? form.gotra?.nani : '__custom'}
               onChange={(value) => handleNestedChange('gotra', 'nani', value)}
               options={gotraOptionsList}
               placeholder="Select gotra"

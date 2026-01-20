@@ -6,11 +6,11 @@ import SelectField from '../../components/SelectField'
 import FileDrop from '../../components/FileDrop'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
 import { saveMatrimony } from '../../lib/dashboardApi'
-import { asOptions as gotraOptions } from '../../constants/gotras'
 import { upload } from '../../lib/api'
 import { useAdminQuery } from '../hooks/useAdminApi.js'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import AddressBlock from '../../components/AddressBlock.jsx'
+import { useGotraOptions } from '../../hooks/useGotraOptions'
 let API_File = import.meta.env.VITE_API_File
 
 
@@ -31,6 +31,7 @@ const emptyForm = {
     gender: 'male',
     name: '',
     height: '',
+    userId: '',
     maritalStatus: 'never_married',
     education: '',
     department: '',
@@ -102,16 +103,9 @@ export default function MatrimonyDetail() {
     const [savedMessage, setSavedMessage] = useState('')
     const [photoError, setPhotoError] = useState('')
     const [photoUploading, setPhotoUploading] = useState(false)
+    const [sameAsOccupation, setSameAsOccupation] = useState(false)
 
-    const gotraChoices = useMemo(() => gotraOptions(lang), [lang])
-    const gotraChoiceValues = useMemo(() => new Set(gotraChoices.map((opt) => opt.value)), [gotraChoices])
-    const gotraSelectOptions = useMemo(
-        () => [
-            ...gotraChoices,
-            { value: '__custom', label: lang === 'hi' ? 'अन्य (स्वयं लिखें)' : 'Other (type manually)' },
-        ],
-        [gotraChoices, lang]
-    )
+    const { gotraOptions: gotraSelectOptions, gotraValueSet: gotraChoiceValues } = useGotraOptions(lang)
 
     const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(
         form.stateCode,
@@ -130,6 +124,7 @@ export default function MatrimonyDetail() {
             occupation: data?.occupation || '',
             department: data?.department || '',
             designation: data?.designation || '',
+            userId: data?.userId || '',
          
             state: data?.state || '',
             height: data?.height || '',
@@ -177,7 +172,7 @@ export default function MatrimonyDetail() {
             maritalStatus: form.maritalStatus,
             education: form.education,
             designation: form.designation,
-            department: form.education,
+            department: form.department,
             
             occupation: form.occupation,
             height: form.height,
@@ -194,6 +189,7 @@ export default function MatrimonyDetail() {
                 dadi: form.gotraDadi,
             },
             photos: form.photos,
+            userId: form.userId?.trim() || undefined,
         })
     }
 
@@ -230,6 +226,15 @@ export default function MatrimonyDetail() {
     const [sameAsCurrent, setSameAsCurrent] = useState(false)
 
     useEffect(() => {
+        if (sameAsOccupation) {
+            setForm(prev => ({
+                ...prev,
+                currentAddress: { ...prev.occupationAddress }
+            }))
+        }
+    }, [sameAsOccupation, form.occupationAddress])
+
+    useEffect(() => {
         if (sameAsCurrent) {
             setForm(prev => ({
                 ...prev,
@@ -264,6 +269,16 @@ export default function MatrimonyDetail() {
                             value={form?.name}
                             onChange={handleChange('name')}
                             className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+                        />
+                    </label>
+                    <label className="block text-sm md:col-span-2">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'यूज़र आईडी (वैकल्पिक)' : 'Linked user ID (optional)'}</span>
+                        <input
+                            type="text"
+                            value={form?.userId}
+                            onChange={handleChange('userId')}
+                            className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+                            placeholder={lang === 'hi' ? 'उपयोगकर्ता को लिंक करने के लिए आईडी भरें' : 'Attach an existing user to this profile'}
                         />
                     </label>
                     <label className="block text-sm">
@@ -389,6 +404,17 @@ export default function MatrimonyDetail() {
                         setForm={setForm}
                         {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
                     />
+                    <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
+                        <input
+                            type="checkbox"
+                            checked={sameAsOccupation}
+                            onChange={(e) => setSameAsOccupation(e.target.checked)}
+                            className="h-4 w-4"
+                        />
+                        {lang === 'hi'
+                            ? 'वर्तमान पता व्यवसाय के पते जैसा ही है'
+                            : 'Current address is same as occupation address'}
+                    </label>
 
                     <AddressBlock
                         title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}

@@ -57,18 +57,22 @@ export default function SpotlightGrid({ role, titleHi, viewAllPath, limit = 10 }
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {people.map((p) => {
             const user = p.user || p
-            const avatar =
-              API_File+user?.avatarUrl ||
-              makeInitialAvatar(user?.displayName || user?.name || 'Member', {
+            const avatar = user?.avatarUrl
+              ? API_File + user.avatarUrl
+              : makeInitialAvatar(user?.displayName || user?.name || 'Member', {
                 size: 80,
                 radius: 20,
               })
 
-            // be defensive about field names
-            const title =
-              p.spotlightTitle || p.title || p.person?.title || user?.title || ''
-            const place =
-              p.spotlightPlace || p.place || p.person?.place || user?.place || ''
+            const title = user?.designation || p.designation || p.title || ''
+            const place = formatLocation(
+              p.currentAddress ||
+              user?.currentAddress ||
+              p.occupationAddress ||
+              user?.occupationAddress
+            ) || p.place || ''
+            const department = user?.department || p.department || ''
+            const meta = [title || department, place].filter(Boolean).join(' • ')
 
             return (
               <li
@@ -79,14 +83,18 @@ export default function SpotlightGrid({ role, titleHi, viewAllPath, limit = 10 }
                   src={avatar}
                   alt="image"
                   className="h-14 w-14 rounded-xl object-cover"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null
+                    e.currentTarget.src = makeInitialAvatar(user?.displayName || user?.name || 'Member', { size: 80, radius: 20 })
+                  }}
                 />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-slate-900">
                     {user?.displayName || user?.name || 'Member'}
                   </p>
-                  {(title || place) ? (
+                  {meta ? (
                     <p className="truncate text-xs text-slate-600">
-                      {[title, place].filter(Boolean).join(' • ')}
+                      {meta}
                     </p>
                   ) : null}
                 </div>
@@ -97,4 +105,10 @@ export default function SpotlightGrid({ role, titleHi, viewAllPath, limit = 10 }
       )}
     </section>
   )
+}
+
+function formatLocation(addr) {
+  if (!addr || typeof addr !== 'object') return ''
+  const parts = [addr.city, addr.district, addr.state].filter(Boolean)
+  return parts.join(', ')
 }

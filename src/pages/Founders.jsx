@@ -6,6 +6,22 @@ import { makeInitialAvatar } from '../lib/avatar'
 import { get } from '../lib/api'
 let API_File = import.meta.env.VITE_API_File
 
+const OCCUPATION_LABELS = {
+  govt: 'Government job',
+  government_job: 'Government job',
+  private: 'Private job',
+  private_job: 'Private job',
+  business: 'Business',
+  student: 'Student'
+}
+
+const EDUCATION_LABELS = {
+  high_school: 'High school',
+  graduate: 'Graduate',
+  postgraduate: 'Postgraduate',
+  phd: 'PhD'
+}
+
 const fetchFounders = () => get('/public/people?role=founder')
 
 export default function Founders() {
@@ -17,31 +33,29 @@ export default function Founders() {
 
   const cards = useMemo(() => {
     if (!data) return []
-    console.log("data", data)
-    return data.map((person) => ({
+    return data.map((person) => {
+      const user = person?.user || {}
+      const primaryAddress =
+        person?.currentAddress ||
+        user?.currentAddress ||
+        person?.occupationAddress ||
+        user?.occupationAddress ||
+        person?.parentalAddress ||
+        user?.parentalAddress
 
-      id: person.id || person._id,
-      name: person.name,
-      title: person.title,
-      image: person.photo ? API_File + person.photo : makeInitialAvatar(person.name || 'Founder', { size: 100, radius: 28 }),
-      bioEn: person.bioEn,
-      bioHi: person.bioHi,
-      place: person.place,
-
-      // new
-      phone: person?.user?.phone,
-      contactEmail: person?.user?.contactEmail,
-      occupation: person?.user?.occupation,
-      role: person?.role,
-      adimage: person?.adimage, //---url 
-      message: person?.message,
-      department: person?.department,
-      designation: person?.designation,
-      designation: person?.designation,
-      address: person?.user?.currentAddress
-
-
-    }))
+      return {
+        id: person.id || person._id,
+        name: person.name,
+        designation: person.designation || user.designation || person.title,
+        department: person.department || user.department || '',
+        occupation: OCCUPATION_LABELS[person.occupation || user.occupation] || person.occupation || user.occupation || '',
+        education: EDUCATION_LABELS[person.education || user.education] || person.education || user.education || '',
+        location: formatLocation(primaryAddress) || person.place || '',
+        image: person.photo ? API_File + person.photo : makeInitialAvatar(person.name || 'Founder', { size: 100, radius: 28 }),
+        phone: user.phone,
+        contactEmail: user.contactEmail,
+      }
+    })
   }, [data])
 
   return (
@@ -84,6 +98,10 @@ export default function Founders() {
                     alt="image"
                     className="h-20 w-20 rounded-2xl object-cover shrink-0 bg-slate-100"
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null
+                      e.currentTarget.src = makeInitialAvatar(profile.name || 'Member', { size: 100, radius: 28 })
+                    }}
                   />
 
                   {/* Content */}
@@ -92,12 +110,17 @@ export default function Founders() {
                       {profile.name}
                     </h2>
 
-                    {profile.title && (
+                    {profile.designation && (
                       <p className="text-sm font-medium text-blue-600 break-words">
-                        {profile.title}
+                        {profile.designation}
                       </p>
                     )}
 
+                    {(profile.department || profile.location) && (
+                      <p className="text-xs text-slate-600 break-words">
+                        {[profile.department, profile.location].filter(Boolean).join(' • ')}
+                      </p>
+                    )}
 
 
                   </div>
@@ -117,23 +140,6 @@ export default function Founders() {
                         ✉️ {profile.contactEmail}
                       </span>
                     )}
-                    {profile?.department && (
-                      <span className="flex items-center gap-1 truncate">
-                        🏢 {profile.department}
-                      </span>
-                    )}
-
-                    {profile?.designation && (
-                      <span className="flex items-center gap-1 truncate">
-                        🧑‍💼 {profile.designation}
-                      </span>
-                    )}
-                    {profile?.address && (
-                      <span className="flex items-center gap-1 truncate">
-                        Address:- 
-                        {profile.address?.village}, {profile.address?.city}, {profile.address?.district}, {profile.address?.state}
-                      </span>
-                    )}
 
                   </div>
                 )}
@@ -145,4 +151,10 @@ export default function Founders() {
       </div>
     </main>
   )
+}
+
+function formatLocation(addr) {
+  if (!addr || typeof addr !== 'object') return ''
+  const parts = [addr.city, addr.district, addr.state].filter(Boolean)
+  return parts.join(', ')
 }

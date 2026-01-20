@@ -1,12 +1,19 @@
 export default function CardPromo({ href, image, headline, subtext, ariaLabel }) {
+  const Wrapper = href ? 'a' : 'div'
   return (
-    <a
-      href={href}
+    <Wrapper
+      href={href || undefined}
       aria-label={ariaLabel || headline}
       className="block focus:outline-none"
       role="listitem"
+      onClick={(e) => {
+        if (!href) {
+          e.preventDefault()
+          e.stopPropagation()
+        }
+      }}
     >
-      <article className="bg-white rounded-2xl border border-gray-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] focus-visible:ring-4 focus-visible:ring-black/10">
+      <article className={`bg-white rounded-2xl border border-gray-200 shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden transition ${href ? 'hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] focus-visible:ring-4 focus-visible:ring-black/10' : ''}`}>
         <div className="aspect-[4/5] bg-gray-100 overflow-hidden">
           <img
             src={image}
@@ -21,6 +28,6 @@ export default function CardPromo({ href, image, headline, subtext, ariaLabel })
           {subtext && <p className="text-gray-600 text-sm mt-1 clamp-2">{subtext}</p>}
         </div>
       </article>
-    </a>
+    </Wrapper>
   );
 }

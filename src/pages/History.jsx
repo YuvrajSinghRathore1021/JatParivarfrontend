@@ -2,9 +2,7 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useLang } from '../lib/useLang'
 import { Link } from 'react-router-dom'
-import { fetchPublicHistory, fetchHistory } from '../lib/publicApi'
-
-let API_File = import.meta.env.VITE_API_File
+import { fetchHistory } from '../lib/publicApi'
 
 const DEFAULT = {
   heroTitle: {
@@ -31,10 +29,14 @@ export default function History() {
 
 
   if (isLoading) return <p className="p-10 text-center">Loading...</p>
+  const sorted = useMemo(() => {
+    const list = Array.isArray(data) ? [...data] : []
+    return list.sort((a, b) => (b.year || 0) - (a.year || 0))
+  }, [data])
 
   return (
-    <main className="bg-white">
-      <div className="mx-auto max-w-[900px] px-4 sm:px-6 lg:px-8 py-16 space-y-10">
+    <main className="bg-slate-50">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 space-y-10">
 
         {/* HEADER */}
         <header className="space-y-3 text-center">
@@ -85,22 +87,48 @@ export default function History() {
         </section> */}
 
 
-        <section className="relative border-l-2 border-slate-200 pl-8 space-y-8">
-          {data.map((item) => (
+        <section className="space-y-6">
+          {sorted.map((item, idx) => (
             <Link
-              key={item.id}
+              key={item.id || idx}
               to={makePath(`history/${item.id}`)}
-
+              className="block rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition"
             >
-              <article key={item.id} className="relative">
-                {item.year ? (
-                  <span className="absolute -left-[42px] top-1.5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white font-semibold">
-                    {item.year}
-                  </span>
-                ) : null}
-                {/* <h2 className="text-xl font-semibold text-slate-900">{item.category}</h2> */}
-                <h2 className="text-xl font-semibold text-slate-900">{langKey == 'hi' ? item.titleHi : item.titleEn}</h2>
-                <p className="mt-2 text-sm text-slate-600 leading-relaxed">{langKey == 'hi' ? item.bodyHi : item.bodyEn}</p>
+              <article className="grid gap-4 p-6 md:grid-cols-6 md:items-center">
+                <div className="md:col-span-1 flex flex-col items-start md:items-center gap-1">
+                  {item.year ? (
+                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white text-lg font-bold shadow">
+                      {item.year}
+                    </span>
+                  ) : (
+                    <span className="text-xs uppercase text-slate-400">Year N/A</span>
+                  )}
+                  {item.category && (
+                    <span className="text-xs font-semibold text-amber-600 uppercase tracking-wide text-center">
+                      {item.category}
+                    </span>
+                  )}
+                </div>
+                <div className="md:col-span-5 space-y-2">
+                  <h2 className="text-xl font-semibold text-slate-900 break-words">
+                    {langKey === 'hi' ? item.titleHi || item.titleEn : item.titleEn || item.titleHi}
+                  </h2>
+                  <p className="text-sm text-slate-600 leading-relaxed break-words">
+                    {langKey === 'hi' ? item.bodyHi || item.bodyEn : item.bodyEn || item.bodyHi}
+                  </p>
+                  <div className="flex flex-wrap gap-3 text-xs text-slate-500">
+                    {item.createdAt && (
+                      <span className="rounded-full bg-slate-100 px-3 py-1">
+                        {new Date(item.createdAt).toLocaleDateString()}
+                      </span>
+                    )}
+                    {item.updatedAt && (
+                      <span className="rounded-full bg-slate-100 px-3 py-1">
+                        {langKey === 'hi' ? 'अपडेटेड' : 'Updated'} {new Date(item.updatedAt).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </article>
             </Link>
           ))}

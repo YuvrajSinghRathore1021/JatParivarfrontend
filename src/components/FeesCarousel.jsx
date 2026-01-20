@@ -95,7 +95,7 @@ export default function FeesCarousel({ plans }) {
             <p className="text-3xl font-extrabold mt-1 text-slate-900">{plan.price}</p>
             <p className="text-slate-600 mt-2 text-sm flex-1">{plan.desc}</p>
             <Link
-              to={makePath(`subscriptions?plan=${plan.id}`)}
+              to={makePath(`register?plan=${plan.id}`)}
               className="mt-4 inline-flex px-4 h-10 items-center justify-center rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-500"
             >
               {plan.buttonText || (lang === 'hi' ? 'जुड़ें' : 'Join now')}

@@ -1,5 +1,5 @@
 // frontend/src/pages/auth/Register.jsx
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { post, upload } from '../../lib/api'
 import { useLang } from '../../lib/useLang'
@@ -7,7 +7,7 @@ import DateField from '../../components/DateField'
 import SelectField from '../../components/SelectField'
 import FileDrop from '../../components/FileDrop'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
-import { asOptions as gotraOptions } from '../../constants/gotras'
+import { useGotraOptions } from '../../hooks/useGotraOptions'
 import AddressBlock from '../../components/AddressBlock'
 const copy = {
   en: {
@@ -22,7 +22,7 @@ const copy = {
     janAadhar: 'Jan Aadhaar (required)',
     profilePhoto: 'Profile Photo (optional)',
     phone: 'Phone',
-    referral: 'Referral Code (6 characters)',
+    referral: 'Referral Code (required)',
     otp: 'OTP',
     fullName: 'Full Name',
     email: 'Email',
@@ -38,14 +38,15 @@ const copy = {
     haveAccount: 'Already have an account?',
     login: 'Login',
     requiredJan: 'Please upload your Jan Aadhaar before proceeding.',
-    invalidReferral: 'Referral code should be 6 characters (letters or digits).',
+    invalidReferral: 'Referral code must be 6 letters/numbers.',
+    referralRequired: 'Referral code is required to sign up.',
     invalidPhone: 'Please enter a valid phone number.',
     otpRequired: 'Please enter the 6-digit OTP sent to your phone.',
     nameRequired: 'Your full name is required.',
     passwordHint: 'Password must be at least 6 characters.',
     addressRequired: 'Please select your address.',
     phoneExists: 'This phone number is already registered. Please log in instead.',
-    referralNotFound: 'Referral code not found. Please double-check or leave it blank.',
+    referralNotFound: 'Referral code not found. Please confirm with the member who referred you.',
     errorGeneric: 'Something went wrong. Please try again.',
     invalidOtp: 'Invalid OTP. Please try again.',
     invalidEmail: 'Please enter a valid email address.',
@@ -75,7 +76,7 @@ const copy = {
     janAadhar: 'जन आधार (आवश्यक)',
     profilePhoto: 'प्रोफ़ाइल फोटो (वैकल्पिक)',
     phone: 'मोबाइल नंबर',
-    referral: 'रेफ़रल कोड (6 वर्ण)',
+    referral: 'रेफ़रल कोड (आवश्यक)',
     otp: 'OTP',
     fullName: 'पूरा नाम',
     email: 'ईमेल',
@@ -91,14 +92,15 @@ const copy = {
     haveAccount: 'पहले से खाता है?',
     login: 'लॉगिन',
     requiredJan: 'आगे बढ़ने से पहले कृपया जन आधार अपलोड करें।',
-    invalidReferral: 'रेफ़रल कोड 6 वर्ण (अक्षर या अंक) का होना चाहिए।',
+    invalidReferral: 'रेफ़रल कोड 6 अंकों/अक्षरों का होना चाहिए।',
+    referralRequired: 'साइन अप के लिए रेफ़रल कोड अनिवार्य है।',
     invalidPhone: 'कृपया मान्य मोबाइल नंबर डालें।',
     otpRequired: 'कृपया फोन पर प्राप्त 6 अंकों का OTP दर्ज करें।',
     nameRequired: 'कृपया अपना पूरा नाम दर्ज करें।',
     passwordHint: 'पासवर्ड कम से कम 6 वर्ण का होना चाहिए।',
     addressRequired: 'कृपया अपना पता चुनें।',
     phoneExists: 'यह मोबाइल नंबर पहले से पंजीकृत है। कृपया लॉगिन करें।',
-    referralNotFound: 'रेफ़रल कोड नहीं मिला। कृपया दोबारा जाँचें या इसे खाली छोड़ दें।',
+    referralNotFound: 'रेफ़रल कोड नहीं मिला। कृपया रेफ़र करने वाले सदस्य से पुष्टि करें।',
     errorGeneric: 'कुछ गड़बड़ हुई। कृपया फिर से प्रयास करें।',
     invalidOtp: 'OTP मान्य नहीं है। कृपया पुनः प्रयास करें।',
     invalidEmail: 'कृपया मान्य ईमेल पता दर्ज करें।',
@@ -176,6 +178,8 @@ const OCCUPATION = {
   ],
 }
 
+const REFERRAL_REGEX = /^[A-Z0-9-]{6}$/
+
 export default function Register() {
   const { lang, makePath } = useLang()
   const t = copy[lang]
@@ -189,7 +193,7 @@ export default function Register() {
   const OTP_ENABLED = !TEST_BYPASS_OTP
 
   const [step, setStep] = useState(1)
-  const totalSteps = OTP_ENABLED ? 6 : 5
+  const totalSteps = OTP_ENABLED ? 8 : 7
   const displayStep = OTP_ENABLED ? step : (step <= 1 ? 1 : step - 1)
 
   const [phone, setPhone] = useState('')
@@ -272,7 +276,10 @@ export default function Register() {
     if (p) setPlan(p)
   }, [qs])
 
-  const prev = () => setStep((s) => Math.max(1, s - 1))
+  const prev = () => setStep((s) => {
+    if (!OTP_ENABLED && s === 3) return 1
+    return Math.max(1, s - 1)
+  })
 
   const startOtp = async () => {
     try {
@@ -291,13 +298,6 @@ export default function Register() {
         await post('/otp/start', { phone })
         setStep(2)
       } else {
-        // BYPASS OTP: validate & capture referral, then jump to personal step
-        const normalizedRef = ref.trim().toUpperCase()
-        if (normalizedRef && !/^[A-Z0-9]{6}$/.test(normalizedRef)) {
-          setError(t.invalidReferral)
-          return
-        }
-        setRef(normalizedRef)
         setStep(3)
       }
     } catch (e) {
@@ -318,11 +318,6 @@ export default function Register() {
   const verifyOtp = async () => {
     try {
       setError('')
-      const normalizedRef = ref.trim().toUpperCase()
-      if (normalizedRef && !/^[A-Z0-9]{6}$/.test(normalizedRef)) {
-        setError(t.invalidReferral)
-        return
-      }
       if (!otp || otp.trim().length !== 6) {
         setError(t.otpRequired)
         return
@@ -330,7 +325,6 @@ export default function Register() {
 
       setLoading(true)
       await post('/otp/verify', { phone, code: otp.trim() })
-      setRef(normalizedRef)
       setStep(3)
     } catch (e) {
       console.error(e)
@@ -345,26 +339,46 @@ export default function Register() {
     }
   }
 
+  const handleReferralNext = async () => {
+    setError('')
+    const normalizedRef = ref.trim().toUpperCase()
+    if (!normalizedRef) {
+      setError(t.referralRequired)
+      return
+    }
+    if (!REFERRAL_REGEX.test(normalizedRef)) {
+      setError(t.invalidReferral)
+      return
+    }
+    try {
+      setLoading(true)
+      const exists = await checkReferral(normalizedRef)
+      if (!exists) {
+        setError(t.referralNotFound)
+        return
+      }
+      setRef(normalizedRef)
+      setStep(4)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handlePersonalNext = () => {
     setError('')
     if (!form.name || !form.name.trim()) {
       setError(t.nameRequired)
       return
     }
-    if (form.email == "") {
-      setError(t.invalidEmailReq)
-      return
-    }
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       setError(t.invalidEmail)
       return
-
     }
     if (!form.password || form.password.length < 6) {
       setError(t.passwordHint)
       return
     }
-    setStep(4)
+    setStep(5)
   }
 
   const handleAddressNext = () => {
@@ -384,12 +398,17 @@ export default function Register() {
       return
     }
 
-    setStep(5)
+    setStep(6)
+  }
+
+  const handleEducationNext = () => {
+    setError('')
+    setStep(7)
   }
 
   const handleGotraNext = () => {
     setError('')
-    setStep(6)
+    setStep(8)
   }
 
   const finalize = async () => {
@@ -399,7 +418,11 @@ export default function Register() {
         setError(t.requiredJan); return
       }
       const normalizedRef = ref.trim().toUpperCase()
-      if (normalizedRef && !/^[A-Z0-9]{6}$/.test(normalizedRef)) {
+      if (!normalizedRef) {
+        setError(t.referralRequired)
+        return
+      }
+      if (!REFERRAL_REGEX.test(normalizedRef)) {
         setError(t.invalidReferral)
         return
       }
@@ -409,7 +432,7 @@ export default function Register() {
 
       const payload = {
         phone,
-        refCode: normalizedRef || null,
+        refCode: normalizedRef,
         form,
         gotra: {
           self: gotra?.self == '__custom' ? gotraform?.self : gotra?.self,
@@ -441,9 +464,9 @@ export default function Register() {
     }
   }
 
-  const gotraOpts = useMemo(() => gotraOptions(lang), [lang])
-  const [sameAsCurrent, setSameAsCurrent] = useState(false)
-  const [sameAsOccupation, setSameAsOccupation] = useState(false)
+  const { gotraOptions: gotraOpts, gotraValueSet } = useGotraOptions(lang)
+  const [sameAsCurrent, setSameAsCurrent] = useState(true)
+  const [sameAsOccupation, setSameAsOccupation] = useState(true)
   useEffect(() => {
     if (sameAsCurrent) {
       setForm(prev => ({
@@ -544,46 +567,53 @@ export default function Register() {
               </div>
             )}
 
-            {/* STEP 3 – Personal */}
+            {/* STEP 3 – Referral */}
             {step === 3 && (
               <div className="space-y-4">
                 <label className="text-sm font-medium text-slate-700">{t.referral}</label>
-                {/* <input
-                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder={t.referral}
-                  value={ref}
-                  maxLength={6}
-                  onChange={(e) => setRef(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
-                /> */}
-
                 <input
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base"
                   placeholder={t.referral}
                   value={ref}
                   maxLength={6}
                   onChange={(e) => {
-                    const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6)
+                    const val = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 6)
                     setRef(val)
                   }}
                   onBlur={async () => {
-                    if (!ref) return
+                    const normalized = ref.trim().toUpperCase()
+                    if (!normalized) {
+                      setError(t.referralRequired)
+                      return
+                    }
 
-                    if (!/^[A-Z0-9]{6}$/.test(ref)) {
+                    if (!REFERRAL_REGEX.test(normalized)) {
                       setError(t.invalidReferral)
                       return
                     }
 
-                    const exists = await checkReferral(ref)
+                    const exists = await checkReferral(normalized)
                     if (!exists) {
-                      setError(
-                        t.referralNotFound)
+                      setError(t.referralNotFound)
                     } else {
+                      setRef(normalized)
                       setError('')
                     }
                   }}
                 />
 
-                {/* ---- */}
+                <div className="flex gap-2">
+                  <button onClick={prev} className="px-5 py-3 rounded-xl border">{t.back}</button>
+                  <button onClick={handleReferralNext} disabled={loading} className="px-5 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-60">
+                    {loading ? '…' : t.next}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 4 – Personal */}
+            {step === 4 && (
+              <div className="space-y-4">
                 <input
                   className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder={t.fullName}
@@ -623,31 +653,6 @@ export default function Register() {
                   placeholder={t.placeholders.marital}
                 />
 
-                <SelectField
-                  label={t.education}
-                  value={form.education}
-                  onChange={(v) => setForm({ ...form, education: v })}
-                  options={EDUCATION[lang]}
-                  placeholder={t.placeholders.education}
-                />
-
-
-                <SelectField
-                  label={t.occupation}
-                  value={form.occupation}
-                  onChange={(v) => setForm({ ...form, occupation: v })}
-                  options={OCCUPATION[lang]}
-                  placeholder={t.placeholders.occupation}
-                /><label className="block text-sm">
-                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
-                        <input value={form.department} 
-                        onChange={(e) => setForm({ ...form, department: e.target.value })} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
-                    </label> 
-                   <label className="block text-sm">
-                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पद का नाम' : 'Designation'}</span>
-                        <input value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
-                    </label> 
-
                 <div className="relative">
                   <input
                     type={showPwd ? "text" : "password"}
@@ -685,8 +690,8 @@ export default function Register() {
               </div>
             )}
 
-            {/* STEP 4 – Address */}
-            {step === 4 && (
+            {/* STEP 5 – Address */}
+            {step === 5 && (
               <div className="space-y-4">
 
                 <AddressBlock
@@ -745,15 +750,52 @@ export default function Register() {
               </div>
             )}
 
-            {/* STEP 5 – Gotra */}
-            {step === 5 && (
-              ///
+            {/* STEP 6 – Education & Occupation */}
+            {step === 6 && (
+              <div className="space-y-4">
+                <SelectField
+                  label={t.education}
+                  value={form.education}
+                  onChange={(v) => setForm({ ...form, education: v })}
+                  options={EDUCATION[lang]}
+                  placeholder={t.placeholders.education}
+                />
+
+
+                <SelectField
+                  label={t.occupation}
+                  value={form.occupation}
+                  onChange={(v) => setForm({ ...form, occupation: v })}
+                  options={OCCUPATION[lang]}
+                  placeholder={t.placeholders.occupation}
+                />
+                <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
+                        <input value={form.department} 
+                        onChange={(e) => setForm({ ...form, department: e.target.value })} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label> 
+                   <label className="block text-sm">
+                        <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पद का नाम' : 'Designation'}</span>
+                        <input value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
+                    </label> 
+
+                <div className="flex gap-2">
+                  <button onClick={prev} className="px-5 py-3 rounded-xl border">{t.back}</button>
+                  <button onClick={handleEducationNext} className="px-5 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-500">
+                    {t.next}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 7 – Gotra */}
+            {step === 7 && (
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <SelectField
                     label={t.gotraSelf}
-                    value={gotra?.self}
-                    onChange={(v) => setGotra({ ...gotra, self: v })}
+                    value={gotraValueSet.has(gotra?.self) ? gotra?.self : '__custom'}
+                    onChange={(v) => setGotra({ ...gotra, self: v === '__custom' ? '__custom' : v })}
                     options={gotraOpts}
                     placeholder={t.placeholders.gotra}
                   />
@@ -769,8 +811,8 @@ export default function Register() {
                 <div className="space-y-2">
                   <SelectField
                     label={t.gotraMother}
-                    value={gotra?.mother}
-                    onChange={(v) => setGotra({ ...gotra, mother: v })}
+                    value={gotraValueSet.has(gotra?.mother) ? gotra?.mother : '__custom'}
+                    onChange={(v) => setGotra({ ...gotra, mother: v === '__custom' ? '__custom' : v })}
                     options={gotraOpts}
                     placeholder={t.placeholders.gotra}
                   />
@@ -786,8 +828,8 @@ export default function Register() {
                 <div className="space-y-2">
                   <SelectField
                     label={t.gotraDadi}
-                    value={gotra?.dadi}
-                    onChange={(v) => setGotra({ ...gotra, dadi: v })}
+                    value={gotraValueSet.has(gotra?.dadi) ? gotra?.dadi : '__custom'}
+                    onChange={(v) => setGotra({ ...gotra, dadi: v === '__custom' ? '__custom' : v })}
                     options={gotraOpts}
                     placeholder={t.placeholders.gotra}
                   />
@@ -803,8 +845,8 @@ export default function Register() {
                 <div className="space-y-2">
                   <SelectField
                     label={t.gotraNani}
-                    value={gotra?.nani}
-                    onChange={(v) => setGotra({ ...gotra, nani: v })}
+                    value={gotraValueSet.has(gotra?.nani) ? gotra?.nani : '__custom'}
+                    onChange={(v) => setGotra({ ...gotra, nani: v === '__custom' ? '__custom' : v })}
                     options={gotraOpts}
                     placeholder={t.placeholders.gotra}
                   />
@@ -827,9 +869,41 @@ export default function Register() {
               </div>
             )}
 
-            {/* STEP 6 – Uploads & Plan */}
-            {step === 6 && (
-              <div className="space-y-5">
+            {/* STEP 8 – Plan + uploads */}
+            {step === 8 && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">{t.plan}</h2>
+                  <p className="text-sm text-slate-600 mt-1">
+                    {lang === 'hi'
+                      ? 'अपना सदस्यता प्लान चुनें और फिर भुगतान पर आगे बढ़ें।'
+                      : 'Choose a membership plan before proceeding to payment.'}
+                  </p>
+                  <div className="mt-3 grid gap-3 md:grid-cols-3">
+                    {[
+                      { id: 'founder', title: lang === 'hi' ? 'संस्थापक' : 'Founder', price: '₹10,000' },
+                      { id: 'member', title: lang === 'hi' ? 'सदस्य' : 'Member', price: '₹5,000' },
+                      { id: 'sadharan', title: lang === 'hi' ? 'साधारण' : 'Sadharan', price: '₹1,000' },
+                    ].map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setPlan(p.id)}
+                        className={[
+                          'rounded-2xl border p-4 text-left shadow-sm transition',
+                          plan === p.id
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-slate-200 hover:border-blue-200 hover:shadow'
+                        ].join(' ')}
+                        aria-pressed={plan === p.id}
+                      >
+                        <div className="text-sm font-semibold text-slate-900">{p.title}</div>
+                        <div className="text-lg font-bold text-blue-700 mt-1">{p.price}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <FileDrop
                   label={t.janAadhar}
                   accept=".pdf,image/*"
@@ -848,16 +922,6 @@ export default function Register() {
                 />
 
                 <div className="flex flex-wrap items-center gap-3">
-                  <select
-                    value={plan}
-                    onChange={(e) => setPlan(e.target.value)}
-                    className="p-3 border rounded-xl"
-                    aria-label={t.plan}
-                  >
-                    <option value="founder">Founder ₹101000</option>
-                    <option value="member">Member ₹50000</option>
-                    <option value="sadharan">Sadharan ₹2100</option>
-                  </select>
                   <button
                     onClick={finalize}
                     disabled={loading}

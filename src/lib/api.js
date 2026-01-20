@@ -68,6 +68,7 @@ const write = async (method, url, body, opts = {}) => {
 
 export const put = (url, body, opts = {}) => write('PUT', url, body, opts)
 export const patch = (url, body, opts = {}) => write('PATCH', url, body, opts)
+export const del = (url, opts = {}) => write('DELETE', url, undefined, opts)
 
 export const upload = async (url, file, field = 'file', opts = {}) => {
   const fd = new FormData()

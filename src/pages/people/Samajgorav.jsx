@@ -211,13 +211,15 @@ function PersonCard({ item, href }) {
           >
             {item.name}
           </h3>
-          <p
-            className="mt-1 text-sm text-slate-600"
-            style={{ ...wrapAnywhere, ...clamp2 }}
-            title={item.title}
-          >
-            {item.title || "—"}
-          </p>
+          {item.title && (
+            <p
+              className="mt-1 text-sm text-slate-600"
+              style={{ ...wrapAnywhere, ...clamp2 }}
+              title={item.title}
+            >
+              {item.title}
+            </p>
+          )}
         </div>
       </motion.div>
     </Link>

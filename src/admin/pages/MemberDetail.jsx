@@ -1,6 +1,6 @@
 // frontend/src/admin/pages/MemberDetail.jsx
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
@@ -8,7 +8,7 @@ import { upload } from '../../lib/api.js'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
 import AddressBlock from '../../components/AddressBlock.jsx'
 import SelectField from '../../components/SelectField'
-import { asOptions as gotraOptions } from '../../constants/gotras'
+import { useGotraOptions } from '../../hooks/useGotraOptions'
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
   { value: 'disabled', label: 'Disabled' },
@@ -33,7 +33,7 @@ export default function MemberDetailPage() {
   const [spotlightBannerUploading, setSpotlightBannerUploading] = useState(false)
 
   const [addressCodes, setAddressCodes] = useState({ stateCode: '', districtCode: '', cityCode: '' })
-  const gotraOptionsList = useMemo(() => gotraOptions('en'), [])
+  const { gotraOptions: gotraOptionsList, gotraValueSet } = useGotraOptions('en')
   const {
     states,
     districts,
@@ -53,7 +53,15 @@ export default function MemberDetailPage() {
       try {
         setError('')
         const res = await adminApiFetch(`/members/${id}`, { token })
-        setMember(res.member);
+        const safeGotra = res?.member?.gotra && typeof res.member.gotra === 'object' ? res.member.gotra : {}
+        const safeMember = {
+          ...res.member,
+          gotra: safeGotra,
+          occupationAddress: res?.member?.occupationAddress && typeof res.member.occupationAddress === 'object' ? res.member.occupationAddress : {},
+          currentAddress: res?.member?.currentAddress && typeof res.member.currentAddress === 'object' ? res.member.currentAddress : {},
+          parentalAddress: res?.member?.parentalAddress && typeof res.member.parentalAddress === 'object' ? res.member.parentalAddress : {},
+        }
+        setMember(safeMember);
         setPersonForm(res.person ? {
           id: res.person.id,
           role: res.person.role,
@@ -86,6 +94,26 @@ export default function MemberDetailPage() {
       });
     }
   }, [member]);
+
+  useEffect(() => {
+    if (!member) return
+    const fields = ['self', 'mother', 'dadi', 'nani']
+    const nextGotra = { ...(member.gotra || {}) }
+    const nextForm = {}
+    let changed = false
+    fields.forEach((field) => {
+      const val = (nextGotra[field] || '').toString().trim()
+      if (val && val !== '__custom' && gotraValueSet && !gotraValueSet.has(val)) {
+        nextGotra[field] = '__custom'
+        nextForm[field] = val
+        changed = true
+      }
+    })
+    if (changed) {
+      setMember((prev) => (prev ? { ...prev, gotra: nextGotra } : prev))
+      setgotraform((prev) => ({ ...prev, ...nextForm }))
+    }
+  }, [member?.gotra, gotraValueSet])
 
 
   const isSpotlightEligible = member?.role === 'founder' || member?.role === 'member'
@@ -206,7 +234,6 @@ export default function MemberDetailPage() {
         publicNote: member.publicNote,
         avatarUrl: member.avatarUrl,
         janAadhaarUrl: member.janAadhaarUrl,
-        gotra: hasValues(member.gotra) ? member.gotra : undefined,
         gotra: {
           self: member.gotra?.self == '__custom' ? gotraform?.self : member.gotra?.self,
           mother: member.gotra?.mother == '__custom' ? gotraform?.mother : member.gotra?.mother,
@@ -251,16 +278,20 @@ export default function MemberDetailPage() {
     setSavingSpotlight(true)
     setError('')
     try {
+      const derivedTitle = member?.designation || personForm.title
+      const derivedDepartment = member?.department || personForm.department
+      const derivedPlace = member?.currentAddress?.city || member?.occupationAddress?.city || personForm.place
+
       await adminApiFetch(`/founders/${personForm.id}`, {
         token,
         method: 'PATCH',
         body: {
           name: personForm.name,
-          title: personForm.title,
-          designation: personForm.designation,
-          department: personForm?.department,
-          education: personForm?.education,
-          place: personForm.place,
+          title: derivedTitle,
+          designation: derivedTitle,
+          department: derivedDepartment,
+          education: member?.education,
+          place: derivedPlace,
           bioEn: personForm.bioEn,
           bioHi: personForm.bioHi,
           order: personForm.order,
@@ -493,7 +524,7 @@ export default function MemberDetailPage() {
           <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
           <div className="space-y-2"><SelectField
             label="Self"
-            value={member.gotra?.self}
+            value={gotraValueSet.has(member.gotra?.self) ? member.gotra?.self : '__custom'}
             onChange={(value) => updateNested('gotra', 'self', value)}
             options={gotraOptionsList}
             placeholder="Select gotra"
@@ -501,7 +532,7 @@ export default function MemberDetailPage() {
             {member.gotra?.self == '__custom' && (
               <input
                 placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                value={member.self}
+                value={gotraform?.self || ''}
                 onChange={handleChangeNew('self')}
                 className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
               />
@@ -510,7 +541,7 @@ export default function MemberDetailPage() {
 
           <div className="space-y-2"><SelectField
             label="Mother"
-            value={member.gotra?.mother}
+            value={gotraValueSet.has(member.gotra?.mother) ? member.gotra?.mother : '__custom'}
             onChange={(value) => updateNested('gotra', 'mother', value)}
             options={gotraOptionsList}
             placeholder="Select gotra"
@@ -518,7 +549,7 @@ export default function MemberDetailPage() {
             {member.gotra?.mother == '__custom' && (
               <input
                 placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                value={member.mother}
+                value={gotraform?.mother || ''}
                 onChange={handleChangeNew('mother')}
                 className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
               />
@@ -526,15 +557,15 @@ export default function MemberDetailPage() {
 
           <div className="space-y-2"><SelectField
             label="Dadi"
-            value={member.gotra?.dadi}
+            value={gotraValueSet.has(member.gotra?.dadi) ? member.gotra?.dadi : '__custom'}
             onChange={(value) => updateNested('gotra', 'dadi', value)}
             options={gotraOptionsList}
             placeholder="Select gotra"
           />
-            {member.gotra?.dadi == '__custom' && (
+            {(member.gotra?.dadi === '__custom' || (member.gotra?.dadi && !gotraValueSet.has(member.gotra?.dadi))) && (
               <input
                 placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                value={member.dadi}
+                value={gotraform?.dadi || ''}
                 onChange={handleChangeNew('dadi')}
                 className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
               />
@@ -542,15 +573,15 @@ export default function MemberDetailPage() {
 
           <div className="space-y-2"><SelectField
             label="Nani"
-            value={member.gotra?.nani}
+            value={gotraValueSet.has(member.gotra?.nani) ? member.gotra?.nani : '__custom'}
             onChange={(value) => updateNested('gotra', 'nani', value)}
             options={gotraOptionsList}
             placeholder="Select gotra"
           />
-            {member.gotra?.nani == '__custom' && (
+            {(member.gotra?.nani === '__custom' || (member.gotra?.nani && !gotraValueSet.has(member.gotra?.nani))) && (
               <input
                 placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                value={member.nani}
+                value={gotraform?.nani || ''}
                 onChange={handleChangeNew('nani')}
                 className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
               />
@@ -642,11 +673,10 @@ export default function MemberDetailPage() {
             </a>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {/* <Field label="Display name" value={personForm.name} onChange={(val) => setPersonForm((prev) => ({ ...prev, name: val }))} /> */}
-            <Field label="Title / Designation" value={personForm.title} onChange={(val) => setPersonForm((prev) => ({ ...prev, title: val }))} />
-            <Field label="Role title" value={personForm.designation || ''} onChange={(val) => setPersonForm((prev) => ({ ...prev, designation: val }))} />
             <Field label="Order (homepage priority)" type="number" value={personForm.order ?? 1} onChange={(val) => setPersonForm((prev) => ({ ...prev, order: Number(val || 0) }))} />
-            <Field label="department" value={personForm.place || ''} onChange={(val) => setPersonForm((prev) => ({ ...prev, place: val }))} />
+            <div className="text-xs text-slate-500 md:col-span-1">
+              Designation and department come from the member profile above and are shown automatically.
+            </div>
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"

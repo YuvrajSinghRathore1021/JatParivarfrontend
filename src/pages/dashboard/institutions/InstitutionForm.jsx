@@ -5,6 +5,7 @@ import SelectField from '../../../components/SelectField'
 import { useGeoOptions } from '../../../hooks/useGeoOptions'
 import { createInstitution } from '../../../lib/dashboardApi'
 import { useLang } from '../../../lib/useLang'
+import { useEffect } from 'react'
 
 const copy = {
   dharamshala: {
@@ -49,6 +50,21 @@ export default function InstitutionForm({ kind }) {
     form.districtCode,
     lang,
   )
+  const OTHER = '__OTHER__'
+
+  useEffect(() => {
+    // if values exist but no code (loaded from edits), flip to manual fields
+    if (form.state && !form.stateCode) {
+      setForm((prev) => ({ ...prev, stateCode: OTHER }))
+    }
+    if (form.district && !form.districtCode) {
+      setForm((prev) => ({ ...prev, districtCode: OTHER }))
+    }
+    if (form.city && !form.cityCode) {
+      setForm((prev) => ({ ...prev, cityCode: OTHER }))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.state, form.district, form.city])
 
   const mutation = useMutation({
     mutationFn: createInstitution,
@@ -158,6 +174,18 @@ export default function InstitutionForm({ kind }) {
           label={lang === 'hi' ? 'राज्य' : 'State'}
           value={form.stateCode}
           onChange={(code) => {
+            if (code === OTHER) {
+              setForm((prev) => ({
+                ...prev,
+                stateCode: OTHER,
+                state: '',
+                districtCode: '',
+                district: '',
+                cityCode: '',
+                city: '',
+              }))
+              return
+            }
             const selected = states.find((item) => item.code === code)
             setForm((prev) => ({
               ...prev,
@@ -169,13 +197,31 @@ export default function InstitutionForm({ kind }) {
               city: '',
             }))
           }}
-          options={stateOptions}
+          options={[...stateOptions, { value: OTHER, label: lang === 'hi' ? 'सूची में नहीं' : 'Not in list' }]}
           placeholder={lang === 'hi' ? 'राज्य चुनें' : 'Select state'}
         />
+        {form.stateCode === OTHER && (
+          <input
+            value={form.state}
+            onChange={handleChange('state')}
+            placeholder={lang === 'hi' ? 'राज्य लिखें' : 'Enter state'}
+            className="w-full rounded-xl border border-slate-200 px-3 py-2"
+          />
+        )}
         <SelectField
           label={lang === 'hi' ? 'ज़िला' : 'District'}
           value={form.districtCode}
           onChange={(code) => {
+            if (code === OTHER) {
+              setForm((prev) => ({
+                ...prev,
+                districtCode: OTHER,
+                district: '',
+                cityCode: '',
+                city: '',
+              }))
+              return
+            }
             const selected = districts.find((item) => item.code === code)
             setForm((prev) => ({
               ...prev,
@@ -185,14 +231,30 @@ export default function InstitutionForm({ kind }) {
               city: '',
             }))
           }}
-          options={districtOptions}
+          options={[...districtOptions, { value: OTHER, label: lang === 'hi' ? 'सूची में नहीं' : 'Not in list' }]}
           placeholder={lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}
           disabled={!form.stateCode}
         />
+        {form.districtCode === OTHER && (
+          <input
+            value={form.district}
+            onChange={handleChange('district')}
+            placeholder={lang === 'hi' ? 'ज़िला लिखें' : 'Enter district'}
+            className="w-full rounded-xl border border-slate-200 px-3 py-2"
+          />
+        )}
         <SelectField
           label={lang === 'hi' ? 'शहर' : 'City'}
           value={form.cityCode}
           onChange={(code) => {
+            if (code === OTHER) {
+              setForm((prev) => ({
+                ...prev,
+                cityCode: OTHER,
+                city: '',
+              }))
+              return
+            }
             const selected = cities.find((item) => item.code === code)
             setForm((prev) => ({
               ...prev,
@@ -200,10 +262,18 @@ export default function InstitutionForm({ kind }) {
               city: selected?.name.en || '',
             }))
           }}
-          options={cityOptions}
+          options={[...cityOptions, { value: OTHER, label: lang === 'hi' ? 'सूची में नहीं' : 'Not in list' }]}
           placeholder={lang === 'hi' ? 'शहर चुनें' : 'Select city'}
           disabled={!form.districtCode}
         />
+        {form.cityCode === OTHER && (
+          <input
+            value={form.city}
+            onChange={handleChange('city')}
+            placeholder={lang === 'hi' ? 'शहर लिखें' : 'Enter city'}
+            className="w-full rounded-xl border border-slate-200 px-3 py-2"
+          />
+        )}
         <label className="block text-sm">
           <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पिन कोड' : 'PIN code'}</span>
           <input value={form.pin} onChange={handleChange('pin')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />

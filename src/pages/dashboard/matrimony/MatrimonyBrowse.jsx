@@ -97,28 +97,28 @@ export default function MatrimonyBrowse() {
               <article key={profile.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
                 <Link to={urlmake(profile)}>
                   <header className="flex items-center gap-4">
-                    <img src={avatar} alt="image" className="h-14 w-14 rounded-2xl object-cover" />
+                    <img src={avatar} alt="image" className="h-14 w-14 rounded-2xl object-cover shrink-0" />
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-900">
+                      <h3 className="text-lg font-semibold text-slate-900 text-wrap-anywhere line-clamp-1">
                         {profile?.name || user.displayName || (lang === 'hi' ? 'सदस्य' : 'Member')}
                       </h3>
-                      <p className="text-sm text-slate-500">{profile.age ? `${profile.age} ${lang === 'hi' ? 'वर्ष' : 'years'}` : '—'}</p>
+                      <p className="text-sm text-slate-500 text-wrap-anywhere line-clamp-1">{profile.age ? `${profile.age} ${lang === 'hi' ? 'वर्ष' : 'years'}` : '—'}</p>
                     </div>
                   </header>
                   <dl className="grid grid-cols-2 gap-3 text-xs text-slate-600">
                     <div>
                       <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'गोत्र' : 'Gotra'}</dt>
-                      <dd>{profile.gotra?.self || '—'}</dd>
+                      <dd className="text-wrap-anywhere line-clamp-1">{profile.gotra?.self || '—'}</dd>
                     </div>
 
                     <div>
                       <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'लंबाई' : 'Height'}</dt>
-                      <dd>{profile.height || '—'}</dd>
+                      <dd className="text-wrap-anywhere line-clamp-1">{profile.height || '—'}</dd>
                     </div>
 
                     <div>
                       <dt className="font-semibold text-slate-500 uppercase tracking-wide">{lang === 'hi' ? 'स्थान' : 'Location'}</dt>
-                      <dd>
+                      <dd className="text-wrap-anywhere line-clamp-1">
                         {[profile.location?.city, profile.location?.state].filter(Boolean).join(', ') || '—'}
                       </dd>
                     </div>

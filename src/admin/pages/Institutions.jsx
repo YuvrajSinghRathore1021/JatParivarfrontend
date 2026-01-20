@@ -3,6 +3,7 @@ import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
 import { useAdminQuery } from '../hooks/useAdminApi.js'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
+const normalizeReferralCode = (value = '') => value.trim().toUpperCase()
 
 export default function InstitutionsPage() {
   const [kind, setKind] = useState('dharamshala')
@@ -158,15 +159,45 @@ function InstitutionFormButton({ item, kind, onSaved }) {
         phone: '',
       },
       contactpersons: [],   // <-- NEW
-
+      referralCode: '',
+      userId: '',
     }
   )// ✅ Add this for geo selections
   const [addressCodes, setAddressCodes] = useState({ stateCode: '', districtCode: '', cityCode: '' })
   const { states, districts, cities, stateOptions, districtOptions, cityOptions } =
-    useGeoOptions(addressCodes.stateCode, addressCodes.districtCode, 'en')
+    useGeoOptions(addressCodes.stateCode, addressCodes.districtCode, 'en', { includeRemoved: true })
+  const stateOpts = useMemo(() => stateOptions.map((o) => ({ ...o, value: String(o.value) })), [stateOptions])
+  const districtOpts = useMemo(() => districtOptions.map((o) => ({ ...o, value: String(o.value) })), [districtOptions])
+  const cityOpts = useMemo(() => cityOptions.map((o) => ({ ...o, value: String(o.value) })), [cityOptions])
+  const matchCodeByName = (list = [], value) => {
+    if (!value) return ''
+    const normalized = value.toString().trim().toLowerCase()
+    const match = list.find((item) => {
+      const en = item?.name?.en?.toString().trim().toLowerCase()
+      const hi = item?.name?.hi?.toString().trim().toLowerCase()
+      return en === normalized || hi === normalized
+    })
+    return match?.code || ''
+  }
+
+  useEffect(() => {
+    // Pre-fill dropdowns when editing an existing listing.
+    setAddressCodes((prev) => {
+      const nextState = prev.stateCode || matchCodeByName(states, form.state)
+      const nextDistrict = prev.districtCode || matchCodeByName(districts, form.district)
+      const nextCity = prev.cityCode || matchCodeByName(cities, form.city)
+      if (nextState === prev.stateCode && nextDistrict === prev.districtCode && nextCity === prev.cityCode) return prev
+      return { stateCode: nextState || '', districtCode: nextDistrict || '', cityCode: nextCity || '' }
+    })
+  }, [states, districts, cities, form.state, form.district, form.city])
 
   // ✅ Handlers for dependent dropdowns (same as in MemberDetail)
   const onStateChange = (code) => {
+    if (code === '__OTHER__') {
+      setAddressCodes({ stateCode: '__OTHER__', districtCode: '', cityCode: '' })
+      setForm((prev) => ({ ...prev, state: '', district: '', city: '' }))
+      return
+    }
     const selected = states.find((s) => s.code === code)
     setAddressCodes({ stateCode: code, districtCode: '', cityCode: '' })
     setForm((prev) => ({
@@ -178,6 +209,11 @@ function InstitutionFormButton({ item, kind, onSaved }) {
   }
 
   const onDistrictChange = (code) => {
+    if (code === '__OTHER__') {
+      setAddressCodes((prev) => ({ ...prev, districtCode: '__OTHER__', cityCode: '' }))
+      setForm((prev) => ({ ...prev, district: '', city: '' }))
+      return
+    }
     const selected = districts.find((d) => d.code === code)
     setAddressCodes((prev) => ({ ...prev, districtCode: code, cityCode: '' }))
     setForm((prev) => ({
@@ -188,6 +224,11 @@ function InstitutionFormButton({ item, kind, onSaved }) {
   }
 
   const onCityChange = (code) => {
+    if (code === '__OTHER__') {
+      setAddressCodes((prev) => ({ ...prev, cityCode: '__OTHER__' }))
+      setForm((prev) => ({ ...prev, city: '' }))
+      return
+    }
     const selected = cities.find((c) => c.code === code)
     setAddressCodes((prev) => ({ ...prev, cityCode: code }))
     setForm((prev) => ({
@@ -287,15 +328,29 @@ function InstitutionFormButton({ item, kind, onSaved }) {
             <label className="text-xs font-medium text-slate-600">Title (EN)</label>
             <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" required />
           </div>
+          <div>
+            <label className="text-xs font-medium text-slate-600">Title (HI)</label>
+            <input value={form.titleHi || ''} onChange={(e) => setForm({ ...form, titleHi: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
+          </div>
           {form?.kind == "sanstha" && (
             <div>
               <label className="text-xs font-medium text-slate-600">Business (EN)</label>
               <input value={form.businessEn} onChange={(e) => setForm({ ...form, businessEn: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
             </div>
           )}
+          {form?.kind == "sanstha" && (
+            <div>
+              <label className="text-xs font-medium text-slate-600">Business (HI)</label>
+              <input value={form.businessHi || ''} onChange={(e) => setForm({ ...form, businessHi: e.target.value })} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
+            </div>
+          )}
           <div>
             <label className="text-xs font-medium text-slate-600">Description (EN)</label>
             <textarea value={form.descriptionEn || ''} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} className="mt-1 w-full  border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-slate-600">Description (HI)</label>
+            <textarea value={form.descriptionHi || ''} onChange={(e) => setForm({ ...form, descriptionHi: e.target.value })} className="mt-1 w-full  border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
           </div>
 
           {/* ✅ Address fields using geoOptions */}
@@ -348,15 +403,24 @@ function InstitutionFormButton({ item, kind, onSaved }) {
             <div>
               <label className="text-xs font-medium text-slate-600">State</label>
               <select
-                value={addressCodes.stateCode}
-                onChange={(e) => onStateChange(e.target.value)}
+                value={addressCodes.stateCode || ''}
+                onChange={(e) => onStateChange(String(e.target.value || ''))}
                 className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
               >
                 <option value="">Select state</option>
-                {stateOptions.map((opt) => (
+                {stateOpts.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
+                <option value="__OTHER__">Not in list</option>
               </select>
+              {addressCodes.stateCode === '__OTHER__' && (
+                <input
+                  className="mt-2 w-full max-w-2xl border border-slate-300 rounded px-3 py-2 text-sm"
+                  placeholder="Enter state"
+                  value={form.state}
+                  onChange={(e) => setForm((prev) => ({ ...prev, state: e.target.value }))}
+                />
+              )}
             </div>
           </div>
 
@@ -364,31 +428,49 @@ function InstitutionFormButton({ item, kind, onSaved }) {
             <div>
               <label className="text-xs font-medium text-slate-600">District</label>
               <select
-                value={addressCodes.districtCode}
-                onChange={(e) => onDistrictChange(e.target.value)}
+                value={addressCodes.districtCode || ''}
+                onChange={(e) => onDistrictChange(String(e.target.value || ''))}
                 disabled={!addressCodes.stateCode}
                 className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
               >
                 <option value="">Select district</option>
-                {districtOptions.map((opt) => (
+                {districtOpts.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
+                <option value="__OTHER__">Not in list</option>
               </select>
+              {addressCodes.districtCode === '__OTHER__' && (
+                <input
+                  className="mt-2 w-full max-w-2xl border border-slate-300 rounded px-3 py-2 text-sm"
+                  placeholder="Enter district"
+                  value={form.district}
+                  onChange={(e) => setForm((prev) => ({ ...prev, district: e.target.value }))}
+                />
+              )}
             </div>
 
             <div>
               <label className="text-xs font-medium text-slate-600">City</label>
               <select
-                value={addressCodes.cityCode}
-                onChange={(e) => onCityChange(e.target.value)}
+                value={addressCodes.cityCode || ''}
+                onChange={(e) => onCityChange(String(e.target.value || ''))}
                 disabled={!addressCodes.districtCode}
                 className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
               >
                 <option value="">Select city</option>
-                {cityOptions.map((opt) => (
+                {cityOpts.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
+                <option value="__OTHER__">Not in list</option>
               </select>
+              {addressCodes.cityCode === '__OTHER__' && (
+                <input
+                  className="mt-2 w-full max-w-2xl border border-slate-300 rounded px-3 py-2 text-sm"
+                  placeholder="Enter city"
+                  value={form.city}
+                  onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value }))}
+                />
+              )}
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">Pin</label>
@@ -401,6 +483,26 @@ function InstitutionFormButton({ item, kind, onSaved }) {
           <div>
             <label className="text-xs font-medium text-slate-600">Address</label>
             <textarea value={form.addressEn || ''} onChange={(e) => setForm({ ...form, addressEn: e.target.value })} className="mt-1 w-full  border border-slate-300 rounded px-3 py-2 text-sm" rows={3} />
+          </div>
+          <div className="grid md:grid-cols-2 gap-3">
+            <label className="text-xs font-medium text-slate-600">
+              <span>Linked userId (optional)</span>
+              <input
+                value={form.userId || ''}
+                onChange={(e)=>setForm((prev)=>({...prev, userId: e.target.value}))}
+                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                placeholder="Paste user ObjectId"
+              />
+            </label>
+            <label className="text-xs font-medium text-slate-600">
+              <span>Referral code (optional)</span>
+              <input
+                value={form.referralCode || ''}
+                onChange={(e)=>setForm((prev)=>({...prev, referralCode: normalizeReferralCode(e.target.value)}))}
+                className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm uppercase"
+                placeholder="Referral code"
+              />
+            </label>
           </div>
           {/* ===========================
     CONTACTS SECTION

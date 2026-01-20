@@ -4,6 +4,7 @@ import { useSectionRoot } from '../../../lib/useSectionRoot'
 import JobBoard from './JobBoard'
 import PostJob from './PostJob'
 import ManageJobs from './ManageJobs'
+import JobDetail from './JobDetail'
 
 function JobsLayout() {
   const { lang } = useLang()
@@ -53,6 +54,7 @@ export default function JobsRoutes() {
         <Route index element={<JobBoard />} />
         <Route path="create" element={<PostJob />} />
         <Route path="manage" element={<ManageJobs />} />
+        <Route path=":jobId" element={<JobDetail />} />
       </Route>
     </Routes>
   )

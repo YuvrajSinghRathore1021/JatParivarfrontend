@@ -1,12 +1,12 @@
 // frontend/src/pages/dashboard/matrimony/MatrimonyProfileForm.jsx
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import SelectField from '../../../components/SelectField'
 import FileDrop from '../../../components/FileDrop'
 import { useGeoOptions } from '../../../hooks/useGeoOptions'
 import { useLang } from '../../../lib/useLang'
-import { fetchMyMatrimonyProfile, saveMatrimonyProfile } from '../../../lib/dashboardApi'
-import { asOptions as gotraOptions } from '../../../constants/gotras'
+import { fetchMyMatrimonyProfile, saveMatrimonyProfile, deleteMatrimonyProfile } from '../../../lib/dashboardApi'
+import { useGotraOptions } from '../../../hooks/useGotraOptions'
 import { upload } from '../../../lib/api'
 import AddressBlock from '../../../components/AddressBlock'
 let API_File = import.meta.env.VITE_API_File
@@ -84,15 +84,7 @@ export default function MatrimonyProfileForm() {
   const [photoError, setPhotoError] = useState('')
   const [photoUploading, setPhotoUploading] = useState(false)
 
-  const gotraChoices = useMemo(() => gotraOptions(lang), [lang])
-  const gotraChoiceValues = useMemo(() => new Set(gotraChoices.map((opt) => opt.value)), [gotraChoices])
-  const gotraSelectOptions = useMemo(
-    () => [
-      ...gotraChoices,
-      { value: '__custom', label: lang === 'hi' ? 'अन्य (स्वयं लिखें)' : 'Other (type manually)' },
-    ],
-    [gotraChoices, lang]
-  )
+  const { gotraOptions: gotraSelectOptions, gotraValueSet: gotraChoiceValues } = useGotraOptions(lang)
 
   const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(
 
@@ -137,6 +129,16 @@ export default function MatrimonyProfileForm() {
       qc.invalidateQueries(['matrimony', 'profile'])
       setSavedMessage(lang === 'hi' ? 'प्रोफ़ाइल सुरक्षित हो गई।' : 'Profile saved successfully.')
       setTimeout(() => setSavedMessage(''), 4000)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteMatrimonyProfile,
+    onSuccess: () => {
+      qc.invalidateQueries(['matrimony', 'profile'])
+      setForm(emptyForm)
+      setSameAsOccupation(false)
+      setSameAsCurrent(false)
     },
   })
 
@@ -520,7 +522,21 @@ export default function MatrimonyProfileForm() {
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        {data?._id && (
+          <button
+            type="button"
+            onClick={() => {
+              if (deleteMutation.isPending) return
+              if (window.confirm(lang === 'hi' ? 'क्या आप प्रोफ़ाइल हटाना चाहते हैं?' : 'Delete your matrimony profile?')) {
+                deleteMutation.mutate()
+              }
+            }}
+            className="rounded-2xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:border-red-300"
+          >
+            {deleteMutation.isPending ? (lang === 'hi' ? 'हटा रहे हैं...' : 'Deleting...') : (lang === 'hi' ? 'प्रोफ़ाइल हटाएँ' : 'Delete profile')}
+          </button>
+        )}
         <button
           type="submit"
           disabled={mutation.isPending}
