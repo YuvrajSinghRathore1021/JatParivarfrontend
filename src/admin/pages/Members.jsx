@@ -448,6 +448,7 @@ function MemberCreateButton({ onCreated }) {
     setSaving(true)
     setError('')
     try {
+      console.log(form);
       const payload = {
         name: form.name,
         displayName: form.displayName || form.name,
@@ -472,7 +473,7 @@ function MemberCreateButton({ onCreated }) {
           dadi: form.gotra?.dadi == '__custom' ? gotraform?.dadi : form.gotra?.dadi
         },
 
-        occupationAddress: {
+        occupationAddress: form.occupationAddress || {
           state: '',
           stateCode: '',
           district: '',
@@ -482,7 +483,7 @@ function MemberCreateButton({ onCreated }) {
           village: ''
         },
 
-        currentAddress: {
+        currentAddress: form.currentAddress || {
           state: '',
           stateCode: '',
           district: '',
@@ -492,7 +493,7 @@ function MemberCreateButton({ onCreated }) {
           village: ''
         },
 
-        parentalAddress: {
+        parentalAddress: form.parentalAddress || {
           state: '',
           stateCode: '',
           district: '',
