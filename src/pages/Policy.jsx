@@ -145,6 +145,11 @@ export default function Policy() {
                         collected unintentionally, we delete it.
                     </p>
 
+                    <h2 className="text-2xl font-semibold mt-6">Contact</h2>
+                    <p>
+                        Jat Bhawan, opposite Water Tanki, Sri Madhopur, Sikar, Rajasthan 332715
+                    </p>
+
                     <h2 className="text-2xl font-semibold mt-6">11. Changes to This Policy</h2>
                     <p>
                         We may update this Policy from time to time. Continued use of the Website means you accept the

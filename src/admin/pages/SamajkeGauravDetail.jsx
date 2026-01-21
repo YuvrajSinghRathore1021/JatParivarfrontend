@@ -5,6 +5,7 @@ import { upload } from "../../lib/api.js";
 import { useAdminQuery } from "../hooks/useAdminApi.js";
 import { useAdminAuth } from "../context/AdminAuthContext.jsx";
 import FileDrop from "../../components/FileDrop.jsx";
+import { makeInitialAvatar } from "../../lib/avatar.js";
 
 let API_File = import.meta.env.VITE_API_File;
 
@@ -194,13 +195,14 @@ export default function SamajkeGauravDetail() {
                             label="Upload Main Photo"
                             onFile={uploadMainPhoto}
                         />
-
-                        {form.photo && (
-                            <img
-                                src={API_File + form.photo}
-                                className="mt-3 w-32 h-32 rounded object-cover border"
-                            />
-                        )}
+                        <img
+                            src={form.photo ? `${API_File || ''}${form.photo}` : makeInitialAvatar(form.name || 'Gaurav', { size: 128, radius: 16 })}
+                            className="mt-3 w-32 h-32 rounded object-cover border bg-slate-100"
+                            onError={(e) => {
+                                e.currentTarget.onerror = null
+                                e.currentTarget.src = makeInitialAvatar(form.name || 'Gaurav', { size: 128, radius: 16 })
+                            }}
+                        />
                     </div>
 
 

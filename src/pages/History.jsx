@@ -28,11 +28,12 @@ export default function History() {
 
 
 
-  if (isLoading) return <p className="p-10 text-center">Loading...</p>
   const sorted = useMemo(() => {
     const list = Array.isArray(data) ? [...data] : []
     return list.sort((a, b) => (b.year || 0) - (a.year || 0))
   }, [data])
+
+  if (isLoading) return <p className="p-10 text-center">Loading...</p>
 
   return (
     <main className="bg-slate-50">
@@ -95,16 +96,12 @@ export default function History() {
               className="block rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition"
             >
               <article className="grid gap-4 p-6 md:grid-cols-6 md:items-center">
-                <div className="md:col-span-1 flex flex-col items-start md:items-center gap-1">
-                  {item.year ? (
-                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white text-lg font-bold shadow">
-                      {item.year}
-                    </span>
-                  ) : (
-                    <span className="text-xs uppercase text-slate-400">Year N/A</span>
-                  )}
+                <div className="md:col-span-1 flex flex-col items-start md:items-center gap-2">
+                  <span className="inline-flex items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-base font-bold text-blue-700 shadow-sm">
+                    {item.year || (langKey === 'hi' ? 'वर्ष N/A' : 'Year N/A')}
+                  </span>
                   {item.category && (
-                    <span className="text-xs font-semibold text-amber-600 uppercase tracking-wide text-center">
+                    <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wide text-center bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg">
                       {item.category}
                     </span>
                   )}

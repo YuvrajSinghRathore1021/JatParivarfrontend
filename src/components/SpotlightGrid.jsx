@@ -57,12 +57,15 @@ export default function SpotlightGrid({ role, titleHi, viewAllPath, limit = 10 }
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {people.map((p) => {
             const user = p.user || p
-            const avatar = user?.avatarUrl
-              ? API_File + user.avatarUrl
-              : makeInitialAvatar(user?.displayName || user?.name || 'Member', {
-                size: 80,
-                radius: 20,
-              })
+            const fallbackAvatar = makeInitialAvatar(user?.displayName || user?.name || 'Member', {
+              size: 80,
+              radius: 20,
+            })
+            const avatar = p.photo
+              ? `${API_File || ''}${p.photo}`
+              : user?.avatarUrl
+                ? `${API_File || ''}${user.avatarUrl}`
+                : fallbackAvatar
 
             const title = user?.designation || p.designation || p.title || ''
             const place = formatLocation(
@@ -85,7 +88,7 @@ export default function SpotlightGrid({ role, titleHi, viewAllPath, limit = 10 }
                   className="h-14 w-14 rounded-xl object-cover"
                   onError={(e) => {
                     e.currentTarget.onerror = null
-                    e.currentTarget.src = makeInitialAvatar(user?.displayName || user?.name || 'Member', { size: 80, radius: 20 })
+                    e.currentTarget.src = fallbackAvatar
                   }}
                 />
                 <div className="min-w-0">

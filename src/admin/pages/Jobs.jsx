@@ -146,10 +146,17 @@ function JobFormButton({ job, onSaved }) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState(() => job || {
-    title: '', description: '', type: 'full_time',
-    locationState: '', locationCity: '',
-    salaryRange: '', contactPhone: '',
-    approved: false, published: false,
+    title: '',
+    description: '',
+    type: 'full_time',
+    locationState: '',
+    locationDistrict: '',
+    locationCity: '',
+    locationVillage: '',
+    salaryRange: '',
+    contactPhone: '',
+    approved: false,
+    published: false,
     referralCode: '',
     userId: '',
   })
@@ -174,6 +181,28 @@ function JobFormButton({ job, onSaved }) {
     if (open && !job) {
       setGeoCodes({ stateCode: '', districtCode: '', cityCode: '' })
     }
+  }, [open, job])
+
+  // Prefill geo codes from existing job if present
+  useEffect(() => {
+    if (!open || !job) return
+    setGeoCodes((prev) => ({
+      stateCode: job.locationStateCode || prev.stateCode,
+      districtCode: job.locationDistrictCode || prev.districtCode,
+      cityCode: job.locationCityCode || prev.cityCode,
+    }))
+  }, [open, job])
+
+  // If job already has names but not codes (older data), force "__OTHER__" so manual fields show with existing text.
+  useEffect(() => {
+    if (!open || !job) return
+    setGeoCodes((prev) => {
+      const next = { ...prev }
+      if (!job.locationStateCode && job.locationState && !next.stateCode) next.stateCode = '__OTHER__'
+      if (!job.locationDistrictCode && job.locationDistrict && !next.districtCode) next.districtCode = '__OTHER__'
+      if (!job.locationCityCode && job.locationCity && !next.cityCode) next.cityCode = '__OTHER__'
+      return next
+    })
   }, [open, job])
 
   useEffect(() => {
@@ -269,6 +298,7 @@ function JobFormButton({ job, onSaved }) {
         locationState: form.locationState || stateOptions.find((s) => s.value === geoCodes.stateCode)?.label || form.locationState,
         locationDistrict: form.locationDistrict || districtOptions.find((d) => d.value === geoCodes.districtCode)?.label || form.locationDistrict,
         locationCity: form.locationCity || cityOptions.find((c) => c.value === geoCodes.cityCode)?.label || form.locationCity,
+        locationVillage: form.locationVillage || '',
       }
       if (job) {
         await adminApiFetch(`/jobs/${job.id}`, { token, method: 'PATCH', body: payload })
@@ -340,7 +370,6 @@ function JobFormButton({ job, onSaved }) {
               <select
                 value={geoCodes.districtCode}
                 onChange={(e) => onDistrictChange(e.target.value)}
-                disabled={!geoCodes.stateCode}
                 className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
               >
                 <option value="">Select district</option>
@@ -363,7 +392,6 @@ function JobFormButton({ job, onSaved }) {
               <select
                 value={geoCodes.cityCode}
                 onChange={(e) => onCityChange(e.target.value)}
-                disabled={!geoCodes.districtCode}
                 className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
               >
                 <option value="">Select city</option>
@@ -409,6 +437,16 @@ function JobFormButton({ job, onSaved }) {
               <label className="text-xs font-medium text-slate-600">Contact phone</label>
               <input value={form.contactPhone||''} onChange={e=>setForm({...form, contactPhone:e.target.value})} className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm" />
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-slate-600">Address (पता)</label>
+            <input
+              value={form.locationVillage || ''}
+              onChange={(e) => setForm({ ...form, locationVillage: e.target.value })}
+              className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm"
+              placeholder="Street / locality"
+            />
           </div>
 
           <div className="grid md:grid-cols-2 gap-3">

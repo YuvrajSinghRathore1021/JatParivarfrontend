@@ -3,6 +3,7 @@ import { useAdminAuth } from '../context/AdminAuthContext.jsx';
 import { useAdminQuery } from '../hooks/useAdminApi.js';
 import { Link } from 'react-router-dom';
 import { adminApiFetch } from '../api/client.js';
+import { makeInitialAvatar } from '../../lib/avatar.js';
 
 let API_File = import.meta.env.VITE_API_File;
 
@@ -105,6 +106,9 @@ export default function SamajkeGaurav() {
 function GauravCard({ item, onSaved }) {
     const { token } = useAdminAuth();
     const [busy, setBusy] = useState(false);
+    const photoSrc = item.photo
+        ? `${API_File || ''}${item.photo}`
+        : makeInitialAvatar(item.name || 'Gaurav', { size: 80, radius: 18 });
 
     const call = (path, body, type = 'PATCH') =>
         adminApiFetch(path, { token, body, method: type });
@@ -123,8 +127,12 @@ function GauravCard({ item, onSaved }) {
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
             <div className="flex items-center gap-3">
                 <img
-                    src={API_File + item.photo}
-                    className="w-20 h-20 rounded-lg object-cover border"
+                    src={photoSrc}
+                    className="w-20 h-20 rounded-lg object-cover border bg-slate-100"
+                    onError={(e) => {
+                        e.currentTarget.onerror = null
+                        e.currentTarget.src = makeInitialAvatar(item.name || 'Gaurav', { size: 80, radius: 18 })
+                    }}
                 />
                 <div>
                     <h2 className="text-lg font-semibold">{item.name}</h2>

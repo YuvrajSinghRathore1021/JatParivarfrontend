@@ -22,9 +22,8 @@ export default function Terms() {
           <p>
             Welcome to Jat Parivar (the “Platform” / “Website”), accessible at
             https://jatparivar.org. This Website is owned and operated by
-            Cambridge Multimedia Pvt. Ltd., having its registered office at
-            Jaipur Times, 4c-Scheme plot no. 588 New Loha Mandi Road, Jaipur,
-            Rajasthan 302013.
+            Cambridge Multimedia Pvt. Ltd., having its office at Jat Bhawan,
+            opposite Water Tanki, Sri Madhopur, Sikar, Rajasthan 332715.
           </p>
           <p>
             By accessing or using our Website, mobile site, or any related

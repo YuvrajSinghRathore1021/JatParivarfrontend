@@ -43,6 +43,7 @@ export default function HeroScrollYouTube({
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         const el = sectionRef.current;
+        if (!el) return;
         const rect = el.getBoundingClientRect();
         const vh = window.innerHeight || 1;
 

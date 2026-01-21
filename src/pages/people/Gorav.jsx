@@ -142,6 +142,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useLang } from "../../lib/useLang";
+import { makeInitialAvatar } from "../../lib/avatar";
 
 let API_File = import.meta.env.VITE_API_File;
 let API = import.meta.env.VITE_API_URL;
@@ -165,6 +166,15 @@ const wrapAnywhere = {
   wordBreak: "break-word",
 };
 
+const formatCategoryLabel = (value) => {
+  if (!value || typeof value !== "string") return "";
+  return value
+    .split(/[-_ ]+/g)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+};
+
 function Chip({ children, tone = "slate" }) {
   const toneMap = {
     slate: "bg-slate-100 text-slate-700 border-slate-200",
@@ -185,6 +195,10 @@ function Chip({ children, tone = "slate" }) {
 }
 
 function PersonCard({ item, href }) {
+  const photo = item.photo
+    ? `${API_File || ''}${item.photo}`
+    : makeInitialAvatar(item.name || 'Member', { size: 320, radius: 0 })
+
   return (
     <Link to={href} className="group block">
       <motion.div
@@ -193,10 +207,14 @@ function PersonCard({ item, href }) {
       >
         <div className="relative">
           <img
-            src={item.photo ? API_File + item.photo : "/no-img.png"}
+            src={photo}
             className="h-56 w-full object-cover"
             alt={item.name || "image"}
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.onerror = null
+              e.currentTarget.src = makeInitialAvatar(item.name || 'Member', { size: 320, radius: 0 })
+            }}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0" />
 
@@ -206,7 +224,7 @@ function PersonCard({ item, href }) {
                 {item.data.timeline}
               </Chip>
             )}
-            {item?.data?.category && <Chip tone="blue">{item.data.category}</Chip>}
+            {item?.data?.category && <Chip tone="blue">{formatCategoryLabel(item.data.category)}</Chip>}
           </div>
         </div>
 

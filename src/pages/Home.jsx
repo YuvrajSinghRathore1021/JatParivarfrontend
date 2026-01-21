@@ -94,9 +94,9 @@ const content = {
     whyJoin: {
       heading: 'Why join our portal',
       cards: [
-        { title: 'End-to-end security', body: 'Single-device login with OTP, encrypted uploads, and manual moderation on every listing.' },
-        { title: 'Real impact data', body: 'Dashboards with stats on jobs closed, marriages matched, and funds deployed.' },
-        { title: 'Language first', body: 'Full Hindi and English experiences with URL parity and SEO-ready hreflang tags.' },
+        { title: 'Trusted profiles & listings', body: 'Verified members and moderated jobs, matrimony, and directory entries to reduce fraud.' },
+        { title: 'Opportunities for families', body: 'Find jobs, apply easily, explore matrimony, and connect with community support faster.' },
+        { title: 'News, events & initiatives', body: 'Stay updated on scholarships, welfare drives, dharamshalas, and community announcements in one place.' },
       ],
     },
     feesHeading: 'Membership fees',
@@ -161,9 +161,9 @@ const content = {
     whyJoin: {
       heading: 'हमारे पोर्टल से क्यों जुड़ें',
       cards: [
-        { title: 'पूरी सुरक्षा', body: 'OTP आधारित लॉगिन, एन्क्रिप्टेड अपलोड और हर लिस्टिंग पर मॉडरेशन।' },
-        { title: 'प्रभाव का आँकड़ा', body: 'डैशबोर्ड में नौकरियों, विवाह मिलान और निधि वितरण का लाइव डेटा।' },
-        { title: 'भाषा प्राथमिकता', body: 'URL समानता के साथ हिंदी और अंग्रेज़ी अनुभव, SEO के लिए तैयार hreflang टैग।' },
+        { title: 'सत्यापित प्रोफ़ाइल व लिस्टिंग', body: 'सदस्यों की पहचान और जॉब/विवाह/निर्देशिका लिस्टिंग पर मॉडरेशन—भरोसा और सुरक्षा बढ़े।' },
+        { title: 'परिवारों के लिए अवसर', body: 'रोज़गार देखें/आवेदन करें, विवाह प्रोफ़ाइल खोजें और समुदाय की सहायता व संसाधनों से जुड़ें।' },
+        { title: 'समाचार, कार्यक्रम और पहल', body: 'स्कॉलरशिप, सेवा अभियान, धर्मशालाओं और सामुदायिक घोषणाओं की अपडेट एक ही जगह।' },
       ],
     },
     feesHeading: 'सदस्य शुल्क',

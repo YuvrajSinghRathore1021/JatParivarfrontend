@@ -142,11 +142,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { makeInitialAvatar } from "../../lib/avatar.js";
 
 let API_File = import.meta.env.VITE_API_File;
 let API = import.meta.env.VITE_API_URL;
 
 const wrapAnywhere = { overflowWrap: "anywhere", wordBreak: "break-word" };
+const formatCategory = (value) => {
+  if (!value || typeof value !== "string") return "";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
 
 function InfoPill({ children }) {
   return (
@@ -182,9 +187,9 @@ export default function GauravDetails() {
   };
 
   const profileImage = useMemo(() => {
-    if (!item?.photo) return null;
-    return API_File + item.photo;
-  }, [item?.photo]);
+    if (!item?.photo) return makeInitialAvatar(item?.name || "Gaurav", { size: 320, radius: 160 });
+    return `${API_File || ""}${item.photo}`;
+  }, [item?.photo, item?.name]);
 
   if (loading)
     return <p className="p-6 text-center text-lg">Loading…</p>;
@@ -213,9 +218,13 @@ export default function GauravDetails() {
           <div className="absolute -top-16 left-6">
             <div className="h-32 w-32 rounded-full bg-white p-1 shadow-xl">
               <img
-                src={profileImage || "/no-img.png"}
+                src={profileImage}
                 alt="image"
-                className="h-full w-full rounded-full object-cover"
+                className="h-full w-full rounded-full object-cover bg-slate-100"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = makeInitialAvatar(item?.name || "Gaurav", { size: 320, radius: 160 });
+                }}
               />
             </div>
           </div>
@@ -229,7 +238,7 @@ export default function GauravDetails() {
             </p>
 
             <div className="mt-4 flex flex-wrap gap-2">
-              {item?.data?.category && <InfoPill>{item.data.category}</InfoPill>}
+              {item?.data?.category && <InfoPill>{formatCategory(item.data.category)}</InfoPill>}
               {item?.data?.timeline && <InfoPill>{item.data.timeline}</InfoPill>}
             </div>
           </div>

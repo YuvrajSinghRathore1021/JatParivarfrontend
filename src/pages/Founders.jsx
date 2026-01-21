@@ -67,8 +67,8 @@ export default function Founders() {
           </h1>
           <p className="text-slate-600 max-w-3xl mx-auto">
             {lang === 'hi'
-              ? 'जिन सदस्यों ने ₹1,01,000 या उससे अधिक योगदान दिया है और समुदाय के परिवर्तन को आगे बढ़ाया है।'
-              : 'Members who have contributed ₹1,01,000 or more and actively guide community transformation.'}
+              ? 'समुदाय के परिवर्तन में मार्गदर्शन करने वाले प्रमुख सदस्य।'
+              : 'Key members who actively guide community transformation.'}
           </p>
         </header>
 
