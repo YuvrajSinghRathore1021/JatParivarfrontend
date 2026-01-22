@@ -71,12 +71,14 @@
 import { useEffect, useState } from "react";
 import { get, post } from "../lib/api";
 
-export default function NumberRequestButton({ receiverId }) {
+export default function NumberRequestButton({ receiverId, compact = false }) {
   const [status, setStatus] = useState(null);
   const [receiverNumber, setReceiverNumber] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Fetch status
   useEffect(() => {
+    if (!receiverId) return undefined;
     get(`/found/request/status/${receiverId}`)
       .then((res) => {
         const data = res;
@@ -90,6 +92,8 @@ export default function NumberRequestButton({ receiverId }) {
 
         if (data.status === "approved" && data.receiverPhone) {
           setReceiverNumber(data.receiverPhone);
+        } else {
+          setReceiverNumber("");
         }
       })
       .catch(() => {});
@@ -97,38 +101,72 @@ export default function NumberRequestButton({ receiverId }) {
 
   // Send request
   const sendRequest = async () => {
-    const res = await post("/found/request/send", { receiverId });
-    const req = res;
-
-    if (req) {
-      setStatus(req.success);
-      alert("Request sent");
+    if (!receiverId) return;
+    setLoading(true);
+    try {
+      const res = await post("/found/request/send", { receiverId });
+      if (res?.request?.status) {
+        setStatus(res.request.status);
+      } else {
+        setStatus("pending");
+      }
+      // refresh to fetch phone immediately if it was already approved
+      const refreshed = await get(`/found/request/status/${receiverId}`).catch(() => null);
+      if (refreshed?.status) {
+        setStatus(refreshed.status);
+        if (refreshed.status === "approved" && refreshed.receiverPhone) {
+          setReceiverNumber(refreshed.receiverPhone);
+        }
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   // UI
   if (status === "approved") {
     return (
-      <p className="text-green-600 font-semibold">
-        Number: {receiverNumber}
+      <p className={compact ? "text-sm font-semibold text-green-700" : "text-green-600 font-semibold"}>
+        {compact ? receiverNumber : `Number: ${receiverNumber || "—"}`}
       </p>
     );
   }
 
   if (status === "pending") {
     return (
-      <p className="text-yellow-600 font-semibold">
+      <p className={compact ? "text-sm font-semibold text-amber-700" : "text-yellow-600 font-semibold"}>
         Request Sent
       </p>
+    );
+  }
+
+  if (status === "rejected") {
+    return (
+      <button
+        onClick={sendRequest}
+        disabled={loading}
+        className={
+          compact
+            ? "text-sm font-semibold text-slate-700 hover:underline disabled:opacity-60"
+            : "text-slate-700 font-medium hover:underline disabled:opacity-60"
+        }
+      >
+        {loading ? "Sending…" : "Request Again"}
+      </button>
     );
   }
 
   return (
     <button
       onClick={sendRequest}
-      className="text-blue-600 font-medium hover:underline"
+      disabled={loading}
+      className={
+        compact
+          ? "text-sm font-semibold text-blue-700 hover:underline disabled:opacity-60"
+          : "text-blue-600 font-medium hover:underline disabled:opacity-60"
+      }
     >
-      Request Number
+      {loading ? "Sending…" : "Request Number"}
     </button>
   );
 }

@@ -5,8 +5,9 @@ import { useQuery } from '@tanstack/react-query'
 import { get } from '../../lib/api'
 import { useLang } from '../../lib/useLang'
 import { makeInitialAvatar } from '../../lib/avatar'
+import NumberRequestButton from '../NumberRequestButton'
 let API_File = import.meta.env.VITE_API_File
-const fetchPerson = (id) => get(`/public/user/${id}`)
+const fetchPerson = (id) => get(`/found/user/${id}`)
 
 const OCCUPATION_LABELS = {
   govt: 'Government job',
@@ -36,7 +37,8 @@ export default function UserDetails() {
   })
 
   const person = data?.person || null
-  const phone = person?.phone || person?.alternatePhone || '—'
+  const canViewPhone = Boolean(data?.canViewPhone)
+  const phone = canViewPhone ? (person?.phone || person?.alternatePhone || '—') : '—'
   const email = person?.contactEmail || person?.email || '—'
   const occupation = OCCUPATION_LABELS[person?.occupation] || person?.occupation || '—'
   const designation = person?.designation || person?.title || '—'
@@ -51,11 +53,9 @@ export default function UserDetails() {
     labelHi: 'वर्तमान पता',
     value: person?.currentAddress
       ? [
-          person.currentAddress.village,
           person.currentAddress.city,
           person.currentAddress.district,
-          person.currentAddress.state,
-          person.currentAddress.pincode
+          person.currentAddress.state
         ].filter(Boolean).join(', ')
       : '—'
   },
@@ -65,11 +65,9 @@ export default function UserDetails() {
     labelHi: 'पैतृक पता',
     value: person?.parentalAddress
       ? [
-          person.parentalAddress.village,
           person.parentalAddress.city,
           person.parentalAddress.district,
-          person.parentalAddress.state,
-          person.parentalAddress.pincode
+          person.parentalAddress.state
         ].filter(Boolean).join(', ')
       : '—'
   },
@@ -79,25 +77,23 @@ export default function UserDetails() {
     labelHi: 'कार्यस्थल का पता',
     value: person?.occupationAddress
       ? [
-          person.occupationAddress.village,
           person.occupationAddress.city,
           person.occupationAddress.district,
-          person.occupationAddress.state,
-          person.occupationAddress.pincode
+          person.occupationAddress.state
         ].filter(Boolean).join(', ')
       : '—'
   }
 ]
   const image = useMemo(() => {
     if (!person) return null
-    if (person.photo) return API_File + person.photo
+    if (person.avatarUrl) return API_File + person.avatarUrl
     const fallbackName =
       person.name ||
       person?.displayName ||
       person?.phone ||
       'Member'
     return makeInitialAvatar(fallbackName, { size: 120, radius: 36 })
-  }, [person?.displayName, person?.name, person?.phone, person])
+  }, [person])
 
   const backToList = () => {
     navigate(makePath('dashboard/found'))
@@ -185,7 +181,13 @@ export default function UserDetails() {
 
               {/* CONTACT GRID */}
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                <InfoTile labelEn="Phone" labelHi="फ़ोन" lang={lang} value={phone} />
+                <InfoTile labelEn="Phone" labelHi="फ़ोन" lang={lang} value={phone}>
+                  {canViewPhone ? (
+                    <span>{phone}</span>
+                  ) : (
+                    <NumberRequestButton receiverId={personId} compact />
+                  )}
+                </InfoTile>
                 <InfoTile labelEn="Email" labelHi="ईमेल" lang={lang} value={email} />
                 <InfoTile labelEn="Occupation" labelHi="व्यवसाय" lang={lang} value={occupation} />
                 <InfoTile labelEn="Education" labelHi="शिक्षा" lang={lang} value={education} />
@@ -242,13 +244,13 @@ export default function UserDetails() {
   )
 }
 
-function InfoTile({ labelEn, labelHi, value, lang }) {
+function InfoTile({ labelEn, labelHi, value, lang, children }) {
   return (
     <div>
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
         {lang === 'hi' ? labelHi : labelEn}
       </p>
-      <p className="mt-1 text-sm text-slate-800">{value || '—'}</p>
+      <div className="mt-1 text-sm text-slate-800">{children ?? (value || '—')}</div>
     </div>
   )
 }

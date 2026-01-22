@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchJobs, applyToJob } from '../../../lib/dashboardApi'
 import { useLang } from '../../../lib/useLang'
 import { Link } from 'react-router-dom'
+import { useGeoOptions } from '../../../hooks/useGeoOptions'
 
 export default function JobBoard() {
   const { lang } = useLang()
@@ -13,9 +14,15 @@ export default function JobBoard() {
 
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
-  const [expanded, setExpanded] = useState(null)
-  const [openDetails, setOpenDetails] = useState(null)
+  const [stateCode, setStateCode] = useState('')
+  const [districtCode, setDistrictCode] = useState('')
+  const [cityCode, setCityCode] = useState('')
+  const [addressQuery, setAddressQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [openApply, setOpenApply] = useState(null)
+
+  const { stateOptions, districtOptions, cityOptions } = useGeoOptions(stateCode, districtCode, lang)
 
 
   // 🔹 Fetch jobs
@@ -29,7 +36,7 @@ export default function JobBoard() {
     mutationFn: ({ jobId, payload }) => applyToJob(jobId, payload),
     onSuccess: () => {
       qc.invalidateQueries(['jobs', 'public']) // ✅ refresh list
-      setExpanded(null) // close form
+      setOpenApply(null) // close form
     },
   })
 
@@ -38,11 +45,26 @@ export default function JobBoard() {
     const list = data || []
     return list.filter((job) => {
       const matchesType = typeFilter ? job.type === typeFilter : true
-      const text = `${job.title} ${job.description} ${job.locationCity} ${job.locationDistrict} ${job.locationState}`.toLowerCase()
+      const matchesState = stateCode ? job.locationStateCode === stateCode : true
+      const matchesDistrict = districtCode ? job.locationDistrictCode === districtCode : true
+      const matchesCity = cityCode ? job.locationCityCode === cityCode : true
+      const matchesAddress = addressQuery
+        ? `${job.locationVillage || ''} ${job.locationCity || ''} ${job.locationDistrict || ''} ${job.locationState || ''}`
+          .toLowerCase()
+          .includes(addressQuery.toLowerCase())
+        : true
+      const text = `${job.title} ${job.description} ${job.locationVillage} ${job.locationCity} ${job.locationDistrict} ${job.locationState}`.toLowerCase()
       const matchesSearch = search ? text.includes(search.toLowerCase()) : true
-      return matchesType && matchesSearch
+      return matchesType && matchesState && matchesDistrict && matchesCity && matchesAddress && matchesSearch
     })
-  }, [data, search, typeFilter])
+  }, [data, search, typeFilter, stateCode, districtCode, cityCode, addressQuery])
+
+  const total = filtered.length
+  const canGoNext = page * pageSize < total
+  const pagedJobs = useMemo(() => {
+    const start = (page - 1) * pageSize
+    return filtered.slice(start, start + pageSize)
+  }, [filtered, page, pageSize])
 
   // 🔹 Submit handler
   const onApply = (jobId, event) => {
@@ -91,6 +113,79 @@ export default function JobBoard() {
         </div>
       </header>
 
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+        <div className="grid gap-4 md:grid-cols-4">
+          <select
+            className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            value={stateCode}
+            onChange={(e) => {
+              setStateCode(e.target.value)
+              setDistrictCode('')
+              setCityCode('')
+            }}
+          >
+            <option value="">{lang === 'hi' ? 'राज्य' : 'State'}</option>
+            {stateOptions.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            value={districtCode}
+            disabled={!stateCode}
+            onChange={(e) => {
+              setDistrictCode(e.target.value)
+              setCityCode('')
+            }}
+          >
+            <option value="">{lang === 'hi' ? 'जिला' : 'District'}</option>
+            {districtOptions.map((d) => (
+              <option key={d.value} value={d.value}>
+                {d.label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            value={cityCode}
+            disabled={!districtCode}
+            onChange={(e) => setCityCode(e.target.value)}
+          >
+            <option value="">{lang === 'hi' ? 'शहर' : 'City'}</option>
+            {cityOptions.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+          <input
+            value={addressQuery}
+            onChange={(e) => setAddressQuery(e.target.value)}
+            placeholder={lang === 'hi' ? 'पता / गाँव' : 'Address / village'}
+            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+          />
+        </div>
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              setStateCode('')
+              setDistrictCode('')
+              setCityCode('')
+              setAddressQuery('')
+              setSearch('')
+              setTypeFilter('')
+              setPage(1)
+            }}
+            className="rounded-2xl bg-slate-100 px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200"
+          >
+            {lang === 'hi' ? 'रीसेट' : 'Reset'}
+          </button>
+        </div>
+      </div>
+
       {isLoading ? (
         <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, idx) => (
@@ -102,10 +197,58 @@ export default function JobBoard() {
           {lang === 'hi' ? 'कोई नौकरी पोस्टिंग उपलब्ध नहीं है।' : 'No job postings are available right now.'}
         </div>
       ) : (
-        <div className="space-y-4">
-          {filtered.map((job) => {
+        <>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-sm text-slate-600">
+            <div>
+              <span>
+                {lang === 'hi' ? 'कुल' : 'Total'}: <span className="font-semibold text-slate-900">{total}</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="inline-flex items-center gap-2">
+                {lang === 'hi' ? 'प्रति पृष्ठ' : 'Rows'}
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value) || 10)
+                    setPage(1)
+                  }}
+                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                >
+                  {[10, 20, 50].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="inline-flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 disabled:opacity-50"
+                >
+                  {lang === 'hi' ? 'पिछला' : 'Prev'}
+                </button>
+                <span className="text-sm text-slate-600">
+                  {lang === 'hi' ? 'पेज' : 'Page'} <span className="font-semibold text-slate-900">{page}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={!canGoNext}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 disabled:opacity-50"
+                >
+                  {lang === 'hi' ? 'अगला' : 'Next'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+          {pagedJobs.map((job) => {
             const applied = applyMutation.isSuccess && applyMutation.variables?.jobId === job.id
-            const locationText = [job.locationCity, job.locationDistrict, job.locationState].filter(Boolean).join(', ')
             return (
               <article key={job.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex flex-col gap-3">
@@ -149,42 +292,6 @@ export default function JobBoard() {
                       </button>
                     )}
                   </div>
-
-                  {openDetails === job.id && (
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-2">
-                      <p className="text-sm text-slate-700 break-words whitespace-pre-wrap">
-                        <span className="font-semibold ">
-                          {lang === 'hi' ? 'विवरण:' : 'Description:'}
-                        </span>{' '}
-                        {job.description || '—'}
-                      </p>
-
-                      <p className="text-sm text-slate-600">
-                        <span className="font-semibold">
-                          {lang === 'hi' ? 'नौकरी प्रकार:' : 'Job type:'}
-                        </span>{' '}
-                        {job.type?.replace('_', ' ') || '—'}
-                      </p>
-
-                      <p className="text-sm text-slate-600">
-                        <span className="font-semibold">
-                          {lang === 'hi' ? 'स्थान:' : 'Location:'}
-                        </span>{' '}
-                        {locationText || '—'}
-                      </p>
-                      <p className="text-sm text-slate-600 break-words">
-                        <span className="font-semibold">
-                          {lang === 'hi' ? 'पता:' : 'Address:'}
-                        </span>{' '}
-                        {job?.locationVillage || '—'}
-                      </p>
-
-                      <p className="text-xs text-slate-400">
-                        {lang === 'hi' ? 'पोस्ट तिथि:' : 'Posted on:'}{' '}
-                        {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : '—'}
-                      </p>
-                    </div>
-                  )}
 
                   {openApply === job.id && (
                     <form
@@ -231,6 +338,7 @@ export default function JobBoard() {
             )
           })}
         </div>
+        </>
       )}
     </div>
   )

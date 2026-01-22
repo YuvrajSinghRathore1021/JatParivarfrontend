@@ -20,6 +20,14 @@ const sortOptions = [
 export default function MatrimonyBrowse() {
   const { lang } = useLang()
   const [sort, setSort] = useState('recent')
+  const [nameQuery, setNameQuery] = useState('')
+  const [designationQuery, setDesignationQuery] = useState('')
+  const [departmentQuery, setDepartmentQuery] = useState('')
+  const [locationQuery, setLocationQuery] = useState('')
+  const [addressQuery, setAddressQuery] = useState('')
+  const [keywordQuery, setKeywordQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const qc = useQueryClient()
 
   const { data: profiles, isLoading } = useQuery({
@@ -42,7 +50,51 @@ export default function MatrimonyBrowse() {
     onSuccess: () => qc.invalidateQueries(['matrimony', 'interests']),
   })
 
-  const sortedProfiles = profiles || []
+  const sortedProfiles = useMemo(() => profiles || [], [profiles])
+
+  const filteredProfiles = useMemo(() => {
+    const list = sortedProfiles
+    const nameQ = nameQuery.trim().toLowerCase()
+    const desgQ = designationQuery.trim().toLowerCase()
+    const deptQ = departmentQuery.trim().toLowerCase()
+    const locQ = locationQuery.trim().toLowerCase()
+    const addrQ = addressQuery.trim().toLowerCase()
+    const keyQ = keywordQuery.trim().toLowerCase()
+
+    if (!nameQ && !desgQ && !deptQ && !locQ && !addrQ && !keyQ) return list
+
+    return list.filter((profile) => {
+      const user = profile.user || {}
+      const nameText = `${profile.name || ''} ${user.displayName || ''} ${user.name || ''}`.toLowerCase()
+      const designationText = `${profile.designation || ''} ${user.designation || ''}`.toLowerCase()
+      const departmentText = `${profile.department || ''} ${user.department || ''}`.toLowerCase()
+
+      const loc = profile.location || profile.currentAddress || {}
+      const locationText = `${loc.city || ''} ${loc.district || ''} ${loc.state || ''}`.toLowerCase()
+
+      const cur = profile.currentAddress || {}
+      const occ = profile.occupationAddress || {}
+      const par = profile.parentalAddress || {}
+      const addressText = `${cur.village || ''} ${cur.city || ''} ${cur.district || ''} ${cur.state || ''} ${occ.village || ''} ${occ.city || ''} ${occ.district || ''} ${occ.state || ''} ${par.village || ''} ${par.city || ''} ${par.district || ''} ${par.state || ''}`.toLowerCase()
+
+      const keywordText = `${nameText} ${designationText} ${departmentText} ${locationText} ${addressText} ${(profile.gotra?.self || '').toLowerCase()} ${(profile.occupation || '').toLowerCase()}`.toLowerCase()
+
+      if (nameQ && !nameText.includes(nameQ)) return false
+      if (desgQ && !designationText.includes(desgQ)) return false
+      if (deptQ && !departmentText.includes(deptQ)) return false
+      if (locQ && !locationText.includes(locQ)) return false
+      if (addrQ && !addressText.includes(addrQ)) return false
+      if (keyQ && !keywordText.includes(keyQ)) return false
+      return true
+    })
+  }, [sortedProfiles, nameQuery, designationQuery, departmentQuery, locationQuery, addressQuery, keywordQuery])
+
+  const total = filteredProfiles.length
+  const canGoNext = page * pageSize < total
+  const pagedProfiles = useMemo(() => {
+    const start = (page - 1) * pageSize
+    return filteredProfiles.slice(start, start + pageSize)
+  }, [filteredProfiles, page, pageSize])
 
   function urlmake(item) {
     return `/${lang}/dashboard/matrimony/${item.id}`;
@@ -77,19 +129,152 @@ export default function MatrimonyBrowse() {
         </label>
       </div>
 
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+        <div className="grid gap-4 md:grid-cols-3">
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'नाम' : 'Name'}</span>
+            <input
+              value={nameQuery}
+              onChange={(e) => setNameQuery(e.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder={lang === 'hi' ? 'नाम लिखें' : 'Enter name'}
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पद' : 'Designation'}</span>
+            <input
+              value={designationQuery}
+              onChange={(e) => setDesignationQuery(e.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder={lang === 'hi' ? 'पद लिखें' : 'Enter designation'}
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'विभाग' : 'Department'}</span>
+            <input
+              value={departmentQuery}
+              onChange={(e) => setDepartmentQuery(e.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder={lang === 'hi' ? 'विभाग लिखें' : 'Enter department'}
+            />
+          </label>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'स्थान' : 'Location'}</span>
+            <input
+              value={locationQuery}
+              onChange={(e) => setLocationQuery(e.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder={lang === 'hi' ? 'शहर/जिला/राज्य' : 'City/District/State'}
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पता' : 'Address'}</span>
+            <input
+              value={addressQuery}
+              onChange={(e) => setAddressQuery(e.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder={lang === 'hi' ? 'गाँव/पता' : 'Village/address'}
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'कीवर्ड' : 'Keyword'}</span>
+            <input
+              value={keywordQuery}
+              onChange={(e) => setKeywordQuery(e.target.value)}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+              placeholder={lang === 'hi' ? 'सभी में खोजें' : 'Search all fields'}
+            />
+          </label>
+        </div>
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              setNameQuery('')
+              setDesignationQuery('')
+              setDepartmentQuery('')
+              setLocationQuery('')
+              setAddressQuery('')
+              setKeywordQuery('')
+              setPage(1)
+            }}
+            className="rounded-2xl bg-slate-100 px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-200"
+          >
+            {lang === 'hi' ? 'रीसेट' : 'Reset'}
+          </button>
+        </div>
+      </div>
+
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2">
           {Array.from({ length: 4 }).map((_, idx) => (
             <div key={idx} className="h-48 rounded-3xl bg-white shadow-sm animate-pulse" aria-hidden="true" />
           ))}
         </div>
-      ) : sortedProfiles.length === 0 ? (
+      ) : filteredProfiles.length === 0 ? (
         <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
-          {lang === 'hi' ? 'अभी कोई विवाह प्रोफ़ाइल उपलब्ध नहीं है।' : 'No matrimony profiles are available yet.'}
+          {sortedProfiles.length === 0
+            ? lang === 'hi'
+              ? 'अभी कोई विवाह प्रोफ़ाइल उपलब्ध नहीं है।'
+              : 'No matrimony profiles are available yet.'
+            : lang === 'hi'
+              ? 'कोई परिणाम नहीं मिला।'
+              : 'No results found.'}
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {sortedProfiles.map((profile) => {
+        <>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-sm text-slate-600">
+            <div>
+              <span>
+                {lang === 'hi' ? 'कुल' : 'Total'}: <span className="font-semibold text-slate-900">{total}</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="inline-flex items-center gap-2">
+                {lang === 'hi' ? 'प्रति पृष्ठ' : 'Rows'}
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value) || 10)
+                    setPage(1)
+                  }}
+                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                >
+                  {[10, 20, 50].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="inline-flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 disabled:opacity-50"
+                >
+                  {lang === 'hi' ? 'पिछला' : 'Prev'}
+                </button>
+                <span className="text-sm text-slate-600">
+                  {lang === 'hi' ? 'पेज' : 'Page'} <span className="font-semibold text-slate-900">{page}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={!canGoNext}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 disabled:opacity-50"
+                >
+                  {lang === 'hi' ? 'अगला' : 'Next'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+          {pagedProfiles.map((profile) => {
             const user = profile.user || {}
             const avatar = API_File + profile?.photos?.[0] || API_File + user.avatarUrl || makeInitialAvatar(profile?.name || user.displayName || 'Member', { size: 96, radius: 28 })
             const interested = user.id ? likedSet.has(user.id) : false
@@ -142,6 +327,7 @@ export default function MatrimonyBrowse() {
             )
           })}
         </div>
+        </>
       )}
     </div>
   )
