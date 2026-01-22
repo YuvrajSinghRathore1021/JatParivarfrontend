@@ -227,7 +227,7 @@ export default function Terms() {
           <h2 className="text-2xl font-bold">15. Governing Law & Jurisdiction</h2>
 
           <p>
-            These Terms are governed by the laws of India. Courts at Jaipur,
+            These Terms are governed by the laws of India. Courts at Sikar,
             Rajasthan shall have exclusive jurisdiction over all disputes.
           </p>
         </section>

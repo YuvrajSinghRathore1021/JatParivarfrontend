@@ -283,7 +283,7 @@ export default function ProfileEditor() {
     event.target.value = ''
     if (!file) return
     if (file.size > 5 * 1024 * 1024) {
-      setAvatarError(lang === 'hi' ? 'कृपया 5MB से कम आकार की छवि चुनें।' : 'Please choose an image smaller than 5 MB.')
+      setAvatarError(lang === 'hi' ? 'कृपया 1MB से कम आकार की छवि चुनें।' : 'Please choose an image smaller than 1 MB.')
       return
     }
     try {
@@ -324,7 +324,7 @@ export default function ProfileEditor() {
     event.target.value = ''
     if (!file) return
     if (file.size > 5 * 1024 * 1024) {
-      setMessage(lang === 'hi' ? 'कृपया 5MB से कम का बैनर चुनें।' : 'Please choose a banner smaller than 5 MB.')
+      setMessage(lang === 'hi' ? 'कृपया 1MB से कम का बैनर चुनें।' : 'Please choose a banner smaller than 1 MB.')
       return
     }
     try {
@@ -758,8 +758,9 @@ export default function ProfileEditor() {
                 </p>
                 <p className="text-xs text-slate-500">
                   {lang === 'hi'
-                    ? 'लंबवत छवि • अनुशंसित 600×1200px • अधिकतम 5 MB'
-                    : 'Vertical image • recommended 600×1200px • up to 5 MB'}
+                    ? 'क्षैतिज छवि • अनुशंसित 1500×300px • अधिकतम 1 MB'
+                    : 'Horizontal image • recommended 1500×300 • up to 1 MB'}
+                    
                 </p>
               </div>
               <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 h-48 grid place-items-center">

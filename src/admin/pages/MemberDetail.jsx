@@ -143,7 +143,7 @@ export default function MemberDetailPage() {
   const handleAvatarUpload = async (file) => {
     if (!file) return
     if (file.size > 5 * 1024 * 1024) {
-      alert('Please choose an image smaller than 5 MB.')
+      alert('Please choose an image smaller than 1 MB.')
       return
     }
     setUploading((prev) => ({ ...prev, avatar: true }))
@@ -194,7 +194,7 @@ export default function MemberDetailPage() {
   const handleSpotlightBannerUpload = async (file) => {
     if (!file) return
     if (file.size > 5 * 1024 * 1024) {
-      alert('Please choose an image smaller than 5 MB.')
+      alert('Please choose an image smaller than 1 MB.')
       return
     }
     setSpotlightBannerUploading(true)
@@ -601,7 +601,7 @@ export default function MemberDetailPage() {
             onUpload={handleAvatarUpload}
             uploading={uploading.avatar}
             accept="image/*"
-            hint="JPG/PNG • Max 5 MB"
+            hint="JPG/PNG • Max 1 MB"
           />
           <UploadField
             label="Jan Aadhaar (file URL)"
@@ -693,7 +693,7 @@ export default function MemberDetailPage() {
                 onUpload={handleSpotlightBannerUpload}
                 uploading={spotlightBannerUploading}
                 accept="image/*"
-                hint="Tall image • Max 5 MB"
+                hint="max 1 MB  size 1920×1080"
               />
             </div>
           </div>

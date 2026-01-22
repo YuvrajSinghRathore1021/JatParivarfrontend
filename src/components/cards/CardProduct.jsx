@@ -44,7 +44,7 @@ export default function CardProduct({
 
         <div className="p-2.5">
           {badge && (
-            <span className="inline-block text-xs text-gray-600 bg-gray-100 border border-gray-200 rounded-full px-2 py-0.5 mb-2">
+            <span className="inline-block text-xs text-gray-600 bg-gray-100 border border-gray-200 rounded-full px-2 py-0.1 MB-2">
               {badge}
             </span>
           )}

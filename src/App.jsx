@@ -107,7 +107,7 @@ export default function App() {
         <Route path="login" element={<Login />} />
         <Route path="forget-password" element={<ForgetPassword />} />
         <Route path="register" element={<Register />} />
-        <Route path="matrimony" element={<MatrimonyBrowse />} />
+        {/* <Route path="matrimony" element={<MatrimonyBrowse />} /> */}
         <Route path="jobs" element={<JobsIndex />} />
         <Route path="dharamshaalaye" element={<Dharamshalaye />} />
         <Route path="sansthaye" element={<Sansthaye />} />

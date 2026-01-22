@@ -202,7 +202,7 @@ function NewsFormButton({ item, onSaved }) {
     if (!file) return
 
     if (file.size > 5 * 1024 * 1024) {
-      setPhotoError(lang === 'hi' ? 'कृपया 5MB से कम आकार की छवि चुनें।' : 'Please choose an image smaller than 5 MB.')
+      setPhotoError(lang === 'hi' ? 'कृपया 1MB से कम आकार की छवि चुनें।' : 'Please choose an image smaller than 1 MB.')
       return
     }
     try {
@@ -315,7 +315,7 @@ function NewsFormButton({ item, onSaved }) {
             <FileDrop
               accept="image/*"
               onFile={addPhoto}
-              hint={lang === 'hi' ? 'JPG/PNG • अधिकतम 5 MB' : 'JPG/PNG • up to 5 MB'}
+              hint={lang === 'hi' ? 'JPG/PNG • अधिकतम 1 MB' : 'JPG/PNG • up to 1 MB'}
               label={lang === 'hi' ? 'नई फोटो जोड़ें' : 'Add a new photo'}
             />
             {photoUploading && (

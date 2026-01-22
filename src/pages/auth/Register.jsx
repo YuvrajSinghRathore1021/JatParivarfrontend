@@ -61,7 +61,7 @@ const copy = {
     },
     uploads: {
       janHint: 'PDF or image • Max 10 MB',
-      photoHint: 'JPG/PNG • Max 5 MB',
+      photoHint: 'JPG/PNG • Max 1 MB',
     }
   },
   hi: {
@@ -114,7 +114,7 @@ const copy = {
     },
     uploads: {
       janHint: 'PDF या इमेज • अधिकतम 10 MB',
-      photoHint: 'JPG/PNG • अधिकतम 5 MB',
+      photoHint: 'JPG/PNG • अधिकतम 1 MB',
     }
   },
 }
