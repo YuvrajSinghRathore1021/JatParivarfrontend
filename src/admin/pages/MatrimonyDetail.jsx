@@ -13,6 +13,14 @@ import AddressBlock from '../../components/AddressBlock.jsx'
 import { useGotraOptions } from '../../hooks/useGotraOptions'
 let API_File = import.meta.env.VITE_API_File
 
+const normalizeOccupationKey = (value) => {
+    const v = String(value || '').trim()
+    if (!v) return ''
+    if (v === 'govt') return 'government_job'
+    if (v === 'private') return 'private_job'
+    return v
+}
+
 
 const genders = [
     { value: 'male', labelEn: 'Male', labelHi: 'पुरुष' },
@@ -121,7 +129,7 @@ export default function MatrimonyDetail() {
             gender: data?.gender || 'male',
             maritalStatus: data?.maritalStatus || 'never_married',
             education: data?.education || '',
-            occupation: data?.occupation || '',
+            occupation: normalizeOccupationKey(data?.occupation),
             department: data?.department || '',
             designation: data?.designation || '',
             userId: data?.userId || '',

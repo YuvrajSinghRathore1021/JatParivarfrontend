@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useLang } from '../../../lib/useLang'
 import { Link } from 'react-router-dom'
+import { useGeoOptions } from '../../../hooks/useGeoOptions'
 import {
   fetchMatrimonyProfiles,
   fetchMatrimonyInterests,
@@ -10,6 +11,29 @@ import {
 } from '../../../lib/dashboardApi'
 import { makeInitialAvatar } from '../../../lib/avatar'
 let API_File = import.meta.env.VITE_API_File
+
+const normalizeOccupationKey = (value) => {
+  const v = String(value || '').trim()
+  if (!v) return ''
+  if (v === 'govt') return 'government_job'
+  if (v === 'private') return 'private_job'
+  return v
+}
+
+const OCCUPATION_OPTIONS = {
+  en: [
+    { value: 'government_job', label: 'Government Job' },
+    { value: 'private_job', label: 'Private Job' },
+    { value: 'business', label: 'Business' },
+    { value: 'student', label: 'Student' },
+  ],
+  hi: [
+    { value: 'government_job', label: 'सरकारी नौकरी' },
+    { value: 'private_job', label: 'प्राइवेट नौकरी' },
+    { value: 'business', label: 'व्यवसाय' },
+    { value: 'student', label: 'छात्र' },
+  ],
+}
 
 const sortOptions = [
   { value: 'recent', labelEn: 'Recently updated', labelHi: 'हाल ही में अपडेट' },
@@ -23,7 +47,10 @@ export default function MatrimonyBrowse() {
   const [nameQuery, setNameQuery] = useState('')
   const [designationQuery, setDesignationQuery] = useState('')
   const [departmentQuery, setDepartmentQuery] = useState('')
-  const [locationQuery, setLocationQuery] = useState('')
+  const [occupationQuery, setOccupationQuery] = useState('')
+  const [stateCode, setStateCode] = useState('')
+  const [districtCode, setDistrictCode] = useState('')
+  const [cityCode, setCityCode] = useState('')
   const [addressQuery, setAddressQuery] = useState('')
   const [keywordQuery, setKeywordQuery] = useState('')
   const [page, setPage] = useState(1)
@@ -50,6 +77,12 @@ export default function MatrimonyBrowse() {
     onSuccess: () => qc.invalidateQueries(['matrimony', 'interests']),
   })
 
+  const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(
+    stateCode,
+    districtCode,
+    lang,
+  )
+
   const sortedProfiles = useMemo(() => profiles || [], [profiles])
 
   const filteredProfiles = useMemo(() => {
@@ -57,11 +90,11 @@ export default function MatrimonyBrowse() {
     const nameQ = nameQuery.trim().toLowerCase()
     const desgQ = designationQuery.trim().toLowerCase()
     const deptQ = departmentQuery.trim().toLowerCase()
-    const locQ = locationQuery.trim().toLowerCase()
+    const occQ = normalizeOccupationKey(occupationQuery)
     const addrQ = addressQuery.trim().toLowerCase()
     const keyQ = keywordQuery.trim().toLowerCase()
 
-    if (!nameQ && !desgQ && !deptQ && !locQ && !addrQ && !keyQ) return list
+    if (!nameQ && !desgQ && !deptQ && !occQ && !stateCode && !districtCode && !cityCode && !addrQ && !keyQ) return list
 
     return list.filter((profile) => {
       const user = profile.user || {}
@@ -69,25 +102,55 @@ export default function MatrimonyBrowse() {
       const designationText = `${profile.designation || ''} ${user.designation || ''}`.toLowerCase()
       const departmentText = `${profile.department || ''} ${user.department || ''}`.toLowerCase()
 
-      const loc = profile.location || profile.currentAddress || {}
-      const locationText = `${loc.city || ''} ${loc.district || ''} ${loc.state || ''}`.toLowerCase()
+      const cur = profile.location || profile.currentAddress || {}
+      const locationText = `${cur.city || ''} ${cur.district || ''} ${cur.state || ''}`.toLowerCase()
 
-      const cur = profile.currentAddress || {}
       const occ = profile.occupationAddress || {}
       const par = profile.parentalAddress || {}
       const addressText = `${cur.village || ''} ${cur.city || ''} ${cur.district || ''} ${cur.state || ''} ${occ.village || ''} ${occ.city || ''} ${occ.district || ''} ${occ.state || ''} ${par.village || ''} ${par.city || ''} ${par.district || ''} ${par.state || ''}`.toLowerCase()
 
-      const keywordText = `${nameText} ${designationText} ${departmentText} ${locationText} ${addressText} ${(profile.gotra?.self || '').toLowerCase()} ${(profile.occupation || '').toLowerCase()}`.toLowerCase()
+      const normalizedOccupation = normalizeOccupationKey(profile.occupation || user.occupation)
+      const occupationText = `${normalizedOccupation} ${(profile.occupation || '')} ${(user.occupation || '')}`.toLowerCase()
+      const keywordText = `${nameText} ${designationText} ${departmentText} ${occupationText} ${locationText} ${addressText} ${(profile.gotra?.self || '').toLowerCase()}`.toLowerCase()
 
       if (nameQ && !nameText.includes(nameQ)) return false
       if (desgQ && !designationText.includes(desgQ)) return false
       if (deptQ && !departmentText.includes(deptQ)) return false
-      if (locQ && !locationText.includes(locQ)) return false
+
+      if (occQ && normalizedOccupation !== occQ) return false
+
+      if (stateCode) {
+        if (cur.stateCode) {
+          if (cur.stateCode !== stateCode) return false
+        } else {
+          const sel = states.find((s) => s.code === stateCode)
+          if (!sel?.name?.en || String(cur.state || '').trim() !== sel.name.en) return false
+        }
+      }
+
+      if (districtCode) {
+        if (cur.districtCode) {
+          if (cur.districtCode !== districtCode) return false
+        } else {
+          const sel = districts.find((d) => d.code === districtCode)
+          if (!sel?.name?.en || String(cur.district || '').trim() !== sel.name.en) return false
+        }
+      }
+
+      if (cityCode) {
+        if (cur.cityCode) {
+          if (cur.cityCode !== cityCode) return false
+        } else {
+          const sel = cities.find((c) => c.code === cityCode)
+          if (!sel?.name?.en || String(cur.city || '').trim() !== sel.name.en) return false
+        }
+      }
+
       if (addrQ && !addressText.includes(addrQ)) return false
       if (keyQ && !keywordText.includes(keyQ)) return false
       return true
     })
-  }, [sortedProfiles, nameQuery, designationQuery, departmentQuery, locationQuery, addressQuery, keywordQuery])
+  }, [sortedProfiles, nameQuery, designationQuery, departmentQuery, occupationQuery, stateCode, districtCode, cityCode, addressQuery, keywordQuery, states, districts, cities])
 
   const total = filteredProfiles.length
   const canGoNext = page * pageSize < total
@@ -159,21 +222,95 @@ export default function MatrimonyBrowse() {
             />
           </label>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <label className="block text-sm">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'स्थान' : 'Location'}</span>
-            <input
-              value={locationQuery}
-              onChange={(e) => setLocationQuery(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
-              placeholder={lang === 'hi' ? 'शहर/जिला/राज्य' : 'City/District/State'}
-            />
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'राज्य' : 'State'}</span>
+            <select
+              value={stateCode}
+              onChange={(e) => {
+                setStateCode(e.target.value)
+                setDistrictCode('')
+                setCityCode('')
+                setPage(1)
+              }}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+            >
+              <option value="">{lang === 'hi' ? 'राज्य चुनें' : 'Select State'}</option>
+              {stateOptions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
           </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'ज़िला' : 'District'}</span>
+            <select
+              value={districtCode}
+              onChange={(e) => {
+                setDistrictCode(e.target.value)
+                setCityCode('')
+                setPage(1)
+              }}
+              disabled={!stateCode}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white disabled:bg-slate-50"
+            >
+              <option value="">{lang === 'hi' ? 'ज़िला चुनें' : 'Select District'}</option>
+              {districtOptions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'शहर' : 'City'}</span>
+            <select
+              value={cityCode}
+              onChange={(e) => {
+                setCityCode(e.target.value)
+                setPage(1)
+              }}
+              disabled={!districtCode}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white disabled:bg-slate-50"
+            >
+              <option value="">{lang === 'hi' ? 'शहर चुनें' : 'Select City'}</option>
+              {cityOptions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
+            <select
+              value={occupationQuery}
+              onChange={(e) => {
+                setOccupationQuery(e.target.value)
+                setPage(1)
+              }}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+            >
+              <option value="">{lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}</option>
+              {(lang === 'hi' ? OCCUPATION_OPTIONS.hi : OCCUPATION_OPTIONS.en).map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
           <label className="block text-sm">
             <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पता' : 'Address'}</span>
             <input
               value={addressQuery}
-              onChange={(e) => setAddressQuery(e.target.value)}
+              onChange={(e) => {
+                setAddressQuery(e.target.value)
+                setPage(1)
+              }}
               className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
               placeholder={lang === 'hi' ? 'गाँव/पता' : 'Village/address'}
             />
@@ -182,7 +319,10 @@ export default function MatrimonyBrowse() {
             <span className="font-semibold text-slate-600">{lang === 'hi' ? 'कीवर्ड' : 'Keyword'}</span>
             <input
               value={keywordQuery}
-              onChange={(e) => setKeywordQuery(e.target.value)}
+              onChange={(e) => {
+                setKeywordQuery(e.target.value)
+                setPage(1)
+              }}
               className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
               placeholder={lang === 'hi' ? 'सभी में खोजें' : 'Search all fields'}
             />
@@ -195,7 +335,10 @@ export default function MatrimonyBrowse() {
               setNameQuery('')
               setDesignationQuery('')
               setDepartmentQuery('')
-              setLocationQuery('')
+              setOccupationQuery('')
+              setStateCode('')
+              setDistrictCode('')
+              setCityCode('')
               setAddressQuery('')
               setKeywordQuery('')
               setPage(1)

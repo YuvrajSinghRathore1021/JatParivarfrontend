@@ -3,13 +3,35 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import SelectField from '../../../components/SelectField'
 import FileDrop from '../../../components/FileDrop'
-import { useGeoOptions } from '../../../hooks/useGeoOptions'
 import { useLang } from '../../../lib/useLang'
 import { fetchMyMatrimonyProfile, saveMatrimonyProfile, deleteMatrimonyProfile } from '../../../lib/dashboardApi'
 import { useGotraOptions } from '../../../hooks/useGotraOptions'
 import { upload } from '../../../lib/api'
 import AddressBlock from '../../../components/AddressBlock'
 let API_File = import.meta.env.VITE_API_File
+
+const normalizeOccupationKey = (value) => {
+  const v = String(value || '').trim()
+  if (!v) return ''
+  if (v === 'govt') return 'government_job'
+  if (v === 'private') return 'private_job'
+  return v
+}
+
+const OCCUPATION_OPTIONS = {
+  en: [
+    { value: 'government_job', label: 'Government Job' },
+    { value: 'private_job', label: 'Private Job' },
+    { value: 'business', label: 'Business' },
+    { value: 'student', label: 'Student' },
+  ],
+  hi: [
+    { value: 'government_job', label: 'सरकारी नौकरी' },
+    { value: 'private_job', label: 'प्राइवेट नौकरी' },
+    { value: 'business', label: 'व्यवसाय' },
+    { value: 'student', label: 'छात्र' },
+  ],
+}
 const genders = [
   { value: 'male', labelEn: 'Male', labelHi: 'पुरुष' },
   { value: 'female', labelEn: 'Female', labelHi: 'महिला' },
@@ -86,11 +108,6 @@ export default function MatrimonyProfileForm() {
 
   const { gotraOptions: gotraSelectOptions, gotraValueSet: gotraChoiceValues } = useGotraOptions(lang)
 
-  const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(
-
-    lang,
-  )
-
   useEffect(() => {
     if (data) {
       setForm({
@@ -101,7 +118,7 @@ export default function MatrimonyProfileForm() {
         education: data.education || '',
         designation: data.designation || '',
         department: data.department || '',
-        occupation: data.occupation || '',
+        occupation: normalizeOccupationKey(data.occupation),
 
         height: data.height || '',
         gotraSelf: data.gotra?.self || '',
@@ -157,7 +174,7 @@ export default function MatrimonyProfileForm() {
       education: form.education,
       department: form.department,
       designation: form.designation,
-      occupation: form.occupation,
+      occupation: normalizeOccupationKey(form.occupation),
       height: form.height,
       visible: form.visible,
 
@@ -328,18 +345,33 @@ export default function MatrimonyProfileForm() {
                         <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
                         <input value={form.department} onChange={handleChange('department')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
                     </label> 
-                   <label className="block text-sm">
+                    <label className="block text-sm">
                         <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पद का नाम' : 'Designation'}</span>
                         <input value={form.designation} onChange={handleChange('designation')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
                     </label> 
 
+          <label className="block text-sm md:col-span-2">
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
+            <select
+              value={form.occupation}
+              onChange={handleChange('occupation')}
+              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
+            >
+              <option value="">{lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}</option>
+              {(lang === 'hi' ? OCCUPATION_OPTIONS.hi : OCCUPATION_OPTIONS.en).map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
 
           <AddressBlock
             title={lang === 'hi' ? 'व्यवसाय का पता' : 'Occupation Address'}
             formKey="occupationAddress"
             form={form}
             setForm={setForm}
-            {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+            {...{ lang }}
           />
           <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
             <input
@@ -358,7 +390,7 @@ export default function MatrimonyProfileForm() {
               formKey="currentAddress"
               form={form}
               setForm={setForm}
-              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+              {...{ lang }}
             />)}
           <label className="flex items-center gap-2 text-sm font-medium text-slate-700 md:col-span-2 mt-2">
             <input
@@ -377,7 +409,7 @@ export default function MatrimonyProfileForm() {
               formKey="parentalAddress"
               form={form}
               setForm={setForm}
-              {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
+              {...{ lang }}
             />
           )}
 

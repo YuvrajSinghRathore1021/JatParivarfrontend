@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
 import { useAdminQuery } from '../hooks/useAdminApi.js'
@@ -40,7 +40,7 @@ export default function Matrimony() {
             ) : (
                 <div className="grid gap-4 md:grid-cols-2">
                     {list.map(item => (
-                        <InstitutionCard key={item.id} item={item} onSaved={() => refetch()} />
+                        <InstitutionCard key={item._id} item={item} onSaved={() => refetch()} />
                     ))}
                     {list.length === 0 && <p className="text-sm text-slate-500">No listings yet.</p>}
                 </div>
@@ -81,14 +81,18 @@ function InstitutionCard({ item, onSaved }) {
 
             {/* Location */}
             <p className="text-sm text-slate-600 mt-1">
-                {item.village ? item.village + ", " : ""}
-                {item.city}, {item.district}, {item.state}
+                {[
+                    item?.currentAddress?.village,
+                    item?.currentAddress?.city,
+                    item?.currentAddress?.district,
+                    item?.currentAddress?.state,
+                ].filter(Boolean).join(", ") || "—"}
             </p>
 
             
             {/* Height + Marital Status */}
             <div className="mt-2 text-sm text-slate-700 space-y-1">
-                <p><b>Height:</b> {item.hight ? item.hight + " inch" : "Not provided"}</p>
+                <p><b>Height:</b> {item.height ? item.height : "Not provided"}</p>
                 <p><b>Status:</b> {item.maritalStatus}</p>
             </div>
 
