@@ -22,7 +22,7 @@ export default function Terms() {
           <p>
             Welcome to Jat Parivar (the “Platform” / “Website”), accessible at
             https://jatparivar.org. This Website is owned and operated by
-            Cambridge Multimedia Pvt. Ltd., having its office at Jat Bhawan,
+            Rameshwar Lal Jat., having its office at Jat Bhawan,
             opposite Water Tanki, Sri Madhopur, Sikar, Rajasthan 332715.
           </p>
           <p>
@@ -200,7 +200,7 @@ export default function Terms() {
         <section className="space-y-4 text-lg leading-relaxed text-slate-700">
           <h2 className="text-2xl font-bold">13. Indemnity</h2>
 
-          <p>You agree to indemnify and hold harmless Cambridge Multimedia Pvt. Ltd. from any claims arising due to:</p>
+          <p>You agree to indemnify and hold harmless Rameshwar Lal Jat. from any claims arising due to:</p>
 
           <ul className="list-disc pl-6 space-y-1">
             <li>Your use of the Website</li>
