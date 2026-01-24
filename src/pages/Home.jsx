@@ -155,7 +155,7 @@ const content = {
     newsHeading: 'ताज़ा सामुदायिक समाचार',
     newsItems: [
       { title: 'स्कॉलरशिप बैच 2025 के लिए आवेदन शुरू', time: '2 दिन पहले' },
-      { title: 'जयपुर टाइम्स के साथ युवा उद्यम अभियान', time: '1 सप्ताह पहले' },
+      // { title: 'जयपुर टाइम्स के साथ युवा उद्यम अभियान', time: '1 सप्ताह पहले' },
       { title: 'मथुरा व हरिद्वार धर्मशालाओं में सुविधाएँ अपग्रेड', time: '3 सप्ताह पहले' },
     ],
     whyJoin: {
@@ -320,7 +320,7 @@ const TICKER_FALLBACK = {
     'Matrimony matches — 312',
     'Institutions onboarded — 86',
     'Scholarship applications processed — 2,410',
-    'Community donations routed — ₹1.9 Cr',
+    'Community  routed — ₹1.9 Cr',
     'Community events hosted — 54',
   ],
   hi: [

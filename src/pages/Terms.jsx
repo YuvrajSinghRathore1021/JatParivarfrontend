@@ -46,7 +46,7 @@ export default function Terms() {
               initiatives
             </li>
             <li>
-              Online collection of membership fees, contributions, and donations
+              Online collection of membership fees, contributions, and 
               via digital payment methods
             </li>
           </ul>
@@ -86,7 +86,7 @@ export default function Terms() {
             <li>Create and update your profile</li>
             <li>View directory listings</li>
             <li>Post information (subject to moderation)</li>
-            <li>Make online payments for membership fees, donations, etc.</li>
+            <li>Make online payments for membership fees,  etc.</li>
           </ul>
 
           <p>We reserve the right to modify or discontinue services anytime.</p>
@@ -145,7 +145,7 @@ export default function Terms() {
           <h2 className="text-2xl font-bold">9. Refund & Cancellation Policy</h2>
 
           <ol className="list-decimal pl-6 space-y-2">
-            <li>Membership fees and donations are non-refundable except in specific cases.</li>
+            <li>Membership fees and  are non-refundable except in specific cases.</li>
 
             <li>A refund may be considered in situations such as:
               <ul className="list-disc pl-6 mt-1 space-y-1">

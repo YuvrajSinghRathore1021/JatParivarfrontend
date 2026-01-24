@@ -21,7 +21,7 @@ const navItems = [
 ]
 
 const externalItems = [
-  { labelEn: 'Jaipur Times', labelHi: 'जयपुर टाइम्स', href: 'https://www.jaipurtimes.org/' },
+  // { labelEn: 'Jaipur Times', labelHi: 'जयपुर टाइम्स', href: 'https://www.jaipurtimes.org/' },
 ]
 
 export default function Navbar() {

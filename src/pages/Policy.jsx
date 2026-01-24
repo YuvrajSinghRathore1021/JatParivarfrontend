@@ -24,7 +24,7 @@ export default function Policy() {
                     <ul className="list-disc pl-6">
                         <li>Visitors to our Website</li>
                         <li>Registered members and users</li>
-                        <li>Users making payments for membership, donations, listings or other services</li>
+                        <li>Users making payments for membership,  listings or other services</li>
                     </ul>
                     <p>
                         This Policy is intended to comply with applicable Indian laws, including the Digital Personal Data
