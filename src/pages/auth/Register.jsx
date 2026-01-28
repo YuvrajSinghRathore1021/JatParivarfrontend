@@ -188,7 +188,7 @@ export default function Register() {
   // Toggle this to bypass phone OTP during testing.
   const TEST_BYPASS_OTP = true // <-- set to false for production (OTP enforced)
   // Set to false to restore the original PhonePe redirect flow.
-  const TEST_BYPASS_PHONEPE = true // <-- set to false for production
+  const TEST_BYPASS_PHONEPE = false // <-- set to false for production
 
   const OTP_ENABLED = !TEST_BYPASS_OTP
 
@@ -454,8 +454,8 @@ export default function Register() {
       }
 
       // Production (PhonePe):
-      // const res = await post('/payments/phonepe/create', payload)
-      // window.location.href = res.redirectUrl
+      const res = await post('/payments/phonepe/create', payload)
+      window.location.href = res.redirectUrl
     } catch (e) {
       console.error(e)
       setError(t.errorGeneric)
