@@ -149,6 +149,7 @@ function PlanCard({ config, plan, onSaved }) {
 }
 
 function Field({ label, value, onChange, type = 'text', ...rest }) {
+  const onWheel = type === 'number' ? (e) => e.currentTarget.blur() : undefined
   return (
     <label className="block text-sm">
       <span className="font-medium text-slate-600">{label}</span>
@@ -156,6 +157,7 @@ function Field({ label, value, onChange, type = 'text', ...rest }) {
         type={type}
         value={value ?? ''}
         onChange={onChange}
+        onWheel={onWheel}
         {...rest}
         className="mt-1 w-full max-w-2xl  rounded-lg border border-slate-300 px-3 py-2 text-sm"
       />

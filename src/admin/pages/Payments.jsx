@@ -11,7 +11,10 @@ export default function PaymentsPage() {
   Object.entries(filters).forEach(([key, value]) => {
     if (value) qs.set(key, value)
   })
-  const { data, isLoading, refetch } = useAdminQuery(queryKey, `/payments?${qs.toString()}`)
+  const { data, isLoading, refetch } = useAdminQuery(queryKey, `/payments?${qs.toString()}`, {
+    refetchInterval: 10_000,
+    refetchIntervalInBackground: true,
+  })
   const list = data?.data || []
   const meta = data?.meta || { page: 1, pageSize: 20, total: 0 }
 
@@ -26,6 +29,7 @@ export default function PaymentsPage() {
           <label className="text-xs font-medium text-slate-600">Status</label>
           <select value={filters.status} onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value, page: 1 }))} className="mt-1 border border-slate-300 rounded px-3 py-2 text-sm">
             <option value="">All</option>
+            <option value="created">Created</option>
             <option value="success">Success</option>
             <option value="pending">Pending</option>
             <option value="failed">Failed</option>
@@ -95,6 +99,7 @@ function PaymentsTable({ list, loading, onChanged }) {
               <td className="px-4 py-3">
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <select value={payment.status} onChange={(e) => updateStatus(payment.id, e.target.value)} className="border border-slate-300 rounded px-2 py-1 text-xs">
+                    <option value="created">Created</option>
                     <option value="success">Success</option>
                     <option value="pending">Pending</option>
                     <option value="failed">Failed</option>
@@ -114,6 +119,6 @@ function PaymentsTable({ list, loading, onChanged }) {
 }
 
 function StatusChip({ status }) {
-  const color = status === 'success' ? 'bg-green-100 text-green-700' : status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
+  const color = status === 'success' ? 'bg-green-100 text-green-700' : (status === 'pending' || status === 'created') ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
   return <span className={`px-2 py-1 rounded-full text-xs font-medium ${color}`}>{status}</span>
 }

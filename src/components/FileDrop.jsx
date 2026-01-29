@@ -56,7 +56,7 @@ export default function FileDrop({
         </div>
         <div className="flex-1">
           <div className="font-semibold text-slate-900">
-            {value ? value.name : "Click to upload or drag & drop"}
+            {value?.name ? value.name : "Click to upload or drag & drop"}
           </div>
           {hint && <div className="text-sm text-slate-500">{hint}</div>}
         </div>

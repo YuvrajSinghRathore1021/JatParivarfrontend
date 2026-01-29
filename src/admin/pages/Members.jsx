@@ -220,6 +220,26 @@ export default function MembersPage() {
                       </button>
                     )}
                   </div>
+                  {(member.referredByUser || member.referredBy) && (
+                    <div className="mt-1 text-[11px] font-sans text-slate-600">
+                      Referred by:{' '}
+                      <span className="font-medium">
+                        {member.referredByUser?.name || '—'}
+                      </span>
+                      {member.referredBy && (
+                        <span className="font-mono text-slate-700"> ({member.referredBy})</span>
+                      )}
+                      {member.referredBy && (
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(member.referredBy)}
+                          className="ml-2 text-blue-600 text-[11px] underline"
+                        >
+                          copy
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-xs text-slate-700 font-mono">
                   <div className="flex items-center gap-2">

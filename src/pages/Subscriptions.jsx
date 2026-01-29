@@ -108,8 +108,9 @@
 
 
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLang } from '../lib/useLang'
+import { fetchPublicPlans } from '../lib/publicApi'
 
 const plans = {
   founder: {
@@ -156,15 +157,49 @@ const plans = {
 export default function Subscriptions() {
   const { lang } = useLang()
   const [loading, setLoading] = useState(false)
+  const [priceByCode, setPriceByCode] = useState({})
   const perksKey = lang === 'hi' ? 'perksHi' : 'perksEn'
+
+  useEffect(() => {
+    let alive = true
+    fetchPublicPlans()
+      .then((list) => {
+        if (!alive) return
+        const map = {}
+        for (const p of Array.isArray(list) ? list : []) {
+          if (p?.code && typeof p.price !== 'undefined') map[p.code] = Number(p.price)
+        }
+        setPriceByCode(map)
+      })
+      .catch(() => {
+        if (!alive) return
+        setPriceByCode({})
+      })
+    return () => { alive = false }
+  }, [])
 
   const items = useMemo(
     () => [
-      { id: 'founder', title: lang === 'hi' ? 'फाउंडर योजना' : 'Founder plan', ...plans.founder },
-      { id: 'member', title: lang === 'hi' ? 'मेम्बर योजना' : 'Member plan', ...plans.member },
-      { id: 'sadharan', title: lang === 'hi' ? 'साधारण सदस्यता' : 'Sadharan membership', ...plans.sadharan },
+      {
+        id: 'founder',
+        title: lang === 'hi' ? 'फाउंडर योजना' : 'Founder plan',
+        ...plans.founder,
+        amount: priceByCode.founder ? `₹${priceByCode.founder.toLocaleString('en-IN')}` : plans.founder.amount,
+      },
+      {
+        id: 'member',
+        title: lang === 'hi' ? 'मेम्बर योजना' : 'Member plan',
+        ...plans.member,
+        amount: priceByCode.member ? `₹${priceByCode.member.toLocaleString('en-IN')}` : plans.member.amount,
+      },
+      {
+        id: 'sadharan',
+        title: lang === 'hi' ? 'साधारण सदस्यता' : 'Sadharan membership',
+        ...plans.sadharan,
+        amount: priceByCode.sadharan ? `₹${priceByCode.sadharan.toLocaleString('en-IN')}` : plans.sadharan.amount,
+      },
     ],
-    [lang]
+    [lang, priceByCode]
   )
 
   const handlePayment = async (planId) => {
