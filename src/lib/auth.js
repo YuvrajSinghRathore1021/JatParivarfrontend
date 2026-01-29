@@ -2,6 +2,19 @@ import { get, post } from './api'
 
 const ADMIN_TOKEN_KEY = 'jp_admin_token'
 const ADMIN_PROFILE_KEY = 'jp_admin_profile'
+const REGISTER_DRAFT_KEYS = ['jp_register_draft_v2', 'jp_register_draft_v1']
+
+const clearRegisterDraft = () => {
+  try {
+    if (typeof window === 'undefined') return
+    for (const key of REGISTER_DRAFT_KEYS) {
+      try { window.sessionStorage.removeItem(key) } catch { /* ignore */ }
+      try { window.localStorage.removeItem(key) } catch { /* ignore */ }
+    }
+  } catch {
+    // ignore
+  }
+}
 
 const persistAdminSession = (token, admin) => {
   if (typeof window === 'undefined') return
@@ -30,6 +43,7 @@ export const login = async (phone, password) => {
   try {
     const adminRes = await post('/admin/auth/login', { phone, password })
     persistAdminSession(adminRes.token, adminRes.admin)
+    clearRegisterDraft()
     return { kind: 'admin', ...adminRes }
   } catch (err) {
     const message = `${err?.message || ''}`
@@ -41,15 +55,21 @@ export const login = async (phone, password) => {
 
   const userRes = await post('/auth/login', { phone, password })
   clearAdminSession()
+  clearRegisterDraft()
   return { kind: 'user', ...userRes }
 }
 
 // Logout (normal users)
-export const logout = () => post('/auth/logout', {})
+export const logout = async () => {
+  await post('/auth/logout', {})
+  clearRegisterDraft()
+  return true
+}
 
 // Admin logout: send the token via /admin/* (api.js now auto-attaches it)
 export const adminLogout = async () => {
   await post('/admin/auth/logout', {}) // Authorization header gets added automatically now
   persistAdminSession('', null)
+  clearRegisterDraft()
   return true
 }

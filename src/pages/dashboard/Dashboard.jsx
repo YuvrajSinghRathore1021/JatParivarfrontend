@@ -49,6 +49,14 @@ function DashboardTopBar() {
   }, [user?.avatarUrl, user?._id])
 
   useEffect(() => {
+    if (!user?._id) return
+    try { window.sessionStorage.removeItem('jp_register_draft_v2') } catch { /* ignore */ }
+    try { window.sessionStorage.removeItem('jp_register_draft_v1') } catch { /* ignore */ }
+    try { window.localStorage.removeItem('jp_register_draft_v2') } catch { /* ignore */ }
+    try { window.localStorage.removeItem('jp_register_draft_v1') } catch { /* ignore */ }
+  }, [user?._id])
+
+  useEffect(() => {
     if (!menuOpen) return undefined
     const onClick = (event) => {
       if (!dropdownRef.current) return

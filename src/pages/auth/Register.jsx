@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { post, upload } from '../../lib/api'
 import { useLang } from '../../lib/useLang'
+import { fetchPublicPlans } from '../../lib/publicApi'
 import DateField from '../../components/DateField'
 import SelectField from '../../components/SelectField'
 import FileDrop from '../../components/FileDrop'
@@ -20,7 +21,7 @@ const copy = {
     proceed: 'Proceed to PhonePe',
     plan: 'Select membership',
     janAadhar: 'Jan Aadhaar (required)',
-    profilePhoto: 'Profile Photo (optional)',
+    profilePhoto: 'Profile Photo (required)',
     phone: 'Phone',
     referral: 'Referral Code (required)',
     otp: 'OTP',
@@ -50,7 +51,16 @@ const copy = {
     errorGeneric: 'Something went wrong. Please try again.',
     invalidOtp: 'Invalid OTP. Please try again.',
     invalidEmail: 'Please enter a valid email address.',
-    invalidEmailReq: 'Please enter a email address.',
+    invalidEmailReq: 'Please enter an email address.',
+    dobRequired: 'Date of birth is required.',
+    genderRequired: 'Gender is required.',
+    maritalRequired: 'Marital status is required.',
+    educationRequired: 'Education is required.',
+    occupationRequired: 'Occupation is required.',
+    departmentRequired: 'Department is required.',
+    designationRequired: 'Designation is required.',
+    requiredPhoto: 'Please upload your profile photo before proceeding.',
+    gotraSelfRequired: 'Please enter your self gotra.',
 
     placeholders: {
       gender: 'Select gender',
@@ -74,7 +84,7 @@ const copy = {
     proceed: 'PhonePe पर जाएँ',
     plan: 'सदस्यता चुनें',
     janAadhar: 'जन आधार (आवश्यक)',
-    profilePhoto: 'प्रोफ़ाइल फोटो (वैकल्पिक)',
+    profilePhoto: 'प्रोफ़ाइल फोटो (आवश्यक)',
     phone: 'मोबाइल नंबर',
     referral: 'रेफ़रल कोड (आवश्यक)',
     otp: 'OTP',
@@ -105,6 +115,15 @@ const copy = {
     invalidOtp: 'OTP मान्य नहीं है। कृपया पुनः प्रयास करें।',
     invalidEmail: 'कृपया मान्य ईमेल पता दर्ज करें।',
     invalidEmailReq: 'कृपया ईमेल पता दर्ज करें।',
+    dobRequired: 'जन्मतिथि आवश्यक है।',
+    genderRequired: 'लिंग आवश्यक है।',
+    maritalRequired: 'वैवाहिक स्थिति आवश्यक है।',
+    educationRequired: 'शिक्षा स्तर आवश्यक है।',
+    occupationRequired: 'पेशा आवश्यक है।',
+    departmentRequired: 'डिपार्टमेंट आवश्यक है।',
+    designationRequired: 'पद का नाम आवश्यक है।',
+    requiredPhoto: 'आगे बढ़ने से पहले कृपया प्रोफ़ाइल फोटो अपलोड करें।',
+    gotraSelfRequired: 'कृपया अपना गोत्र (Self) दर्ज करें।',
     placeholders: {
       gender: 'लिंग चुनें',
       marital: 'वैवाहिक स्थिति चुनें',
@@ -179,6 +198,82 @@ const OCCUPATION = {
 }
 
 const REFERRAL_REGEX = /^[A-Z0-9-]{6}$/
+const DRAFT_KEY = 'jp_register_draft_v2'
+
+const storageGet = (key) => {
+  try {
+    if (typeof window === 'undefined') return null
+    return window.sessionStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+const storageSet = (key, value) => {
+  try {
+    if (typeof window === 'undefined') return
+    window.sessionStorage.setItem(key, value)
+  } catch {
+    // ignore
+  }
+}
+
+const storageRemove = (key) => {
+  try {
+    if (typeof window === 'undefined') return
+    window.sessionStorage.removeItem(key)
+  } catch {
+    // ignore
+  }
+}
+
+const readDraft = () => {
+  try {
+    const raw = storageGet(DRAFT_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return parsed && typeof parsed === 'object' ? parsed : null
+  } catch {
+    return null
+  }
+}
+
+const writeDraft = (next) => {
+  try {
+    storageSet(DRAFT_KEY, JSON.stringify(next))
+  } catch {
+    // ignore
+  }
+}
+
+const clearDraft = () => {
+  try {
+    storageRemove(DRAFT_KEY)
+  } catch {
+    // ignore
+  }
+}
+
+const asSavedFileRef = (v) => {
+  if (!v || typeof v !== 'object') return null
+  if (typeof v.url === 'string' && v.url.trim()) {
+    return { url: v.url, name: typeof v.name === 'string' && v.name.trim() ? v.name : 'Uploaded file' }
+  }
+  return null
+}
+
+const resolveUploadUrl = async (maybeFileOrRef, uploadFn) => {
+  if (!maybeFileOrRef) return null
+  if (typeof maybeFileOrRef === 'object' && typeof maybeFileOrRef.url === 'string' && maybeFileOrRef.url.trim()) {
+    return maybeFileOrRef.url.trim()
+  }
+  // Browser File
+  if (typeof File !== 'undefined' && maybeFileOrRef instanceof File) {
+    const out = await uploadFn('/uploads/file', maybeFileOrRef)
+    return out?.url || null
+  }
+  return null
+}
 
 export default function Register() {
   const { lang, makePath } = useLang()
@@ -246,7 +341,7 @@ export default function Register() {
     setgotraform((prev) => ({ ...prev, [field]: value }))
   }
 
-  const [addr, setAddr] = useState({
+  const [addr, _setAddr] = useState({
     state: '', stateCode: '', district: '', districtCode: '', city: '', cityCode: '', pin: '', permanentaddress: ''
   })
 
@@ -258,8 +353,12 @@ export default function Register() {
   const [janAadhar, setJanAadhar] = useState(null)
   const [profilePhoto, setProfilePhoto] = useState(null)
   const [plan, setPlan] = useState('sadharan')
+  const [plans, setPlans] = useState([])
+  const [plansFetchFailed, setPlansFetchFailed] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [draftLoaded, setDraftLoaded] = useState(false)
+  const [hasDraft, setHasDraft] = useState(false)
 
   const [qs] = useSearchParams()
   const navigate = useNavigate()
@@ -275,6 +374,78 @@ export default function Register() {
     const p = qs.get('plan')
     if (p) setPlan(p)
   }, [qs])
+
+  // Restore draft (so payment failures can resume without re-entering everything)
+  useEffect(() => {
+    const draft = readDraft()
+    if (draft) {
+      setHasDraft(true)
+      if (typeof draft.step === 'number') setStep(draft.step)
+      if (typeof draft.phone === 'string') setPhone(draft.phone)
+      if (typeof draft.ref === 'string') setRef(draft.ref)
+      if (draft.form && typeof draft.form === 'object') setForm(draft.form)
+      if (draft.gotra && typeof draft.gotra === 'object') setGotra(draft.gotra)
+      if (draft.gotraform && typeof draft.gotraform === 'object') setgotraform(draft.gotraform)
+      if (typeof draft.plan === 'string') setPlan(draft.plan)
+
+      const ja = asSavedFileRef(draft.janAadhar)
+      if (ja) setJanAadhar(ja)
+      const pf = asSavedFileRef(draft.profilePhoto)
+      if (pf) setProfilePhoto(pf)
+    }
+    // Mark draft load complete so we don't overwrite stored values with initial empty state.
+    setDraftLoaded(true)
+  }, [])
+
+  // Persist draft (File objects are not persisted; uploaded URLs are)
+  useEffect(() => {
+    if (!draftLoaded) return
+    const prev = readDraft() || {}
+    writeDraft({
+      ...prev,
+      step,
+      phone,
+      ref,
+      form,
+      gotra,
+      gotraform,
+      plan,
+      janAadhar: asSavedFileRef(janAadhar),
+      profilePhoto: asSavedFileRef(profilePhoto),
+      updatedAt: Date.now(),
+    })
+  }, [step, phone, ref, form, gotra, gotraform, plan, janAadhar, profilePhoto])
+
+  // If returning from PhonePe, resume on payment step and show status
+  useEffect(() => {
+    const status = (qs.get('status') || '').toLowerCase()
+    if (!status) return
+    // Only auto-resume on payment step if we still have a draft in this tab/session.
+    if (!hasDraft) return
+    setStep(8)
+    if (status === 'failed') {
+      setError(lang === 'hi' ? 'भुगतान विफल रहा। कृपया पुनः प्रयास करें।' : 'Payment failed. Please try again.')
+    } else if (status === 'pending') {
+      setError(lang === 'hi' ? 'भुगतान लंबित है। कुछ समय बाद पुनः प्रयास करें।' : 'Payment is pending. Please try again in a moment.')
+    }
+  }, [qs, lang, hasDraft])
+
+  useEffect(() => {
+    let alive = true
+    fetchPublicPlans()
+      .then((list) => {
+        if (!alive) return
+        const allowed = new Set(['founder', 'member', 'sadharan'])
+        setPlansFetchFailed(false)
+        setPlans((Array.isArray(list) ? list : []).filter((p) => allowed.has(p?.code)))
+      })
+      .catch(() => {
+        if (!alive) return
+        setPlansFetchFailed(true)
+        setPlans([])
+      })
+    return () => { alive = false }
+  }, [])
 
   const prev = () => setStep((s) => {
     if (!OTP_ENABLED && s === 3) return 1
@@ -370,8 +541,24 @@ export default function Register() {
       setError(t.nameRequired)
       return
     }
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    if (!form.email || !form.email.trim()) {
+      setError(t.invalidEmailReq)
+      return
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
       setError(t.invalidEmail)
+      return
+    }
+    if (!form.dob) {
+      setError(t.dobRequired)
+      return
+    }
+    if (!form.gender) {
+      setError(t.genderRequired)
+      return
+    }
+    if (!form.maritalStatus) {
+      setError(t.maritalRequired)
       return
     }
     if (!form.password || form.password.length < 6) {
@@ -403,11 +590,32 @@ export default function Register() {
 
   const handleEducationNext = () => {
     setError('')
+    if (!form.education) {
+      setError(t.educationRequired)
+      return
+    }
+    if (!form.occupation) {
+      setError(t.occupationRequired)
+      return
+    }
+    if (!form.department || !form.department.trim()) {
+      setError(t.departmentRequired)
+      return
+    }
+    if (!form.designation || !form.designation.trim()) {
+      setError(t.designationRequired)
+      return
+    }
     setStep(7)
   }
 
   const handleGotraNext = () => {
     setError('')
+    const selfVal = gotra?.self === '__custom' ? (gotraform?.self || '') : (gotra?.self || '')
+    if (!selfVal || !String(selfVal).trim()) {
+      setError(t.gotraSelfRequired)
+      return
+    }
     setStep(8)
   }
 
@@ -416,6 +624,9 @@ export default function Register() {
       setError('')
       if (!janAadhar) {
         setError(t.requiredJan); return
+      }
+      if (!profilePhoto) {
+        setError(t.requiredPhoto); return
       }
       const normalizedRef = ref.trim().toUpperCase()
       if (!normalizedRef) {
@@ -427,8 +638,13 @@ export default function Register() {
         return
       }
       setLoading(true)
-      const ja = janAadhar ? (await upload('/uploads/file', janAadhar)).url : null
-      const pf = profilePhoto ? (await upload('/uploads/file', profilePhoto)).url : null
+      const ja = await resolveUploadUrl(janAadhar, upload)
+      const pf = await resolveUploadUrl(profilePhoto, upload)
+
+      const janRef = ja ? { url: ja, name: janAadhar?.name || 'Jan Aadhaar' } : null
+      const photoRef = pf ? { url: pf, name: profilePhoto?.name || 'Profile Photo' } : null
+      if (janRef) setJanAadhar(janRef)
+      if (photoRef) setProfilePhoto(photoRef)
 
       const payload = {
         phone,
@@ -449,12 +665,30 @@ export default function Register() {
 
       if (TEST_BYPASS_PHONEPE) {
         await post('/auth/register', { ...payload, paymentBypassed: true, otpBypassed: !OTP_ENABLED })
+        clearDraft()
         navigate(makePath('login'))
         return
       }
 
       // Production (PhonePe):
       const res = await post('/payments/phonepe/create', payload)
+      if (!res?.redirectUrl) throw new Error('PhonePe: missing redirectUrl')
+
+      // Ensure persisted refs are stored before leaving the SPA
+      const prev = readDraft() || {}
+      writeDraft({
+        ...prev,
+        step: 8,
+        phone,
+        ref: normalizedRef,
+        form,
+        gotra,
+        gotraform,
+        plan,
+        janAadhar: janRef,
+        profilePhoto: photoRef,
+        updatedAt: Date.now(),
+      })
       window.location.href = res.redirectUrl
     } catch (e) {
       console.error(e)
@@ -651,6 +885,7 @@ export default function Register() {
                   onChange={(v) => setForm({ ...form, maritalStatus: v })}
                   options={MARITAL[lang]}
                   placeholder={t.placeholders.marital}
+                  required
                 />
 
                 <div className="relative">
@@ -759,6 +994,7 @@ export default function Register() {
                   onChange={(v) => setForm({ ...form, education: v })}
                   options={EDUCATION[lang]}
                   placeholder={t.placeholders.education}
+                  required
                 />
 
 
@@ -768,6 +1004,7 @@ export default function Register() {
                   onChange={(v) => setForm({ ...form, occupation: v })}
                   options={OCCUPATION[lang]}
                   placeholder={t.placeholders.occupation}
+                  required
                 />
                 <label className="block text-sm">
                         <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
@@ -798,6 +1035,7 @@ export default function Register() {
                     onChange={(v) => setGotra({ ...gotra, self: v === '__custom' ? '__custom' : v })}
                     options={gotraOpts}
                     placeholder={t.placeholders.gotra}
+                    required
                   />
                   {gotra?.self == '__custom' && (
                     <input
@@ -880,27 +1118,39 @@ export default function Register() {
                       : 'Choose a membership plan before proceeding to payment.'}
                   </p>
                   <div className="mt-3 grid gap-3 md:grid-cols-3">
-                    {[
-                      { id: 'founder', title: lang === 'hi' ? 'संस्थापक' : 'Founder', price: '₹10,000' },
-                      { id: 'member', title: lang === 'hi' ? 'सदस्य' : 'Member', price: '₹5,000' },
-                      { id: 'sadharan', title: lang === 'hi' ? 'साधारण' : 'Sadharan', price: '₹1,000' },
-                    ].map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => setPlan(p.id)}
-                        className={[
-                          'rounded-2xl border p-4 text-left shadow-sm transition',
-                          plan === p.id
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-slate-200 hover:border-blue-200 hover:shadow'
-                        ].join(' ')}
-                        aria-pressed={plan === p.id}
-                      >
-                        <div className="text-sm font-semibold text-slate-900">{p.title}</div>
-                        <div className="text-lg font-bold text-blue-700 mt-1">{p.price}</div>
-                      </button>
-                    ))}
+                    {plans.length > 0 && plans.map((p) => {
+                      const id = p.code
+                      const title = lang === 'hi' ? (p.titleHi || p.titleEn) : p.titleEn
+                      const price = `₹${Number(p.price || 0).toLocaleString('en-IN')}`
+                      const disabled = p.active === false
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => !disabled && setPlan(id)}
+                          className={[
+                            'rounded-2xl border p-4 text-left shadow-sm transition',
+                            disabled ? 'opacity-50 cursor-not-allowed' : '',
+                            plan === id
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-slate-200 hover:border-blue-200 hover:shadow'
+                          ].join(' ')}
+                          aria-pressed={plan === id}
+                          disabled={disabled}
+                          title={disabled ? (lang === 'hi' ? 'यह प्लान उपलब्ध नहीं है' : 'This plan is not available') : undefined}
+                        >
+                          <div className="text-sm font-semibold text-slate-900">{title}</div>
+                          <div className="text-lg font-bold text-blue-700 mt-1">{price}</div>
+                        </button>
+                      )
+                    })}
+                    {plans.length === 0 && (
+                      <div className="md:col-span-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                        {plansFetchFailed
+                          ? (lang === 'hi' ? 'प्लान लोड नहीं हो पाए। कृपया बाद में पुनः प्रयास करें।' : 'Unable to load plans. Please try again later.')
+                          : (lang === 'hi' ? 'कोई प्लान कॉन्फ़िगर नहीं है।' : 'No plans configured.')}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -919,12 +1169,13 @@ export default function Register() {
                   onFile={setProfilePhoto}
                   value={profilePhoto}
                   hint={t.uploads.photoHint}
+                  required
                 />
 
                 <div className="flex flex-wrap items-center gap-3">
                   <button
                     onClick={finalize}
-                    disabled={loading}
+                    disabled={loading || plans.length === 0}
                     className="px-5 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-60"
                   >
                     {loading ? '…' : t.proceed}
