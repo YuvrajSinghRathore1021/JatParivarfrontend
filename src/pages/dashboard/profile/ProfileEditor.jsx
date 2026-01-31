@@ -26,6 +26,12 @@ export default function ProfileEditor() {
 
   const { data, isLoading } = useQuery({ queryKey: ['profile', 'me'], queryFn: fetchMyProfile })
   const { gotraOptions: gotraOptionsList, gotraValueSet } = useGotraOptions(lang)
+
+  const gotraChoice = (value) => {
+    const v = (value || '').toString().trim()
+    if (v && gotraValueSet?.has(v)) return v
+    return '__custom'
+  }
   const [geoCodes, setGeoCodes] = useState({ stateCode: '', districtCode: '', cityCode: '' })
   const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(
     geoCodes.stateCode,
@@ -619,70 +625,70 @@ export default function ProfileEditor() {
             setForm={setForm}
             {...{ states, districts, cities, stateOptions, districtOptions, cityOptions, lang }}
           />
-        )}
+	        )}
 
-        <section className="grid gap-4 md:grid-cols-2">
-          <SelectField
-            label={lang === 'hi' ? 'गोत्र (स्व)' : 'Gotra (Self)'}
-            value={gotraValueSet.has(form.gotra?.self) ? form.gotra?.self : '__custom'}
-            onChange={(value) => updateGotraField('self', value === '__custom' ? '' : value)}
-            options={gotraOptionsList}
-            placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
-          />
-          {!gotraValueSet.has(form.gotra?.self) && (
-            <input
-              value={form.gotra?.self || ''}
-              onChange={(e) => updateGotraField('self', e.target.value)}
-              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-            />
-          )}
-          <SelectField
-            label={lang === 'hi' ? 'गोत्र (माता)' : 'Gotra (Mother)'}
-            value={gotraValueSet.has(form.gotra?.mother) ? form.gotra?.mother : '__custom'}
-            onChange={(value) => updateGotraField('mother', value === '__custom' ? '' : value)}
-            options={gotraOptionsList}
-            placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
-          />
-          {!gotraValueSet.has(form.gotra?.mother) && (
-            <input
-              value={form.gotra?.mother || ''}
-              onChange={(e) => updateGotraField('mother', e.target.value)}
-              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-            />
-          )}
-          <SelectField
-            label={lang === 'hi' ? 'गोत्र (दादी)' : 'Gotra (Dadi)'}
-            value={gotraValueSet.has(form.gotra?.dadi) ? form.gotra?.dadi : '__custom'}
-            onChange={(value) => updateGotraField('dadi', value === '__custom' ? '' : value)}
-            options={gotraOptionsList}
-            placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
-          />
-          {(form.gotra?.dadi && !gotraValueSet.has(form.gotra?.dadi)) && (
-            <input
-              value={form.gotra?.dadi || ''}
-              onChange={(e) => updateGotraField('dadi', e.target.value)}
-              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-            />
-          )}
-          <SelectField
-            label={lang === 'hi' ? 'गोत्र (नानी)' : 'Gotra (Nani)'}
-            value={gotraValueSet.has(form.gotra?.nani) ? form.gotra?.nani : '__custom'}
-            onChange={(value) => updateGotraField('nani', value === '__custom' ? '' : value)}
-            options={gotraOptionsList}
-            placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
-          />
-          {(form.gotra?.nani && !gotraValueSet.has(form.gotra?.nani)) && (
-            <input
-              value={form.gotra?.nani || ''}
-              onChange={(e) => updateGotraField('nani', e.target.value)}
-              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-            />
-          )}
-        </section>
+		        <section className="grid gap-4 md:grid-cols-2">
+	          <SelectField
+	            label={lang === 'hi' ? 'गोत्र (स्व)' : 'Gotra (Self)'}
+	            value={gotraChoice(form.gotra?.self)}
+	            onChange={(value) => updateGotraField('self', value === '__custom' ? '' : value)}
+	            options={gotraOptionsList}
+	            placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
+	          />
+	          {gotraChoice(form.gotra?.self) === '__custom' && (
+	            <input
+	              value={form.gotra?.self || ''}
+	              onChange={(e) => updateGotraField('self', e.target.value)}
+	              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	            />
+	          )}
+	          <SelectField
+	            label={lang === 'hi' ? 'गोत्र (माता)' : 'Gotra (Mother)'}
+	            value={gotraChoice(form.gotra?.mother)}
+	            onChange={(value) => updateGotraField('mother', value === '__custom' ? '' : value)}
+	            options={gotraOptionsList}
+	            placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
+	          />
+	          {gotraChoice(form.gotra?.mother) === '__custom' && (
+	            <input
+	              value={form.gotra?.mother || ''}
+	              onChange={(e) => updateGotraField('mother', e.target.value)}
+	              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	            />
+	          )}
+	          <SelectField
+	            label={lang === 'hi' ? 'गोत्र (दादी)' : 'Gotra (Dadi)'}
+	            value={gotraChoice(form.gotra?.dadi)}
+	            onChange={(value) => updateGotraField('dadi', value === '__custom' ? '' : value)}
+	            options={gotraOptionsList}
+	            placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
+	          />
+	          {gotraChoice(form.gotra?.dadi) === '__custom' && (
+	            <input
+	              value={form.gotra?.dadi || ''}
+	              onChange={(e) => updateGotraField('dadi', e.target.value)}
+	              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	            />
+	          )}
+	          <SelectField
+	            label={lang === 'hi' ? 'गोत्र (नानी)' : 'Gotra (Nani)'}
+	            value={gotraChoice(form.gotra?.nani)}
+	            onChange={(value) => updateGotraField('nani', value === '__custom' ? '' : value)}
+	            options={gotraOptionsList}
+	            placeholder={lang === 'hi' ? 'गोत्र चुनें' : 'Select gotra'}
+	          />
+	          {gotraChoice(form.gotra?.nani) === '__custom' && (
+	            <input
+	              value={form.gotra?.nani || ''}
+	              onChange={(e) => updateGotraField('nani', e.target.value)}
+	              placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	            />
+	          )}
+	        </section>
 
         <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5 space-y-4">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -908,17 +914,15 @@ const roleLabel = (role, lang) => {
   if (lang === 'hi') {
     switch (role) {
       case 'founder': return 'संस्थापक'
-      case 'member': return 'प्रबंधन'
+      case 'management': return 'प्रबंधन'
       case 'sadharan': return 'साधारण सदस्य'
-      case 'admin': return 'प्रशासक'
       default: return role || '—'
     }
   }
   switch (role) {
     case 'founder': return 'Founder'
-    case 'member': return 'Management'
+    case 'management': return 'Management'
     case 'sadharan': return 'Sadharan'
-    case 'admin': return 'Admin'
     default: return role || '—'
   }
 }
@@ -926,6 +930,6 @@ const roleLabel = (role, lang) => {
 const spotlightOptionValues = (role) => {
   const values = ['none']
   if (role === 'founder') values.unshift('founder')
-  if (role === 'member') values.unshift('management')
+  if (role === 'management') values.unshift('management')
   return values
 }

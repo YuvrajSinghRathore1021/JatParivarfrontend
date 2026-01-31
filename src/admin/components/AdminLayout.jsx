@@ -1,31 +1,12 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
 
-const menu = [
-  { label: 'Dashboard', to: '/admin', exact: true },
-  { label: 'Members', to: '/admin/members' },
-  { label: 'Founders', to: '/admin/founders' },
-  { label: 'Management', to: '/admin/management' },
-  { label: 'Payments', to: '/admin/payments' },
-  { label: 'Plans', to: '/admin/plans' },
-  { label: 'Achievements', to: '/admin/achievements' },
-  { label: 'Content', to: '/admin/pages' },
-  { label: 'News', to: '/admin/news' },
-  { label: 'History', to: '/admin/history' },
-  { label: 'Institutions', to: '/admin/institutions' },
-  { label: 'Matrimony', to: '/admin/matrimony' },
-  { label: 'Samaj ke Gaurav', to: '/admin/samaj_ke_gaurav' },
-  { label: 'Jobs', to: '/admin/jobs' },
-  { label: 'Settings', to: '/admin/settings' },
-  { label: 'Audit Log', to: '/admin/audit-log' }
-]
-
-function NavigationLinks({ onNavigate }) {
+function NavigationLinks({ items, onNavigate }) {
   return (
     <ul className="py-2">
-      {menu.map((item) => (
+      {items.map((item) => (
         <li key={item.to}>
           <NavLink
             to={item.to}
@@ -47,6 +28,33 @@ export function AdminLayout() {
   const { admin, logout, setAdmin, token } = useAdminAuth()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const menu = useMemo(() => {
+    const items = [
+      { label: 'Dashboard', to: '/admin', exact: true },
+      { label: 'Members', to: '/admin/members' },
+      { label: 'Founders', to: '/admin/founders' },
+      { label: 'Management', to: '/admin/management' },
+      { label: 'Payments', to: '/admin/payments' },
+      { label: 'Plans', to: '/admin/plans' },
+      { label: 'Achievements', to: '/admin/achievements' },
+      { label: 'Content', to: '/admin/pages' },
+      { label: 'News', to: '/admin/news' },
+      { label: 'History', to: '/admin/history' },
+      { label: 'Institutions', to: '/admin/institutions' },
+      { label: 'Matrimony', to: '/admin/matrimony' },
+      { label: 'Samaj ke Gaurav', to: '/admin/samaj_ke_gaurav' },
+      { label: 'Jobs', to: '/admin/jobs' },
+      { label: 'Settings', to: '/admin/settings' },
+      { label: 'Locations', to: '/admin/locations' },
+      { label: 'Gotras', to: '/admin/gotras' },
+      { label: 'Audit Log', to: '/admin/audit-log' },
+    ]
+    if (admin?.roles?.includes('SUPER_ADMIN')) {
+      items.push({ label: 'Admins', to: '/admin/admins' })
+    }
+    return items
+  }, [admin?.roles])
 
   const handleLogout = async () => {
     try {
@@ -73,7 +81,7 @@ export function AdminLayout() {
           <p className="text-xs text-slate-500 ">{admin?.name}</p>
         </div>
         <nav className="flex-1 overflow-y-auto">
-          <NavigationLinks />
+          <NavigationLinks items={menu} />
         </nav>
         <button onClick={handleLogout} className="m-4 px-3 py-2 text-sm border border-slate-200 rounded hover:bg-slate-50">
           Logout
@@ -130,7 +138,7 @@ export function AdminLayout() {
               </button>
             </div>
             <nav className="flex-1 overflow-y-auto">
-              <NavigationLinks onNavigate={() => setMobileOpen(false)} />
+              <NavigationLinks items={menu} onNavigate={() => setMobileOpen(false)} />
             </nav>
             <button onClick={handleLogoutAndClose} className="m-4 px-3 py-2 text-sm border border-slate-200 rounded hover:bg-slate-50">
               Logout

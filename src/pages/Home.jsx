@@ -280,7 +280,7 @@ const DEFAULT_IMPACT = {
   ],
 }
 
-const PLAN_ORDER = ['founder', 'member', 'sadharan']
+const PLAN_ORDER = ['founder', 'management', 'sadharan']
 
 const PLAN_FALLBACKS = {
   founder: {
@@ -292,11 +292,11 @@ const PLAN_FALLBACKS = {
     buttonTextEn: 'Join now',
     buttonTextHi: 'जुड़ें',
   },
-  member: {
-    titleEn: 'Member',
-    titleHi: 'मेम्बर',
-    descriptionEn: 'Appears on member carousel and gains full access.',
-    descriptionHi: 'मेंबर करूसल पर दिखाई देंगे और सभी सेवाएँ उपलब्ध।',
+  management: {
+    titleEn: 'Management',
+    titleHi: 'प्रबंधन',
+    descriptionEn: 'Appears on management carousel and gains full access.',
+    descriptionHi: 'प्रबंधन करूसल पर दिखाई देंगे और सभी सेवाएँ उपलब्ध।',
     price: 50000,
     buttonTextEn: 'Join now',
     buttonTextHi: 'जुड़ें',

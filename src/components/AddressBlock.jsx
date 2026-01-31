@@ -118,6 +118,9 @@ export default function AddressBlock(props) {
     const { title, formKey, form, setForm, lang } = props
 
     const f = form[formKey]
+    const stateCodeValue = f?.stateCode || OTHER
+    const districtCodeValue = f?.districtCode || OTHER
+    const cityCodeValue = f?.cityCode || OTHER
 
     // ⭐ Correct Hook Call
     const { states, districts, cities, stateOptions, districtOptions, cityOptions } = useGeoOptions(f?.stateCode, f?.districtCode, lang)
@@ -162,7 +165,7 @@ export default function AddressBlock(props) {
             {/* STATE */}
             <SelectField
                 label={lang === 'hi' ? 'राज्य' : 'State'}
-                value={f?.stateCode}
+                value={stateCodeValue}
                 options={[
                     ...stateOptions,
                     { value: OTHER, label: lang === 'hi' ? 'सूची में नहीं' : 'Not in list' }
@@ -175,9 +178,9 @@ export default function AddressBlock(props) {
                                 ...prev[formKey],
                                 stateCode: OTHER,
                                 state: '',
-                                districtCode: '',
+                                districtCode: OTHER,
                                 district: '',
-                                cityCode: '',
+                                cityCode: OTHER,
                                 city: '',
                             }
                         }))
@@ -201,10 +204,10 @@ export default function AddressBlock(props) {
             />
 
             {/* MANUAL STATE INPUT */}
-            {f?.stateCode === OTHER && (
+            {stateCodeValue === OTHER && (
                 <input
                     placeholder={lang === 'hi' ? 'राज्य लिखें' : 'Enter State'}
-                    value={f?.state}
+                    value={f?.state || ''}
                     onChange={(e) =>
                         setForm(prev => ({
                             ...prev,
@@ -219,7 +222,7 @@ export default function AddressBlock(props) {
             {/* DISTRICT */}
             <SelectField
                 label={lang === 'hi' ? 'ज़िला' : 'District'}
-                value={f?.districtCode}
+                value={districtCodeValue}
                 options={[
                     ...districtOptions,
                     { value: OTHER, label: lang === 'hi' ? 'सूची में नहीं' : 'Not in list' }
@@ -233,7 +236,7 @@ export default function AddressBlock(props) {
                                 ...prev[formKey],
                                 districtCode: OTHER,
                                 district: '',
-                                cityCode: '',
+                                cityCode: OTHER,
                                 city: '',
                             }
                         }))
@@ -254,10 +257,10 @@ export default function AddressBlock(props) {
                 }}
             />
 
-            {f?.districtCode === OTHER && (
+            {districtCodeValue === OTHER && (
                 <input
                     placeholder={lang === 'hi' ? 'ज़िला लिखें' : 'Enter District'}
-                    value={f?.district}
+                    value={f?.district || ''}
                     onChange={(e) =>
                         setForm(prev => ({
                             ...prev,
@@ -273,7 +276,7 @@ export default function AddressBlock(props) {
             {/* CITY */}
             <SelectField
                 label={lang === 'hi' ? 'शहर' : 'City'}
-                value={f?.cityCode}
+                value={cityCodeValue}
                 options={[
                     ...cityOptions,
                     { value: OTHER, label: lang === 'hi' ? 'सूची में नहीं' : 'Not in list' }
@@ -304,10 +307,10 @@ export default function AddressBlock(props) {
                 }}
             />
 
-            {f?.cityCode === OTHER && (
+            {cityCodeValue === OTHER && (
                 <input
                     placeholder={lang === 'hi' ? 'शहर लिखें' : 'Enter City'}
-                    value={f?.city}
+                    value={f?.city || ''}
                     onChange={(e) =>
                         setForm(prev => ({
                             ...prev,

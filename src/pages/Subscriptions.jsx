@@ -126,15 +126,15 @@ const plans = {
       'कम्युनिटी सक्सेस टीम से प्राथमिकता सहायता।',
     ],
   },
-  member: {
+  management: {
     amount: '₹50,000',
     perksEn: [
-      'Featured on members carousel after admin approval.',
+      'Featured on management listing after admin approval.',
       'Access to marriage, jobs, dharamshala and sanstha tools.',
       'PhonePe auto-renew reminders and invoices.',
     ],
     perksHi: [
-      'एडमिन स्वीकृति के बाद मेम्बर करूसल में लिस्टिंग।',
+      'एडमिन स्वीकृति के बाद प्रबंधन सूची में लिस्टिंग।',
       'विवाह, नौकरियाँ, धर्मशाला व संस्था मॉड्यूल तक पहुँच।',
       'PhonePe ऑटो-रीमाइंडर और इनवॉइस उपलब्ध।',
     ],
@@ -144,12 +144,12 @@ const plans = {
     perksEn: [
       'Secure access to all member-only services.',
       'Post and manage listings with admin approvals.',
-      'Upgrade anytime to Founder or Member tiers.',
+      'Upgrade anytime to Founder or Management tiers.',
     ],
     perksHi: [
       'सभी सदस्य सेवाओं तक सुरक्षित पहुँच।',
       'एडमिन अनुमोदन के साथ लिस्टिंग पोस्ट करें।',
-      'कभी भी फाउंडर या मेम्बर प्लान में अपग्रेड करें।',
+      'कभी भी फाउंडर या प्रबंधन प्लान में अपग्रेड करें।',
     ],
   },
 }
@@ -187,10 +187,10 @@ export default function Subscriptions() {
         amount: priceByCode.founder ? `₹${priceByCode.founder.toLocaleString('en-IN')}` : plans.founder.amount,
       },
       {
-        id: 'member',
-        title: lang === 'hi' ? 'मेम्बर योजना' : 'Member plan',
-        ...plans.member,
-        amount: priceByCode.member ? `₹${priceByCode.member.toLocaleString('en-IN')}` : plans.member.amount,
+        id: 'management',
+        title: lang === 'hi' ? 'प्रबंधन योजना' : 'Management plan',
+        ...plans.management,
+        amount: priceByCode.management ? `₹${priceByCode.management.toLocaleString('en-IN')}` : plans.management.amount,
       },
       {
         id: 'sadharan',

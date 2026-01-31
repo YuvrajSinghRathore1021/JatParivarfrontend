@@ -20,6 +20,9 @@ import SettingsPage from './pages/Settings.jsx'
 import JobsPage from './pages/Jobs.jsx'
 import AuditLogPage from './pages/AuditLog.jsx'
 import MatrimonyDetail from './pages/MatrimonyDetail.jsx'
+import LocationsPage from './pages/Locations.jsx'
+import GotrasPage from './pages/Gotras.jsx'
+import AdminsPage from './pages/Admins.jsx'
 
 import { adminApiFetch } from './api/client.js'
 {/* Samaj ke Gaurav */ }
@@ -74,6 +77,9 @@ function AdminRoutes() {
         <Route path="matrimony/:id" element={<MatrimonyDetail />} />
 
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="locations" element={<LocationsPage />} />
+        <Route path="gotras" element={<GotrasPage />} />
+        <Route path="admins" element={<AdminsPage />} />
         <Route path="audit-log" element={<AuditLogPage />} />
         <Route path="samaj_ke_gaurav" element={<SamajkeGaurav />} />
         <Route path="samaj_ke_gaurav/:id" element={<SamajkeGauravDetail />} />

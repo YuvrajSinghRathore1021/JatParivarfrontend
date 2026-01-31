@@ -5,7 +5,7 @@ import { adminApiFetch } from '../api/client.js'
 
 const PLAN_CONFIG = [
   { code: 'founder', label: 'Founder', labelHi: 'फाउंडर' },
-  { code: 'member', label: 'Member', labelHi: 'मेम्बर' },
+  { code: 'management', label: 'Management', labelHi: 'प्रबंधन' },
   { code: 'sadharan', label: 'Sadharan', labelHi: 'साधारण' },
 ]
 
@@ -30,7 +30,7 @@ export default function PlansPage() {
       <div>
         <h1 className="text-xl font-semibold">Membership plans</h1>
         <p className="text-sm text-slate-500">
-          Configure founder, member, and साधारण plans shown across the public site.
+          Configure founder, management, and साधारण plans shown across the public site.
         </p>
       </div>
 
