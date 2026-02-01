@@ -435,9 +435,19 @@ export default function Register() {
     fetchPublicPlans()
       .then((list) => {
         if (!alive) return
-        const allowed = new Set(['founder', 'member', 'sadharan'])
+        const allowed = new Set(['founder', 'management', 'sadharan'])
+        const order = { founder: 0, management: 1, sadharan: 2 }
         setPlansFetchFailed(false)
-        setPlans((Array.isArray(list) ? list : []).filter((p) => allowed.has(p?.code)))
+        setPlans(
+          (Array.isArray(list) ? list : [])
+            .filter((p) => allowed.has(p?.code))
+            .sort((a, b) => {
+              const ao = order[a.code] ?? 99
+              const bo = order[b.code] ?? 99
+              if (ao !== bo) return ao - bo
+              return Number(b.price || 0) - Number(a.price || 0)
+            })
+        )
       })
       .catch(() => {
         if (!alive) return
@@ -611,7 +621,7 @@ export default function Register() {
 
   const handleGotraNext = () => {
     setError('')
-    const selfVal = gotra?.self === '__custom' ? (gotraform?.self || '') : (gotra?.self || '')
+    const selfVal = gotraChoice(gotra?.self) === '__custom' ? (gotraform?.self || '') : (gotra?.self || '')
     if (!selfVal || !String(selfVal).trim()) {
       setError(t.gotraSelfRequired)
       return
@@ -651,10 +661,10 @@ export default function Register() {
         refCode: normalizedRef,
         form,
         gotra: {
-          self: gotra?.self == '__custom' ? gotraform?.self : gotra?.self,
-          mother: gotra?.mother == '__custom' ? gotraform?.mother : gotra?.mother,
-          nani: gotra?.nani == '__custom' ? gotraform?.nani : gotra?.nani,
-          dadi: gotra?.dadi == '__custom' ? gotraform?.dadi : gotra?.dadi
+          self: gotraChoice(gotra?.self) === '__custom' ? (gotraform?.self || '') : (gotra?.self || ''),
+          mother: gotraChoice(gotra?.mother) === '__custom' ? (gotraform?.mother || '') : (gotra?.mother || ''),
+          nani: gotraChoice(gotra?.nani) === '__custom' ? (gotraform?.nani || '') : (gotra?.nani || ''),
+          dadi: gotraChoice(gotra?.dadi) === '__custom' ? (gotraform?.dadi || '') : (gotra?.dadi || ''),
         },
 
         janAadharUrl: ja,
@@ -699,6 +709,12 @@ export default function Register() {
   }
 
   const { gotraOptions: gotraOpts, gotraValueSet } = useGotraOptions(lang)
+
+  const gotraChoice = (value) => {
+    const v = (value || '').toString().trim()
+    if (v && gotraValueSet?.has(v)) return v
+    return '__custom'
+  }
   const [sameAsCurrent, setSameAsCurrent] = useState(true)
   const [sameAsOccupation, setSameAsOccupation] = useState(true)
   useEffect(() => {
@@ -1026,77 +1042,77 @@ export default function Register() {
             )}
 
             {/* STEP 7 – Gotra */}
-            {step === 7 && (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <SelectField
-                    label={t.gotraSelf}
-                    value={gotraValueSet.has(gotra?.self) ? gotra?.self : '__custom'}
-                    onChange={(v) => setGotra({ ...gotra, self: v === '__custom' ? '__custom' : v })}
-                    options={gotraOpts}
-                    placeholder={t.placeholders.gotra}
-                    required
-                  />
-                  {gotra?.self == '__custom' && (
-                    <input
-                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                      value={gotraform.self}
-                      onChange={handleChange('self')}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                    />
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <SelectField
-                    label={t.gotraMother}
-                    value={gotraValueSet.has(gotra?.mother) ? gotra?.mother : '__custom'}
-                    onChange={(v) => setGotra({ ...gotra, mother: v === '__custom' ? '__custom' : v })}
-                    options={gotraOpts}
-                    placeholder={t.placeholders.gotra}
-                  />
-                  {gotra?.mother == '__custom' && (
-                    <input
-                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                      value={gotraform.mother}
-                      onChange={handleChange('mother')}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                    />
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <SelectField
-                    label={t.gotraDadi}
-                    value={gotraValueSet.has(gotra?.dadi) ? gotra?.dadi : '__custom'}
-                    onChange={(v) => setGotra({ ...gotra, dadi: v === '__custom' ? '__custom' : v })}
-                    options={gotraOpts}
-                    placeholder={t.placeholders.gotra}
-                  />
-                  {gotra?.dadi == '__custom' && (
-                    <input
-                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                      value={gotraform.dadi}
-                      onChange={handleChange('dadi')}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                    />
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <SelectField
-                    label={t.gotraNani}
-                    value={gotraValueSet.has(gotra?.nani) ? gotra?.nani : '__custom'}
-                    onChange={(v) => setGotra({ ...gotra, nani: v === '__custom' ? '__custom' : v })}
-                    options={gotraOpts}
-                    placeholder={t.placeholders.gotra}
-                  />
-                  {gotra?.nani == '__custom' && (
-                    <input
-                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                      value={gotraform.nani}
-                      onChange={handleChange('nani')}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                    />
-                  )}
-                </div>
+	            {step === 7 && (
+	              <div className="grid gap-4 md:grid-cols-2">
+	                <div className="space-y-2">
+	                  <SelectField
+	                    label={t.gotraSelf}
+	                    value={gotraChoice(gotra?.self)}
+	                    onChange={(v) => setGotra({ ...gotra, self: v === '__custom' ? '__custom' : v })}
+	                    options={gotraOpts}
+	                    placeholder={t.placeholders.gotra}
+	                    required
+	                  />
+	                  {gotraChoice(gotra?.self) === '__custom' && (
+	                    <input
+	                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                      value={gotraform.self}
+	                      onChange={handleChange('self')}
+	                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	                    />
+	                  )}
+	                </div>
+	                <div className="space-y-2">
+	                  <SelectField
+	                    label={t.gotraMother}
+	                    value={gotraChoice(gotra?.mother)}
+	                    onChange={(v) => setGotra({ ...gotra, mother: v === '__custom' ? '__custom' : v })}
+	                    options={gotraOpts}
+	                    placeholder={t.placeholders.gotra}
+	                  />
+	                  {gotraChoice(gotra?.mother) === '__custom' && (
+	                    <input
+	                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                      value={gotraform.mother}
+	                      onChange={handleChange('mother')}
+	                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	                    />
+	                  )}
+	                </div>
+	                <div className="space-y-2">
+	                  <SelectField
+	                    label={t.gotraDadi}
+	                    value={gotraChoice(gotra?.dadi)}
+	                    onChange={(v) => setGotra({ ...gotra, dadi: v === '__custom' ? '__custom' : v })}
+	                    options={gotraOpts}
+	                    placeholder={t.placeholders.gotra}
+	                  />
+	                  {gotraChoice(gotra?.dadi) === '__custom' && (
+	                    <input
+	                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                      value={gotraform.dadi}
+	                      onChange={handleChange('dadi')}
+	                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	                    />
+	                  )}
+	                </div>
+	                <div className="space-y-2">
+	                  <SelectField
+	                    label={t.gotraNani}
+	                    value={gotraChoice(gotra?.nani)}
+	                    onChange={(v) => setGotra({ ...gotra, nani: v === '__custom' ? '__custom' : v })}
+	                    options={gotraOpts}
+	                    placeholder={t.placeholders.gotra}
+	                  />
+	                  {gotraChoice(gotra?.nani) === '__custom' && (
+	                    <input
+	                      placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                      value={gotraform.nani}
+	                      onChange={handleChange('nani')}
+	                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	                    />
+	                  )}
+	                </div>
 
                 <div className="md:col-span-2 flex gap-2">
                   <button onClick={prev} className="px-5 py-3 rounded-xl border">{t.back}</button>

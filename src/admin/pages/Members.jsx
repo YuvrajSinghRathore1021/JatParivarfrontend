@@ -126,9 +126,8 @@ export default function MembersPage() {
             >
               <option value="">All roles</option>
               <option value="sadharan">Sadharan</option>
-              <option value="member">Management</option>
+              <option value="management">Management</option>
               <option value="founder">Founder</option>
-              <option value="admin">Admin</option>
             </select>
           </div>
           <div>
@@ -515,6 +514,12 @@ function MemberCreateButton({ onCreated }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gotraValueSet])
 
+  const gotraChoice = (value) => {
+    const v = (value || '').toString().trim()
+    if (v && gotraValueSet?.has(v)) return v
+    return '__custom'
+  }
+
   const submit = async (e) => {
     e.preventDefault()
     setSaving(true)
@@ -538,10 +543,10 @@ function MemberCreateButton({ onCreated }) {
         avatarUrl: form.avatarUrl || undefined,
         janAadhaarUrl: form.janAadhaarUrl || undefined,
         gotra: {
-          self: form.gotra?.self == '__custom' ? gotraform?.self : form.gotra?.self,
-          mother: form.gotra?.mother == '__custom' ? gotraform?.mother : form.gotra?.mother,
-          nani: form.gotra?.nani == '__custom' ? gotraform?.nani : form.gotra?.nani,
-          dadi: form.gotra?.dadi == '__custom' ? gotraform?.dadi : form.gotra?.dadi
+          self: gotraChoice(form.gotra?.self) === '__custom' ? (gotraform?.self || '') : (form.gotra?.self || ''),
+          mother: gotraChoice(form.gotra?.mother) === '__custom' ? (gotraform?.mother || '') : (form.gotra?.mother || ''),
+          nani: gotraChoice(form.gotra?.nani) === '__custom' ? (gotraform?.nani || '') : (form.gotra?.nani || ''),
+          dadi: gotraChoice(form.gotra?.dadi) === '__custom' ? (gotraform?.dadi || '') : (form.gotra?.dadi || ''),
         },
 
         occupationAddress: form.occupationAddress || {
@@ -673,9 +678,8 @@ function MemberCreateButton({ onCreated }) {
               className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
             >
               <option value="sadharan">Sadharan</option>
-              <option value="member">Management</option>
+              <option value="management">Management</option>
               <option value="founder">Founder</option>
-              <option value="admin">Admin</option>
             </select>
           </div>
 
@@ -871,72 +875,72 @@ function MemberCreateButton({ onCreated }) {
               />
             )}
           </div>
-          <div className="md:col-span-2 grid gap-3 md:grid-cols-2 rounded-xl border border-slate-200 p-4">
-            <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
-            <div className="space-y-2"><SelectField
-              label="Self"
-              value={gotraValueSet.has(form.gotra?.self) ? form.gotra?.self : '__custom'}
-              onChange={(value) => handleNestedChange('gotra', 'self', value)}
-              options={gotraOptionsList}
-              placeholder="Select gotra"
-            />
-              {form.gotra?.self == '__custom' && (
-                <input
-                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                  value={gotraform.self}
-                  onChange={handleChangeNew('self')}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                />
-              )}
-            </div>
-
-            <div className="space-y-2"><SelectField
-              label="Mother"
-              value={gotraValueSet.has(form.gotra?.mother) ? form.gotra?.mother : '__custom'}
-              onChange={(value) => handleNestedChange('gotra', 'mother', value)}
-              options={gotraOptionsList}
-              placeholder="Select gotra"
-            />
-              {form.gotra?.mother == '__custom' && (
-                <input
-                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                  value={gotraform.mother}
-                  onChange={handleChangeNew('mother')}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                />
-              )}</div>
-
-            <div className="space-y-2"><SelectField
-              label="Dadi"
-              value={gotraValueSet.has(form.gotra?.dadi) ? form.gotra?.dadi : '__custom'}
-              onChange={(value) => handleNestedChange('gotra', 'dadi', value)}
-              options={gotraOptionsList}
-              placeholder="Select gotra"
-            />
-              {form.gotra?.dadi == '__custom' && (
-                <input
-                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                  value={gotraform.dadi}
-                  onChange={handleChangeNew('dadi')}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                />
-              )}</div>
-
-            <div className="space-y-2"><SelectField
-              label="Nani"
-              value={gotraValueSet.has(form.gotra?.nani) ? form.gotra?.nani : '__custom'}
-              onChange={(value) => handleNestedChange('gotra', 'nani', value)}
-              options={gotraOptionsList}
-              placeholder="Select gotra"
-            />
-              {form.gotra?.nani == '__custom' && (
-                <input
-                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                  value={gotraform.nani}
-                  onChange={handleChangeNew('nani')}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                />
-              )}</div>
+	          <div className="md:col-span-2 grid gap-3 md:grid-cols-2 rounded-xl border border-slate-200 p-4">
+	            <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
+	            <div className="space-y-2"><SelectField
+	              label="Self"
+	              value={gotraChoice(form.gotra?.self)}
+	              onChange={(value) => handleNestedChange('gotra', 'self', value)}
+	              options={gotraOptionsList}
+	              placeholder="Select gotra"
+	            />
+	              {gotraChoice(form.gotra?.self) === '__custom' && (
+	                <input
+	                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                  value={gotraform.self}
+	                  onChange={handleChangeNew('self')}
+	                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	                />
+	              )}
+	            </div>
+	
+	            <div className="space-y-2"><SelectField
+	              label="Mother"
+	              value={gotraChoice(form.gotra?.mother)}
+	              onChange={(value) => handleNestedChange('gotra', 'mother', value)}
+	              options={gotraOptionsList}
+	              placeholder="Select gotra"
+	            />
+	              {gotraChoice(form.gotra?.mother) === '__custom' && (
+	                <input
+	                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                  value={gotraform.mother}
+	                  onChange={handleChangeNew('mother')}
+	                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	                />
+	              )}</div>
+	
+	            <div className="space-y-2"><SelectField
+	              label="Dadi"
+	              value={gotraChoice(form.gotra?.dadi)}
+	              onChange={(value) => handleNestedChange('gotra', 'dadi', value)}
+	              options={gotraOptionsList}
+	              placeholder="Select gotra"
+	            />
+	              {gotraChoice(form.gotra?.dadi) === '__custom' && (
+	                <input
+	                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                  value={gotraform.dadi}
+	                  onChange={handleChangeNew('dadi')}
+	                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	                />
+	              )}</div>
+	
+	            <div className="space-y-2"><SelectField
+	              label="Nani"
+	              value={gotraChoice(form.gotra?.nani)}
+	              onChange={(value) => handleNestedChange('gotra', 'nani', value)}
+	              options={gotraOptionsList}
+	              placeholder="Select gotra"
+	            />
+	              {gotraChoice(form.gotra?.nani) === '__custom' && (
+	                <input
+	                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                  value={gotraform.nani}
+	                  onChange={handleChangeNew('nani')}
+	                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	                />
+	              )}</div>
 
 
           </div>

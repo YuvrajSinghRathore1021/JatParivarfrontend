@@ -179,7 +179,7 @@ function JobFormButton({ job, onSaved }) {
 
   useEffect(() => {
     if (open && !job) {
-      setGeoCodes({ stateCode: '', districtCode: '', cityCode: '' })
+      setGeoCodes({ stateCode: '__OTHER__', districtCode: '__OTHER__', cityCode: '__OTHER__' })
     }
   }, [open, job])
 
@@ -223,7 +223,7 @@ function JobFormButton({ job, onSaved }) {
 
   const onStateChange = (code) => {
     if (code === '__OTHER__') {
-      setGeoCodes({ stateCode: '__OTHER__', districtCode: '', cityCode: '' })
+      setGeoCodes({ stateCode: '__OTHER__', districtCode: '__OTHER__', cityCode: '__OTHER__' })
       setForm((prev) => ({ ...prev, locationState: '', locationDistrict: '', locationCity: '' }))
       return
     }
@@ -239,7 +239,7 @@ function JobFormButton({ job, onSaved }) {
 
   const onDistrictChange = (code) => {
     if (code === '__OTHER__') {
-      setGeoCodes((prev) => ({ ...prev, districtCode: '__OTHER__', cityCode: '' }))
+      setGeoCodes((prev) => ({ ...prev, districtCode: '__OTHER__', cityCode: '__OTHER__' }))
       setForm((prev) => ({ ...prev, locationDistrict: '', locationCity: '' }))
       return
     }

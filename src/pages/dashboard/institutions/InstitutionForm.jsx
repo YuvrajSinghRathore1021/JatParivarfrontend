@@ -41,7 +41,9 @@ const emptyForm = {
 export default function InstitutionForm({ kind }) {
   const { lang } = useLang()
   const qc = useQueryClient()
-  const [form, setForm] = useState(emptyForm)
+  const OTHER = '__OTHER__'
+  const initialForm = { ...emptyForm, stateCode: OTHER, districtCode: OTHER, cityCode: OTHER }
+  const [form, setForm] = useState(initialForm)
   const [message, setMessage] = useState('')
   const labels = copy[kind] || copy.dharamshala
 
@@ -50,7 +52,10 @@ export default function InstitutionForm({ kind }) {
     form.districtCode,
     lang,
   )
-  const OTHER = '__OTHER__'
+
+  const stateCodeValue = form.stateCode || OTHER
+  const districtCodeValue = form.districtCode || OTHER
+  const cityCodeValue = form.cityCode || OTHER
 
   useEffect(() => {
     // if values exist but no code (loaded from edits), flip to manual fields
@@ -70,7 +75,7 @@ export default function InstitutionForm({ kind }) {
     mutationFn: createInstitution,
     onSuccess: () => {
       qc.invalidateQueries(['institutions', kind])
-      setForm(emptyForm)
+      setForm(initialForm)
       setMessage(lang === 'hi' ? 'सूची समीक्षा के लिए भेजी गई।' : 'Listing submitted for admin review.')
       setTimeout(() => setMessage(''), 4000)
     },
@@ -172,16 +177,16 @@ export default function InstitutionForm({ kind }) {
         </label>
         <SelectField
           label={lang === 'hi' ? 'राज्य' : 'State'}
-          value={form.stateCode}
+          value={stateCodeValue}
           onChange={(code) => {
             if (code === OTHER) {
               setForm((prev) => ({
                 ...prev,
                 stateCode: OTHER,
                 state: '',
-                districtCode: '',
+                districtCode: OTHER,
                 district: '',
-                cityCode: '',
+                cityCode: OTHER,
                 city: '',
               }))
               return
@@ -200,7 +205,7 @@ export default function InstitutionForm({ kind }) {
           options={[...stateOptions, { value: OTHER, label: lang === 'hi' ? 'सूची में नहीं' : 'Not in list' }]}
           placeholder={lang === 'hi' ? 'राज्य चुनें' : 'Select state'}
         />
-        {form.stateCode === OTHER && (
+        {stateCodeValue === OTHER && (
           <input
             value={form.state}
             onChange={handleChange('state')}
@@ -210,14 +215,14 @@ export default function InstitutionForm({ kind }) {
         )}
         <SelectField
           label={lang === 'hi' ? 'ज़िला' : 'District'}
-          value={form.districtCode}
+          value={districtCodeValue}
           onChange={(code) => {
             if (code === OTHER) {
               setForm((prev) => ({
                 ...prev,
                 districtCode: OTHER,
                 district: '',
-                cityCode: '',
+                cityCode: OTHER,
                 city: '',
               }))
               return
@@ -235,7 +240,7 @@ export default function InstitutionForm({ kind }) {
           placeholder={lang === 'hi' ? 'ज़िला चुनें' : 'Select district'}
           disabled={!form.stateCode}
         />
-        {form.districtCode === OTHER && (
+        {districtCodeValue === OTHER && (
           <input
             value={form.district}
             onChange={handleChange('district')}
@@ -245,7 +250,7 @@ export default function InstitutionForm({ kind }) {
         )}
         <SelectField
           label={lang === 'hi' ? 'शहर' : 'City'}
-          value={form.cityCode}
+          value={cityCodeValue}
           onChange={(code) => {
             if (code === OTHER) {
               setForm((prev) => ({
@@ -266,7 +271,7 @@ export default function InstitutionForm({ kind }) {
           placeholder={lang === 'hi' ? 'शहर चुनें' : 'Select city'}
           disabled={!form.districtCode}
         />
-        {form.cityCode === OTHER && (
+        {cityCodeValue === OTHER && (
           <input
             value={form.city}
             onChange={handleChange('city')}

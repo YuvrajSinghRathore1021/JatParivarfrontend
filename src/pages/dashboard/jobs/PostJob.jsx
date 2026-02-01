@@ -23,11 +23,11 @@ const emptyForm = {
   contactPhone: '',
   address: {
     state: '',
-    stateCode: '',
+    stateCode: '__OTHER__',
     district: '',
-    districtCode: '',
+    districtCode: '__OTHER__',
     city: '',
-    cityCode: '',
+    cityCode: '__OTHER__',
     village: ''
   },
 }

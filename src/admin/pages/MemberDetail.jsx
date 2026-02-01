@@ -48,40 +48,36 @@ export default function MemberDetailPage() {
     setgotraform((prev) => ({ ...prev, [field]: value }))
   }
 
-  useEffect(() => {
-    const fetchMember = async () => {
-      try {
-        setError('')
-        const res = await adminApiFetch(`/members/${id}`, { token })
-        const safeGotra = res?.member?.gotra && typeof res.member.gotra === 'object' ? res.member.gotra : {}
-        const safeMember = {
-          ...res.member,
-          gotra: safeGotra,
-          occupationAddress: res?.member?.occupationAddress && typeof res.member.occupationAddress === 'object' ? res.member.occupationAddress : {},
-          currentAddress: res?.member?.currentAddress && typeof res.member.currentAddress === 'object' ? res.member.currentAddress : {},
-          parentalAddress: res?.member?.parentalAddress && typeof res.member.parentalAddress === 'object' ? res.member.parentalAddress : {},
-        }
-        setMember(safeMember);
-        setPersonForm(res.person ? {
-          id: res.person.id,
-          role: res.person.role,
-          name: res.person.name || '',
-          title: res.person.title || '',
-          designation: res.person.designation || '',
-          place: res.person.place || '',
-          bioEn: res.person.bioEn || '',
-          bioHi: res.person.bioHi || '',
-          order: res.person.order ?? 1,
-          visible: res.person.visible ?? true,
-          bannerUrl: res.person.bannerUrl || '',
-
-        } : null)
-
-      } catch (err) {
-        setError(err.message)
-      }
+  const fetchMember = async () => {
+    setError('')
+    const res = await adminApiFetch(`/members/${id}`, { token })
+    const safeGotra = res?.member?.gotra && typeof res.member.gotra === 'object' ? res.member.gotra : {}
+    const safeMember = {
+      ...res.member,
+      gotra: safeGotra,
+      occupationAddress: res?.member?.occupationAddress && typeof res.member.occupationAddress === 'object' ? res.member.occupationAddress : {},
+      currentAddress: res?.member?.currentAddress && typeof res.member.currentAddress === 'object' ? res.member.currentAddress : {},
+      parentalAddress: res?.member?.parentalAddress && typeof res.member.parentalAddress === 'object' ? res.member.parentalAddress : {},
     }
-    fetchMember()
+    setMember(safeMember)
+    setPersonForm(res.person ? {
+      id: res.person.id,
+      role: res.person.role,
+      name: res.person.name || '',
+      title: res.person.title || '',
+      designation: res.person.designation || '',
+      place: res.person.place || '',
+      bioEn: res.person.bioEn || '',
+      bioHi: res.person.bioHi || '',
+      order: res.person.order ?? 1,
+      visible: res.person.visible ?? true,
+      bannerUrl: res.person.bannerUrl || '',
+    } : null)
+  }
+
+  useEffect(() => {
+    fetchMember().catch((err) => setError(err.message))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, token])
 
   // ⬇️ ADD THIS useEffect
@@ -116,7 +112,7 @@ export default function MemberDetailPage() {
   }, [member?.gotra, gotraValueSet])
 
 
-  const isSpotlightEligible = member?.role === 'founder' || member?.role === 'member'
+  const isSpotlightEligible = member?.role === 'founder' || member?.role === 'management'
 
   if (!member) {
     return (
@@ -219,6 +215,7 @@ export default function MemberDetailPage() {
       const payload = {
         name: member.name,
         displayName: member.displayName,
+        role: member.role,
         message: member?.message,
         adimage: member.adimage,
         bussinessurl: member.bussinessurl,
@@ -235,10 +232,10 @@ export default function MemberDetailPage() {
         avatarUrl: member.avatarUrl,
         janAadhaarUrl: member.janAadhaarUrl,
         gotra: {
-          self: member.gotra?.self == '__custom' ? gotraform?.self : member.gotra?.self,
-          mother: member.gotra?.mother == '__custom' ? gotraform?.mother : member.gotra?.mother,
-          nani: member.gotra?.nani == '__custom' ? gotraform?.nani : member.gotra?.nani,
-          dadi: member.gotra?.dadi == '__custom' ? gotraform?.dadi : member.gotra?.dadi
+          self: gotraChoice(member.gotra?.self) === '__custom' ? (gotraform?.self || '') : (member.gotra?.self || ''),
+          mother: gotraChoice(member.gotra?.mother) === '__custom' ? (gotraform?.mother || '') : (member.gotra?.mother || ''),
+          nani: gotraChoice(member.gotra?.nani) === '__custom' ? (gotraform?.nani || '') : (member.gotra?.nani || ''),
+          dadi: gotraChoice(member.gotra?.dadi) === '__custom' ? (gotraform?.dadi || '') : (member.gotra?.dadi || ''),
         },
         occupationAddress: member?.occupationAddress,
         currentAddress: member?.currentAddress,
@@ -249,6 +246,7 @@ export default function MemberDetailPage() {
       }
       await adminApiFetch(`/members/${member.id}`, { token, method: 'PATCH', body: payload })
       setPasswords({ value: '', confirm: '' })
+      await fetchMember()
       alert('Member profile updated')
     } catch (err) {
       setError(err.message)
@@ -307,6 +305,12 @@ export default function MemberDetailPage() {
     }
   }
 
+
+  const gotraChoice = (value) => {
+    const v = (value || '').toString().trim()
+    if (v && gotraValueSet?.has(v)) return v
+    return '__custom'
+  }
 
   return (
     <div className="space-y-6">
@@ -396,11 +400,9 @@ export default function MemberDetailPage() {
               onChange={(e) => updateMemberField('role', e.target.value)}
               className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
             >
-              <option value="">All roles</option>
               <option value="sadharan">Sadharan</option>
-              <option value="member">Management</option>
+              <option value="management">Management</option>
               <option value="founder">Founder</option>
-              <option value="admin">Admin</option>
             </select>
           </div>
           <Field label="Referral code" value={member.referralCode || ''} disabled />
@@ -520,70 +522,70 @@ export default function MemberDetailPage() {
         </div> */}
 
 
-        <div className="md:col-span-2 grid gap-3 md:grid-cols-2 rounded-xl border border-slate-200 p-4">
-          <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
-          <div className="space-y-2"><SelectField
-            label="Self"
-            value={gotraValueSet.has(member.gotra?.self) ? member.gotra?.self : '__custom'}
-            onChange={(value) => updateNested('gotra', 'self', value)}
-            options={gotraOptionsList}
-            placeholder="Select gotra"
-          />
-            {member.gotra?.self == '__custom' && (
-              <input
-                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                value={gotraform?.self || ''}
-                onChange={handleChangeNew('self')}
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-              />
-            )}
-          </div>
+	        <div className="md:col-span-2 grid gap-3 md:grid-cols-2 rounded-xl border border-slate-200 p-4">
+	          <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Gotra</p>
+	          <div className="space-y-2"><SelectField
+	            label="Self"
+	            value={gotraChoice(member.gotra?.self)}
+	            onChange={(value) => updateNested('gotra', 'self', value)}
+	            options={gotraOptionsList}
+	            placeholder="Select gotra"
+	          />
+	            {gotraChoice(member.gotra?.self) === '__custom' && (
+	              <input
+	                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                value={gotraform?.self || ''}
+	                onChange={handleChangeNew('self')}
+	                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	              />
+	            )}
+	          </div>
 
-          <div className="space-y-2"><SelectField
-            label="Mother"
-            value={gotraValueSet.has(member.gotra?.mother) ? member.gotra?.mother : '__custom'}
-            onChange={(value) => updateNested('gotra', 'mother', value)}
-            options={gotraOptionsList}
-            placeholder="Select gotra"
-          />
-            {member.gotra?.mother == '__custom' && (
-              <input
-                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                value={gotraform?.mother || ''}
-                onChange={handleChangeNew('mother')}
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-              />
-            )}</div>
-
-          <div className="space-y-2"><SelectField
-            label="Dadi"
-            value={gotraValueSet.has(member.gotra?.dadi) ? member.gotra?.dadi : '__custom'}
-            onChange={(value) => updateNested('gotra', 'dadi', value)}
-            options={gotraOptionsList}
-            placeholder="Select gotra"
-          />
-            {(member.gotra?.dadi === '__custom' || (member.gotra?.dadi && !gotraValueSet.has(member.gotra?.dadi))) && (
-              <input
-                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                value={gotraform?.dadi || ''}
-                onChange={handleChangeNew('dadi')}
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	          <div className="space-y-2"><SelectField
+	            label="Mother"
+	            value={gotraChoice(member.gotra?.mother)}
+	            onChange={(value) => updateNested('gotra', 'mother', value)}
+	            options={gotraOptionsList}
+	            placeholder="Select gotra"
+	          />
+	            {gotraChoice(member.gotra?.mother) === '__custom' && (
+	              <input
+	                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                value={gotraform?.mother || ''}
+	                onChange={handleChangeNew('mother')}
+	                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
               />
             )}</div>
 
-          <div className="space-y-2"><SelectField
-            label="Nani"
-            value={gotraValueSet.has(member.gotra?.nani) ? member.gotra?.nani : '__custom'}
-            onChange={(value) => updateNested('gotra', 'nani', value)}
-            options={gotraOptionsList}
-            placeholder="Select gotra"
-          />
-            {(member.gotra?.nani === '__custom' || (member.gotra?.nani && !gotraValueSet.has(member.gotra?.nani))) && (
-              <input
-                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
-                value={gotraform?.nani || ''}
-                onChange={handleChangeNew('nani')}
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+	          <div className="space-y-2"><SelectField
+	            label="Dadi"
+	            value={gotraChoice(member.gotra?.dadi)}
+	            onChange={(value) => updateNested('gotra', 'dadi', value)}
+	            options={gotraOptionsList}
+	            placeholder="Select gotra"
+	          />
+	            {gotraChoice(member.gotra?.dadi) === '__custom' && (
+	              <input
+	                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                value={gotraform?.dadi || ''}
+	                onChange={handleChangeNew('dadi')}
+	                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+              />
+            )}</div>
+
+	          <div className="space-y-2"><SelectField
+	            label="Nani"
+	            value={gotraChoice(member.gotra?.nani)}
+	            onChange={(value) => updateNested('gotra', 'nani', value)}
+	            options={gotraOptionsList}
+	            placeholder="Select gotra"
+	          />
+	            {gotraChoice(member.gotra?.nani) === '__custom' && (
+	              <input
+	                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                value={gotraform?.nani || ''}
+	                onChange={handleChangeNew('nani')}
+	                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
               />
             )}</div>
 

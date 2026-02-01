@@ -1,11 +1,12 @@
 // frontend/src/admin/pages/Payments.jsx
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
 import { adminApiFetch } from '../api/client.js'
 import { useAdminQuery } from '../hooks/useAdminApi.js'
 
 export default function PaymentsPage() {
-  const [filters, setFilters] = useState({ page: 1, pageSize: 20, status: '' })
+  const [filters, setFilters] = useState({ page: 1, pageSize: 20, status: '', plan: '', search: '' })
   const queryKey = useMemo(() => ['admin', 'payments', filters], [filters])
   const qs = new URLSearchParams()
   Object.entries(filters).forEach(([key, value]) => {
@@ -36,8 +37,12 @@ export default function PaymentsPage() {
           </select>
         </div>
         <div>
-          <label className="text-xs font-medium text-slate-600">Plan ID</label>
-          <input value={filters.planId || ''} onChange={(e) => setFilters(prev => ({ ...prev, planId: e.target.value, page: 1 }))} className="mt-1 border border-slate-300 rounded px-3 py-2 text-sm" />
+          <label className="text-xs font-medium text-slate-600">Plan (code / id / title)</label>
+          <input value={filters.plan || ''} onChange={(e) => setFilters(prev => ({ ...prev, plan: e.target.value, page: 1 }))} className="mt-1 border border-slate-300 rounded px-3 py-2 text-sm" placeholder="founder / management / sadharan" />
+        </div>
+        <div className="flex-1 min-w-[240px]">
+          <label className="text-xs font-medium text-slate-600">Search</label>
+          <input value={filters.search || ''} onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value, page: 1 }))} className="mt-1 w-full border border-slate-300 rounded px-3 py-2 text-sm" placeholder="Order ID, phone, name…" />
         </div>
       </div>
       <PaymentsTable list={list} loading={isLoading} onChanged={() => refetch()} />
@@ -79,6 +84,8 @@ function PaymentsTable({ list, loading, onChanged }) {
         <thead className="bg-slate-50">
           <tr>
             <th className="px-4 py-2 text-left font-medium text-slate-600">Order ID</th>
+            <th className="px-4 py-2 text-left font-medium text-slate-600">Member</th>
+            <th className="px-4 py-2 text-left font-medium text-slate-600">Phone</th>
             <th className="px-4 py-2 text-left font-medium text-slate-600">Amount</th>
             <th className="px-4 py-2 text-left font-medium text-slate-600">Plan</th>
             <th className="px-4 py-2 text-left font-medium text-slate-600">Status</th>
@@ -87,11 +94,21 @@ function PaymentsTable({ list, loading, onChanged }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
-          {loading && <tr><td colSpan={6} className="px-4 py-6 text-center text-slate-500">Loading…</td></tr>}
-          {!loading && list.length === 0 && <tr><td colSpan={6} className="px-4 py-6 text-center text-slate-500">No payments found</td></tr>}
+          {loading && <tr><td colSpan={8} className="px-4 py-6 text-center text-slate-500">Loading…</td></tr>}
+          {!loading && list.length === 0 && <tr><td colSpan={8} className="px-4 py-6 text-center text-slate-500">No payments found</td></tr>}
           {list.map(payment => (
             <tr key={payment.id} className="hover:bg-slate-50">
               <td className="px-4 py-3 font-mono text-xs text-slate-700">{payment.orderId}</td>
+              <td className="px-4 py-3 text-slate-700">
+                {payment.payer?.type === 'user' ? (
+                  <Link to={`/admin/members/${payment.payer.id}`} className="underline">
+                    {payment.payer.name || '—'}
+                  </Link>
+                ) : (
+                  <span>{payment.payer?.name || '—'}</span>
+                )}
+              </td>
+              <td className="px-4 py-3 text-slate-700">{payment.payer?.phone || '—'}</td>
               <td className="px-4 py-3 text-slate-700">₹{(payment.amount / 100 || 0).toLocaleString('en-IN')}</td>
               <td className="px-4 py-3 text-slate-700">{payment.planTitle || '—'}</td>
               <td className="px-4 py-3"><StatusChip status={payment.status} /></td>

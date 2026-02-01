@@ -139,6 +139,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const OTHER = '__OTHER__'
 
   const [form, setForm] = useState(() =>
     item || {
@@ -163,7 +164,11 @@ function InstitutionFormButton({ item, kind, onSaved }) {
       userId: '',
     }
   )// ✅ Add this for geo selections
-  const [addressCodes, setAddressCodes] = useState({ stateCode: '', districtCode: '', cityCode: '' })
+  const [addressCodes, setAddressCodes] = useState(() =>
+    item
+      ? { stateCode: '', districtCode: '', cityCode: '' }
+      : { stateCode: OTHER, districtCode: OTHER, cityCode: OTHER }
+  )
   const { states, districts, cities, stateOptions, districtOptions, cityOptions } =
     useGeoOptions(addressCodes.stateCode, addressCodes.districtCode, 'en', { includeRemoved: true })
   const stateOpts = useMemo(() => stateOptions.map((o) => ({ ...o, value: String(o.value) })), [stateOptions])
@@ -191,10 +196,17 @@ function InstitutionFormButton({ item, kind, onSaved }) {
     })
   }, [states, districts, cities, form.state, form.district, form.city])
 
+  useEffect(() => {
+    if (open && !item) {
+      setAddressCodes({ stateCode: OTHER, districtCode: OTHER, cityCode: OTHER })
+      setForm((prev) => ({ ...prev, state: '', district: '', city: '' }))
+    }
+  }, [open, item, OTHER])
+
   // ✅ Handlers for dependent dropdowns (same as in MemberDetail)
   const onStateChange = (code) => {
     if (code === '__OTHER__') {
-      setAddressCodes({ stateCode: '__OTHER__', districtCode: '', cityCode: '' })
+      setAddressCodes({ stateCode: OTHER, districtCode: OTHER, cityCode: OTHER })
       setForm((prev) => ({ ...prev, state: '', district: '', city: '' }))
       return
     }
@@ -210,7 +222,7 @@ function InstitutionFormButton({ item, kind, onSaved }) {
 
   const onDistrictChange = (code) => {
     if (code === '__OTHER__') {
-      setAddressCodes((prev) => ({ ...prev, districtCode: '__OTHER__', cityCode: '' }))
+      setAddressCodes((prev) => ({ ...prev, districtCode: OTHER, cityCode: OTHER }))
       setForm((prev) => ({ ...prev, district: '', city: '' }))
       return
     }

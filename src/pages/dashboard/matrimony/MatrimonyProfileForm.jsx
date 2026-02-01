@@ -64,31 +64,31 @@ const emptyForm = {
 
   occupationAddress: {
     state: '',
-    stateCode: '',
+    stateCode: '__OTHER__',
     district: '',
-    districtCode: '',
+    districtCode: '__OTHER__',
     city: '',
-    cityCode: '',
+    cityCode: '__OTHER__',
     village: ''
   },
 
   currentAddress: {
     state: '',
-    stateCode: '',
+    stateCode: '__OTHER__',
     district: '',
-    districtCode: '',
+    districtCode: '__OTHER__',
     city: '',
-    cityCode: '',
+    cityCode: '__OTHER__',
     village: ''
   },
 
   parentalAddress: {
     state: '',
-    stateCode: '',
+    stateCode: '__OTHER__',
     district: '',
-    districtCode: '',
+    districtCode: '__OTHER__',
     city: '',
-    cityCode: '',
+    cityCode: '__OTHER__',
     village: ''
   },
 }
