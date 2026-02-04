@@ -161,18 +161,21 @@ export default function Navbar() {
         role="banner"
       >
         {/* Wider container */}
-        <div className="mx-auto max-w-[1280px] px-4">
+        <div className="mx-auto max-w-7xl px-4">
           <div className="h-16 flex items-center justify-between gap-3">
-            <Link to={lang === 'hi' ? '/hi' : '/en'} className="flex items-center gap-3 group -ml-2 sm:-ml-4">
+            <Link
+              to={lang === 'hi' ? '/hi' : '/en'}
+              className="flex h-16 items-center gap-3 group -ml-2 sm:-ml-4 shrink-0"
+            >
               <img
-                src="/icons/20251021_1854_Jat Parivar Unity Logo_simple_compose_01k83f0p3behrre80djf6y47aj.png"
+                src="/icons/jp-logo-trim.png"
                 alt="Jat Parivar logo"
-                className={['h-30 w-auto transition-transform duration-300 group-hover:scale-105'].join(' ')}
+                className="block h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
               <span className="sr-only">Jat Parivar</span>
             </Link>
 
-            <nav className="hidden h-16 lg:flex items-center gap-1 flex-1" aria-label="Primary">
+            <nav className="hidden h-16 lg:flex items-center justify-center gap-1 flex-1" aria-label="Primary">
               {navItems.map((it) => (
                 <NavLink
                   key={it.key}
@@ -266,7 +269,7 @@ export default function Navbar() {
         {/* Sidebar */}
         <aside
           className={[
-            'absolute top-0 right-0 h-full w-[86%] max-w-[360px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out  overflow-y-auto',
+            'absolute top-0 right-0 h-full w-[86%] max-w-90 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out overflow-y-auto',
             open ? 'translate-x-0' : 'translate-x-full'
           ].join(' ')}
           role="dialog"

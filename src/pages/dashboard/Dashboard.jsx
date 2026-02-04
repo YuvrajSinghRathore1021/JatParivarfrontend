@@ -133,11 +133,14 @@ function DashboardTopBar() {
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
-        <Link to={lang === 'hi' ? '/hi' : '/en'} className="flex items-center gap-3 group -ml-2 sm:-ml-4">
+        <Link
+          to={lang === 'hi' ? '/hi' : '/en'}
+          className="flex h-16 items-center gap-3 group -ml-2 sm:-ml-4 shrink-0"
+        >
           <img
-            src="/icons/20251021_1854_Jat Parivar Unity Logo_simple_compose_01k83f0p3behrre80djf6y47aj.png"
+            src="/icons/jp-logo-trim.png"
             alt="Jat Parivar logo"
-            className={['h-30 w-auto', 'transition-transform duration-300 group-hover:scale-105'].join(' ')}
+            className="block h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
           />
           <span className="sr-only">Jat Parivar</span>
         </Link>
@@ -171,7 +174,7 @@ function DashboardTopBar() {
             {/* <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               {lang === 'hi' ? 'स्वागत है' : 'Welcome back'}
             </p> */}
-            <p className="text-sm font-semibold text-slate-900 break-words overflow-hidden line-clamp-1 max-w-[60px] break-all line-clamp-1">
+            <p className="max-w-40 truncate text-sm font-semibold text-slate-900">
               {user?.displayName || user?.name || user?.phone || 'Member'}
             </p>
 
