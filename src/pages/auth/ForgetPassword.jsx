@@ -213,7 +213,7 @@ export default function ForgotPassword() {
         return
       }
       setLoading(true)
-      await post('/auth/forgot/change-password', { phone, newPassword: password })
+      await post('/auth/forgot/change-password', { phone, password: password })
       setSuccess(t.success)
       setTimeout(() => navigate(makePath('login')), 1200)
     } catch {
