@@ -70,7 +70,9 @@ function RequireAuth() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: me,
-    staleTime: 60_000,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: false,
   })
 

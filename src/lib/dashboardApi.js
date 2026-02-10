@@ -55,3 +55,7 @@ export const updateMyProfile = (payload) => put('/me/profile', payload)
 export const updateMyAvatar = (payload) => put('/me/profile/avatar', payload)
 
 export const updateMyPassword = (payload) => put('/me/profile/password', payload)
+
+export const requestProfileOtp = () => post('/me/profile/otp/start', {})
+
+export const verifyProfileOtp = (code) => post('/me/profile/otp/verify', { code })

@@ -1,7 +1,7 @@
 // frontend/src/pages/dashboard/profile/ProfileEditor.jsx
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { fetchMyProfile, updateMyAvatar, updateMyPassword, updateMyProfile } from '../../../lib/dashboardApi'
+import { fetchMyProfile, requestProfileOtp, verifyProfileOtp, updateMyPassword, updateMyProfile } from '../../../lib/dashboardApi'
 import { useLang } from '../../../lib/useLang'
 import { makeInitialAvatar } from '../../../lib/avatar'
 import { upload } from '../../../lib/api'
@@ -115,6 +115,12 @@ export default function ProfileEditor() {
   const [janUploading, setJanUploading] = useState(false)
   const [avatarUploading, setAvatarUploading] = useState(false)
   const [bannerUploading, setBannerUploading] = useState(false)
+  const [otpCode, setOtpCode] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpVerified, setOtpVerified] = useState(false)
+  const [otpLoading, setOtpLoading] = useState(false)
+  const [otpError, setOtpError] = useState('')
+  const [otpMessage, setOtpMessage] = useState('')
   const fileInputRef = useRef(null)
   const janInputRef = useRef(null)
   const bannerInputRef = useRef(null)
@@ -189,36 +195,40 @@ export default function ProfileEditor() {
     })
   }, [data])
 
+  const resetOtpGate = (nextMessage = '') => {
+    setOtpCode('')
+    setOtpSent(false)
+    setOtpVerified(false)
+    setOtpError('')
+    setOtpMessage(nextMessage)
+  }
 
+  const syncOtpRequiredError = (apiMessage) => {
+    if ((apiMessage || '').includes('OTP verification required before profile update')) {
+      resetOtpGate(lang === 'hi' ? 'कृपया नया OTP अनुरोध करें और सत्यापित करें।' : 'Please request and verify a new OTP.')
+      return true
+    }
+    return false
+  }
 
+  
+  
   const mutation = useMutation({
     mutationFn: updateMyProfile,
     onSuccess: () => {
       qc.invalidateQueries(['profile', 'me'])
       qc.invalidateQueries(['public', 'people'])
+      qc.invalidateQueries(['auth', 'me'])
+      resetOtpGate(lang === 'hi' ? 'OTP उपयोग हो गया है। अगली बार सेव करने से पहले नया OTP सत्यापित करें।' : 'OTP consumed. Verify a new OTP before your next save.')
+      setAvatarMessage('')
       setMessage(lang === 'hi' ? 'प्रोफ़ाइल अपडेट हो गई।' : 'Profile updated successfully.')
       alert(lang === 'hi' ? 'प्रोफ़ाइल अपडेट हो गई।' : 'Profile updated successfully.')
       setTimeout(() => setMessage(''), 4000)
     },
     onError: (err) => {
-      setMessage(err.message || (lang === 'hi' ? 'अपडेट विफल रहा।' : 'Update failed.'))
-    },
-  })
-
-  const avatarMutation = useMutation({
-    mutationFn: updateMyAvatar,
-    onSuccess: (res) => {
-      const nextUrl = res?.avatarUrl || ''
-      qc.invalidateQueries(['profile', 'me'])
-      qc.invalidateQueries(['auth', 'me'])
-      setForm((prev) => ({ ...prev, avatarUrl: nextUrl }))
-      setAvatarError('')
-      setAvatarMessage(lang === 'hi' ? 'प्रोफ़ाइल फोटो अपडेट हो गई।' : 'Profile photo updated.')
-      setTimeout(() => setAvatarMessage(''), 4000)
-    },
-    onError: () => {
-      setAvatarMessage('')
-      setAvatarError(lang === 'hi' ? 'फोटो अपडेट नहीं हो सकी।' : 'Could not update the photo.')
+      const apiMessage = extractApiError(err)
+      syncOtpRequiredError(apiMessage)
+      setMessage(apiMessage || (lang === 'hi' ? 'अपडेट विफल रहा।' : 'Update failed.'))
     },
   })
 
@@ -226,11 +236,14 @@ export default function ProfileEditor() {
     mutationFn: updateMyPassword,
     onSuccess: () => {
       setPasswordForm({ current: '', next: '', confirm: '' })
+      resetOtpGate(lang === 'hi' ? 'OTP उपयोग हो गया है। अगली बार बदलाव से पहले नया OTP सत्यापित करें।' : 'OTP consumed. Verify a new OTP before the next update.')
       setMessage(lang === 'hi' ? 'पासवर्ड अपडेट हो गया।' : 'Password updated successfully.')
       setTimeout(() => setMessage(''), 4000)
     },
     onError: (err) => {
-      setMessage(err.message || (lang === 'hi' ? 'पासवर्ड अपडेट विफल रहा।' : 'Password update failed.'))
+      const apiMessage = extractApiError(err)
+      syncOtpRequiredError(apiMessage)
+      setMessage(apiMessage || (lang === 'hi' ? 'पासवर्ड अपडेट विफल रहा।' : 'Password update failed.'))
     },
   })
 
@@ -270,7 +283,7 @@ export default function ProfileEditor() {
   }, [displayAvatar])
 
   const triggerFilePicker = () => {
-    if (avatarUploading || avatarMutation.isPending) return
+    if (!otpVerified || avatarUploading) return
     fileInputRef.current?.click()
   }
 
@@ -288,6 +301,10 @@ export default function ProfileEditor() {
     const file = event.target.files?.[0]
     event.target.value = ''
     if (!file) return
+    if (!otpVerified) {
+      setAvatarError(lang === 'hi' ? 'फोटो बदलने से पहले OTP सत्यापित करें।' : 'Verify OTP before changing the photo.')
+      return
+    }
     if (file.size > 5 * 1024 * 1024) {
       setAvatarError(lang === 'hi' ? 'कृपया 1MB से कम आकार की छवि चुनें।' : 'Please choose an image smaller than 1 MB.')
       return
@@ -297,7 +314,8 @@ export default function ProfileEditor() {
       setAvatarError('')
       setAvatarMessage('')
       const { url } = await upload('/uploads/file', file)
-      avatarMutation.mutate({ avatarUrl: url })
+      setForm((prev) => ({ ...prev, avatarUrl: url }))
+      setAvatarMessage(lang === 'hi' ? 'फोटो तैयार है। बदलाव सहेजने के लिए प्रोफ़ाइल सहेजें।' : 'Photo is ready. Save profile to apply it.')
     } catch (err) {
       console.error(err)
       setAvatarError(lang === 'hi' ? 'अपलोड विफल रहा, कृपया पुनः प्रयास करें।' : 'Upload failed, please try again.')
@@ -346,7 +364,10 @@ export default function ProfileEditor() {
   }
 
   const removeAvatar = () => {
-    avatarMutation.mutate({ avatarUrl: '' })
+    if (!otpVerified) return
+    setForm((prev) => ({ ...prev, avatarUrl: '' }))
+    setAvatarError('')
+    setAvatarMessage(lang === 'hi' ? 'फोटो हटाने के लिए प्रोफ़ाइल सहेजें।' : 'Save profile to remove the photo.')
   }
 
   const removeBanner = () => {
@@ -355,6 +376,10 @@ export default function ProfileEditor() {
 
   const onSubmit = (event) => {
     event.preventDefault()
+    if (!otpVerified) {
+      setOtpError(lang === 'hi' ? 'प्रोफ़ाइल सहेजने से पहले OTP सत्यापित करें।' : 'Verify OTP before saving profile.')
+      return
+    }
     const payload = {
       name: form.name,
       displayName: form.displayName,
@@ -365,6 +390,7 @@ export default function ProfileEditor() {
       publicNote: form.publicNote,
       contactEmail: form.contactEmail,
       alternatePhone: form.alternatePhone,
+      avatarUrl: form.avatarUrl,
       janAadhaarUrl: form.janAadhaarUrl,
       dateOfBirth: form.dateOfBirth || undefined,
 
@@ -388,6 +414,10 @@ export default function ProfileEditor() {
 
   const submitPassword = (event) => {
     event.preventDefault()
+    if (!otpVerified) {
+      setOtpError(lang === 'hi' ? 'पासवर्ड बदलने से पहले OTP सत्यापित करें।' : 'Verify OTP before updating password.')
+      return
+    }
     if (!passwordForm.current || !passwordForm.next) {
       setMessage(lang === 'hi' ? 'कृपया वर्तमान और नया पासवर्ड दर्ज करें।' : 'Please fill current and new password.')
       return
@@ -397,6 +427,44 @@ export default function ProfileEditor() {
       return
     }
     passwordMutation.mutate({ currentPassword: passwordForm.current, newPassword: passwordForm.next })
+  }
+
+  const startProfileOtp = async () => {
+    try {
+      setOtpLoading(true)
+      setOtpError('')
+      setOtpMessage('')
+      await requestProfileOtp()
+      setOtpSent(true)
+      setOtpVerified(false)
+      setOtpCode('')
+      setOtpMessage(lang === 'hi' ? 'OTP भेज दिया गया है। अब उसे सत्यापित करें।' : 'OTP sent. Please verify it now.')
+      setAvatarError('')
+    } catch (err) {
+      setOtpError(extractApiError(err) || (lang === 'hi' ? 'OTP भेजना विफल रहा।' : 'Could not send OTP.'))
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
+  const verifyProfileOtpCode = async () => {
+    const code = otpCode.trim()
+    if (!/^\d{6}$/.test(code)) {
+      setOtpError(lang === 'hi' ? 'कृपया 6 अंकों का OTP दर्ज करें।' : 'Please enter a valid 6-digit OTP.')
+      return
+    }
+    try {
+      setOtpLoading(true)
+      setOtpError('')
+      await verifyProfileOtp(code)
+      setOtpVerified(true)
+      setOtpMessage(lang === 'hi' ? 'OTP सत्यापित है। अब आप एक बदलाव सहेज सकते हैं।' : 'OTP verified. You can complete one save action now.')
+    } catch (err) {
+      setOtpError(extractApiError(err) || (lang === 'hi' ? 'OTP सत्यापन विफल रहा।' : 'OTP verification failed.'))
+      setOtpVerified(false)
+    } finally {
+      setOtpLoading(false)
+    }
   }
   const [sameAsCurrent, setSameAsCurrent] = useState(false)
   const [sameAsOccupation, setSameAsOccupation] = useState(false)
@@ -460,10 +528,10 @@ export default function ProfileEditor() {
               <button
                 type="button"
                 onClick={triggerFilePicker}
-                disabled={avatarUploading || avatarMutation.isPending}
+                disabled={!otpVerified || avatarUploading || mutation.isPending}
                 className="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                {avatarUploading || avatarMutation.isPending
+                {avatarUploading
                   ? lang === 'hi'
                     ? 'अपलोड हो रहा है…'
                     : 'Uploading…'
@@ -475,7 +543,7 @@ export default function ProfileEditor() {
                 <button
                   type="button"
                   onClick={removeAvatar}
-                  disabled={avatarMutation.isPending}
+                  disabled={!otpVerified || avatarUploading || mutation.isPending}
                   className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-400 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {lang === 'hi' ? 'फोटो हटाएँ' : 'Remove photo'}
@@ -842,10 +910,48 @@ export default function ProfileEditor() {
           </div>
         </div>
 
+        <section className="rounded-3xl border border-slate-200 bg-slate-50 p-5 space-y-3">
+          <h3 className="text-sm font-semibold text-slate-700">
+            {lang === 'hi' ? 'प्रोफ़ाइल अपडेट OTP' : 'Profile update OTP'}
+          </h3>
+          <p className="text-xs text-slate-500">
+            {lang === 'hi'
+              ? 'प्रोफ़ाइल/फोटो/पासवर्ड में बदलाव सहेजने के लिए OTP सत्यापन अनिवार्य है।'
+              : 'OTP verification is required before saving profile, photo, or password changes.'}
+          </p>
+          <div className="grid gap-3 md:grid-cols-[auto_1fr_auto]">
+            <button
+              type="button"
+              onClick={startProfileOtp}
+              disabled={otpLoading}
+              className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {otpLoading ? (lang === 'hi' ? 'कृपया प्रतीक्षा करें…' : 'Please wait…') : (lang === 'hi' ? 'OTP अनुरोध करें' : 'Request OTP')}
+            </button>
+            <input
+              value={otpCode}
+              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder={lang === 'hi' ? '6 अंकों का OTP' : 'Enter 6-digit OTP'}
+              disabled={!otpSent || otpLoading || otpVerified}
+              className="rounded-2xl border border-slate-200 px-3 py-2 text-sm disabled:bg-slate-100"
+            />
+            <button
+              type="button"
+              onClick={verifyProfileOtpCode}
+              disabled={!otpSent || otpLoading || otpVerified}
+              className="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-300"
+            >
+              {lang === 'hi' ? 'OTP सत्यापित करें' : 'Verify OTP'}
+            </button>
+          </div>
+          {otpMessage && <p className="text-xs text-green-600">{otpMessage}</p>}
+          {otpError && <p className="text-xs text-red-600">{otpError}</p>}
+        </section>
+
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={mutation.isPending}
+            disabled={mutation.isPending || !otpVerified}
             className="rounded-2xl bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
           >
             {mutation.isPending ? (lang === 'hi' ? 'सहेज रहे हैं...' : 'Saving...') : lang === 'hi' ? 'प्रोफ़ाइल सहेजें' : 'Save profile'}
@@ -881,7 +987,7 @@ export default function ProfileEditor() {
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={passwordMutation.isPending}
+            disabled={passwordMutation.isPending || !otpVerified}
             className="rounded-2xl border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {passwordMutation.isPending ? (lang === 'hi' ? 'सहेज रहे हैं...' : 'Saving...') : lang === 'hi' ? 'पासवर्ड अपडेट करें' : 'Update password'}
@@ -909,6 +1015,16 @@ function LabeledField({ label, value, onChange, type = 'text', disabled, placeho
 }
 
 const hasValues = (obj = {}) => Object.values(obj || {}).some((val) => val)
+const extractApiError = (err) => {
+  const raw = err?.message || ''
+  if (!raw) return ''
+  try {
+    const parsed = JSON.parse(raw)
+    return parsed?.error || raw
+  } catch {
+    return raw
+  }
+}
 
 const roleLabel = (role, lang) => {
   if (lang === 'hi') {
