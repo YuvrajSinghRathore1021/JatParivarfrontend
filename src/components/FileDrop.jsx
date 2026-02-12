@@ -21,7 +21,7 @@ export default function FileDrop({
   };
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 break-all">
       {label && (
         <div className="text-sm font-medium text-slate-700">
           {label} {required && <span className="text-rose-600">*</span>}
