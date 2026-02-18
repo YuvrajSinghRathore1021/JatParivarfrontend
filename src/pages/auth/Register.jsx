@@ -281,7 +281,7 @@ export default function Register() {
 
   // ===== TEST SWITCHES =====
   // Toggle this to bypass phone OTP during testing.
-  const TEST_BYPASS_OTP = true
+  const TEST_BYPASS_OTP = false
   // Set to false to restore the original PhonePe redirect flow.
   const TEST_BYPASS_PHONEPE = false // <-- set to false for production
 
