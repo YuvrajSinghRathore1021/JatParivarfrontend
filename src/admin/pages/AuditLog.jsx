@@ -1,18 +1,40 @@
 // frontend/src/admin/pages/AuditLog.jsx
 import { useState } from 'react'
-import { useAdminQuery } from '../hooks/useAdminApi.js'
+import { useAdminMutation, useAdminQuery } from '../hooks/useAdminApi.js'
 
 export default function AuditLogPage() {
   const [page, setPage] = useState(1)
   const { data, isLoading } = useAdminQuery(['admin', 'audit', page], `/audit-logs?page=${page}`)
+  const deleteAllMutation = useAdminMutation('/audit-logs/delete-all', { method: 'POST', invalidate: [['admin', 'audit']] })
   const list = data?.data || []
   const meta = data?.meta || { page: 1, pageSize: 20, total: 0 }
+  const handleDeleteAll = async () => {
+    const ok = window.confirm('Delete all audit logs? This cannot be undone.')
+    if (!ok) return
+    try {
+      await deleteAllMutation.mutateAsync({})
+      setPage(1)
+    } catch (err) {
+      alert(err?.message || 'Could not delete audit logs.')
+    }
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">Audit log</h1>
-        <p className="text-sm text-slate-500">Review recent administrative activity.</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold">Audit log</h1>
+          <p className="text-sm text-slate-500">Review recent administrative activity.</p>
+          <p className="text-xs text-slate-400">Logs auto-delete after 15 days.</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleDeleteAll}
+          disabled={deleteAllMutation.isPending}
+          className="rounded border border-red-300 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100 disabled:opacity-60"
+        >
+          {deleteAllMutation.isPending ? 'Deleting...' : 'Delete all logs'}
+        </button>
       </div>
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
         <table className="min-w-full divide-y divide-slate-200 text-sm">

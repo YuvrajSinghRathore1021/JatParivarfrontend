@@ -6,6 +6,7 @@ import { get, patch } from '../lib/api'
 import { useGeoOptions } from '../hooks/useGeoOptions'
 import { useGotraOptions } from '../hooks/useGotraOptions'
 import NumberRequestButton from './NumberRequestButton'
+import { OCCUPATION_FILTER_OPTIONS, getOccupationLabel } from '../constants/profileOptions'
 
 const API_File = import.meta.env.VITE_API_File
 
@@ -108,30 +109,7 @@ export default function Found() {
       alert(`Request ${decision}`)
     }
   }
-
-  const OCCUPATION = {
-    en: [
-      { value: 'government_job', label: 'Government job' },
-      { value: 'private_job', label: 'Private job' },
-      { value: 'business', label: 'Business' },
-      { value: 'student', label: 'Student' },
-    ],
-    hi: [
-      { value: 'government_job', label: 'सरकारी नौकरी' },
-      { value: 'private_job', label: 'निजी नौकरी' },
-      { value: 'business', label: 'व्यवसाय' },
-      { value: 'student', label: 'छात्र' },
-    ],
-  }
-
   const cards = useMemo(() => {
-    const OCC_LABELS = {
-      government_job: lang === 'hi' ? 'सरकारी नौकरी' : 'Government job',
-      private_job: lang === 'hi' ? 'निजी नौकरी' : 'Private job',
-      business: lang === 'hi' ? 'व्यवसाय' : 'Business',
-      student: lang === 'hi' ? 'छात्र' : 'Student',
-    }
-
     return (data || []).map((p) => {
       const addr = p.currentAddress || p.occupationAddress || p.parentalAddress || {}
       return {
@@ -144,7 +122,7 @@ export default function Found() {
         district: addr.district || '',
         city: addr.city || '',
         gotra: p.gotra?.self || '',
-        occupation: OCC_LABELS[p.occupation] || p.occupation || '',
+        occupation: getOccupationLabel(p.occupation, lang),
       }
     })
   }, [data, lang])
@@ -283,7 +261,7 @@ export default function Found() {
             onChange={(e) => setOccupation(e.target.value)}
           >
             <option value="">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</option>
-            {(lang === 'hi' ? OCCUPATION.hi : OCCUPATION.en).map((o) => (
+            {OCCUPATION_FILTER_OPTIONS[lang].map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
@@ -516,3 +494,5 @@ export default function Found() {
     </div>
   )
 }
+
+

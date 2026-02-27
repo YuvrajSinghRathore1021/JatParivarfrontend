@@ -6,24 +6,9 @@ import { get } from '../../lib/api'
 import { useLang } from '../../lib/useLang'
 import { makeInitialAvatar } from '../../lib/avatar'
 import NumberRequestButton from '../NumberRequestButton'
+import { getOccupationLabel, getEducationLabel } from '../../constants/profileOptions'
 let API_File = import.meta.env.VITE_API_File
 const fetchPerson = (id) => get(`/found/user/${id}`)
-
-const OCCUPATION_LABELS = {
-  govt: 'Government job',
-  government_job: 'Government job',
-  private: 'Private job',
-  private_job: 'Private job',
-  business: 'Business',
-  student: 'Student'
-}
-
-const EDUCATION_LABELS = {
-  high_school: 'High school',
-  graduate: 'Graduate',
-  postgraduate: 'Postgraduate',
-  phd: 'PhD'
-}
 
 export default function UserDetails() {
   const { personId } = useParams()
@@ -40,10 +25,10 @@ export default function UserDetails() {
   const canViewPhone = Boolean(data?.canViewPhone)
   const phone = canViewPhone ? (person?.phone || person?.alternatePhone || '—') : '—'
   const email = person?.contactEmail || person?.email || '—'
-  const occupation = OCCUPATION_LABELS[person?.occupation] || person?.occupation || '—'
+  const occupation = getOccupationLabel(person?.occupation, lang) || '—'
   const designation = person?.designation || person?.title || '—'
   const educationRaw = person?.education?.highestQualification || person?.education
-  const education = EDUCATION_LABELS[educationRaw] || educationRaw || '—'
+  const education = getEducationLabel(educationRaw, lang) || '—'
   const department = person?.department || '—'
 
   const addressEntries = [
@@ -254,3 +239,5 @@ function InfoTile({ labelEn, labelHi, value, lang, children }) {
     </div>
   )
 }
+
+

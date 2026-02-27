@@ -8,30 +8,20 @@ import { fetchMyMatrimonyProfile, saveMatrimonyProfile, deleteMatrimonyProfile }
 import { useGotraOptions } from '../../../hooks/useGotraOptions'
 import { upload } from '../../../lib/api'
 import AddressBlock from '../../../components/AddressBlock'
+import {
+  OCCUPATION_CATEGORY_OPTIONS,
+  PROFESSIONAL_SERVICE_OPTIONS,
+  EDUCATION_CATEGORY_OPTIONS,
+  GRADUATE_SPECIALIZATION_OPTIONS,
+  getOccupationCategory,
+  getOccupationSpecialization,
+  composeOccupationValue,
+  getEducationCategory,
+  getGraduateSpecialization,
+  getPostgraduateCustomText,
+  composeEducationValue,
+} from '../../../constants/profileOptions'
 let API_File = import.meta.env.VITE_API_File
-
-const normalizeOccupationKey = (value) => {
-  const v = String(value || '').trim()
-  if (!v) return ''
-  if (v === 'govt') return 'government_job'
-  if (v === 'private') return 'private_job'
-  return v
-}
-
-const OCCUPATION_OPTIONS = {
-  en: [
-    { value: 'government_job', label: 'Government Job' },
-    { value: 'private_job', label: 'Private Job' },
-    { value: 'business', label: 'Business' },
-    { value: 'student', label: 'Student' },
-  ],
-  hi: [
-    { value: 'government_job', label: 'सरकारी नौकरी' },
-    { value: 'private_job', label: 'प्राइवेट नौकरी' },
-    { value: 'business', label: 'व्यवसाय' },
-    { value: 'student', label: 'छात्र' },
-  ],
-}
 const genders = [
   { value: 'male', labelEn: 'Male', labelHi: 'पुरुष' },
   { value: 'female', labelEn: 'Female', labelHi: 'महिला' },
@@ -118,7 +108,7 @@ export default function MatrimonyProfileForm() {
         education: data.education || '',
         designation: data.designation || '',
         department: data.department || '',
-        occupation: normalizeOccupationKey(data.occupation),
+        occupation: data.occupation || '',
 
         height: data.height || '',
         gotraSelf: data.gotra?.self || '',
@@ -166,6 +156,19 @@ export default function MatrimonyProfileForm() {
 
   const onSubmit = (event) => {
     event.preventDefault()
+    if (occupationCategory === 'professional_services' && !occupationSpecialization) {
+      setPhotoError(lang === 'hi' ? 'कृपया प्रोफेशनल सर्विसेज विशेषज्ञता चुनें।' : 'Please select professional service specialization.')
+      return
+    }
+    if (educationCategory === 'graduate' && !graduateSpecialization) {
+      setPhotoError(lang === 'hi' ? 'कृपया स्नातक विशेषज्ञता चुनें।' : 'Please select graduate specialization.')
+      return
+    }
+    if (educationCategory === 'postgraduate' && !String(postgraduateCustomText || '').trim()) {
+      setPhotoError(lang === 'hi' ? 'कृपया स्नातकोत्तर योग्यता दर्ज करें।' : 'Please enter postgraduate qualification.')
+      return
+    }
+    setPhotoError('')
     mutation.mutate({
       age: form.age ? Number(form.age) : undefined,
       gender: form.gender,
@@ -174,7 +177,7 @@ export default function MatrimonyProfileForm() {
       education: form.education,
       department: form.department,
       designation: form.designation,
-      occupation: normalizeOccupationKey(form.occupation),
+      occupation: form.occupation,
       height: form.height,
       visible: form.visible,
 
@@ -242,6 +245,13 @@ export default function MatrimonyProfileForm() {
       }))
     }
   }, [sameAsOccupation, form.occupationAddress])
+
+  const occupationCategory = getOccupationCategory(form.occupation)
+  const occupationSpecialization = getOccupationSpecialization(form.occupation)
+  const educationCategory = getEducationCategory(form.education)
+  const graduateSpecialization = getGraduateSpecialization(form.education)
+  const postgraduateCustomText = getPostgraduateCustomText(form.education)
+
   return (
     <form onSubmit={onSubmit} className="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <header>
@@ -307,39 +317,60 @@ export default function MatrimonyProfileForm() {
               ))}
             </select>
           </label>
-          <label className="block text-sm">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'शिक्षा' : 'Education'}</span>
-            {/* <input value={form.education} onChange={handleChange('education')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" /> */}
-
-
-
-            <select
-              value={form.education}
-              onChange={handleChange('education')}
-              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
-            >
-              <option value="">
-                {lang === 'hi' ? 'शिक्षा चुनें' : 'Select Education'}
-              </option>
-
-
-
-              <option value="high_school">
-                {lang === 'hi' ? 'हाई स्कूल' : 'High School'}
-              </option>
-
-              <option value="graduate">
-                {lang === 'hi' ? 'स्नातक' : 'Graduate'}
-              </option>
-
-              <option value="postgraduate">
-                {lang === 'hi' ? 'स्नातकोत्तर' : 'Postgraduate'}
-              </option>
-
-              <option value="phd">
-                {lang === 'hi' ? 'पीएचडी' : 'PhD'}
-              </option>
-            </select> </label>
+          <SelectField
+            label={lang === 'hi' ? 'शिक्षा' : 'Education'}
+            value={educationCategory}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                education: composeEducationValue({
+                  category: value,
+                  graduateSpecialization,
+                  postgraduateCustomText
+                })
+              }))
+            }
+            options={EDUCATION_CATEGORY_OPTIONS[lang] || EDUCATION_CATEGORY_OPTIONS.en}
+            placeholder={lang === 'hi' ? 'शिक्षा चुनें' : 'Select education'}
+          />
+          {educationCategory === 'graduate' && (
+            <SelectField
+              label={lang === 'hi' ? 'स्नातक विशेषज्ञता' : 'Graduate Specialization'}
+              value={graduateSpecialization}
+              onChange={(value) =>
+                setForm((prev) => ({
+                  ...prev,
+                  education: composeEducationValue({
+                    category: 'graduate',
+                    graduateSpecialization: value,
+                    postgraduateCustomText
+                  })
+                }))
+              }
+              options={GRADUATE_SPECIALIZATION_OPTIONS[lang] || GRADUATE_SPECIALIZATION_OPTIONS.en}
+              placeholder={lang === 'hi' ? 'स्नातक विशेषज्ञता चुनें' : 'Select graduate specialization'}
+            />
+          )}
+          {educationCategory === 'postgraduate' && (
+            <label className="block text-sm">
+              <span className="font-semibold text-slate-600">{lang === 'hi' ? 'स्नातकोत्तर योग्यता' : 'Postgraduate Qualification'}</span>
+              <input
+                value={postgraduateCustomText}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    education: composeEducationValue({
+                      category: 'postgraduate',
+                      graduateSpecialization,
+                      postgraduateCustomText: e.target.value
+                    })
+                  }))
+                }
+                className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+                placeholder={lang === 'hi' ? 'अपनी योग्यता लिखें' : 'Type your qualification'}
+              />
+            </label>
+          )}
 
             <label className="block text-sm">
                         <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
@@ -350,21 +381,42 @@ export default function MatrimonyProfileForm() {
                         <input value={form.designation} onChange={handleChange('designation')} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
                     </label> 
 
-          <label className="block text-sm md:col-span-2">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
-            <select
-              value={form.occupation}
-              onChange={handleChange('occupation')}
-              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
-            >
-              <option value="">{lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}</option>
-              {(lang === 'hi' ? OCCUPATION_OPTIONS.hi : OCCUPATION_OPTIONS.en).map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="md:col-span-2">
+            <SelectField
+              label={lang === 'hi' ? 'व्यवसाय' : 'Occupation'}
+              value={occupationCategory}
+              onChange={(value) =>
+                setForm((prev) => ({
+                  ...prev,
+                  occupation: composeOccupationValue({
+                    category: value,
+                    specialization: occupationSpecialization
+                  })
+                }))
+              }
+              options={OCCUPATION_CATEGORY_OPTIONS[lang] || OCCUPATION_CATEGORY_OPTIONS.en}
+              placeholder={lang === 'hi' ? 'व्यवसाय चुनें' : 'Select occupation'}
+            />
+          </div>
+          {occupationCategory === 'professional_services' && (
+            <div className="md:col-span-2">
+              <SelectField
+                label={lang === 'hi' ? 'प्रोफेशनल सर्विसेज विशेषज्ञता' : 'Professional Services Specialization'}
+                value={occupationSpecialization}
+                onChange={(value) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    occupation: composeOccupationValue({
+                      category: 'professional_services',
+                      specialization: value
+                    })
+                  }))
+                }
+                options={PROFESSIONAL_SERVICE_OPTIONS[lang] || PROFESSIONAL_SERVICE_OPTIONS.en}
+                placeholder={lang === 'hi' ? 'विशेषज्ञता चुनें' : 'Select specialization'}
+              />
+            </div>
+          )}
 
           <AddressBlock
             title={lang === 'hi' ? 'व्यवसाय का पता' : 'Occupation Address'}

@@ -5,23 +5,8 @@ import { Link } from 'react-router-dom'
 import { useLang } from '../lib/useLang'
 import { makeInitialAvatar } from '../lib/avatar'
 import { get } from '../lib/api'
+import { getOccupationLabel, getEducationLabel } from '../constants/profileOptions'
 let API_File = import.meta.env.VITE_API_File
-
-const OCCUPATION_LABELS = {
-  govt: 'Government job',
-  government_job: 'Government job',
-  private: 'Private job',
-  private_job: 'Private job',
-  business: 'Business',
-  student: 'Student'
-}
-
-const EDUCATION_LABELS = {
-  high_school: 'High school',
-  graduate: 'Graduate',
-  postgraduate: 'Postgraduate',
-  phd: 'PhD'
-}
 
 const fetchManagement = () => get('/public/people?role=management')
 
@@ -49,15 +34,15 @@ export default function Management() {
         name: person.name,
         designation: person.designation || user.designation || person.title,
         department: person.department || user.department || '',
-        occupation: OCCUPATION_LABELS[person.occupation || user.occupation] || person.occupation || user.occupation || '',
-        education: EDUCATION_LABELS[person.education || user.education] || person.education || user.education || '',
+        occupation: getOccupationLabel(person.occupation || user.occupation, lang),
+        education: getEducationLabel(person.education || user.education, lang),
         location: formatLocation(primaryAddress) || person.place || '',
         image: person.photo ? API_File + person.photo : makeInitialAvatar(person.name || 'Leader', { size: 100, radius: 28 }),
-        phone: user.phone,
+        phone: user.phone || null,
         contactEmail: user.contactEmail,
       }
     })
-  }, [data])
+  }, [data, lang])
 
   return (
     <main className="bg-slate-50">

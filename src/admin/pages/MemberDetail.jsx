@@ -1,4 +1,4 @@
-// frontend/src/admin/pages/MemberDetail.jsx
+﻿// frontend/src/admin/pages/MemberDetail.jsx
 
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -9,6 +9,19 @@ import { useGeoOptions } from '../../hooks/useGeoOptions'
 import AddressBlock from '../../components/AddressBlock.jsx'
 import SelectField from '../../components/SelectField'
 import { useGotraOptions } from '../../hooks/useGotraOptions'
+import {
+  OCCUPATION_CATEGORY_OPTIONS,
+  PROFESSIONAL_SERVICE_OPTIONS,
+  EDUCATION_CATEGORY_OPTIONS,
+  GRADUATE_SPECIALIZATION_OPTIONS,
+  getOccupationCategory,
+  getOccupationSpecialization,
+  composeOccupationValue,
+  getEducationCategory,
+  getGraduateSpecialization,
+  getPostgraduateCustomText,
+  composeEducationValue,
+} from '../../constants/profileOptions'
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
   { value: 'disabled', label: 'Disabled' },
@@ -55,6 +68,7 @@ export default function MemberDetailPage() {
     const safeMember = {
       ...res.member,
       gotra: safeGotra,
+      showPhoneOnPublic: res?.member?.showPhoneOnPublic !== false,
       occupationAddress: res?.member?.occupationAddress && typeof res.member.occupationAddress === 'object' ? res.member.occupationAddress : {},
       currentAddress: res?.member?.currentAddress && typeof res.member.currentAddress === 'object' ? res.member.currentAddress : {},
       parentalAddress: res?.member?.parentalAddress && typeof res.member.parentalAddress === 'object' ? res.member.parentalAddress : {},
@@ -80,7 +94,7 @@ export default function MemberDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, token])
 
-  // ⬇️ ADD THIS useEffect
+  // â¬‡ï¸ ADD THIS useEffect
   useEffect(() => {
     if (member) {
       setAddressCodes({
@@ -117,7 +131,7 @@ export default function MemberDetailPage() {
   if (!member) {
     return (
       <div className="bg-white border border-slate-200 rounded-lg p-4">
-        {error ? <p className="text-sm text-red-600">{error}</p> : <p>Loading…</p>}
+        {error ? <p className="text-sm text-red-600">{error}</p> : <p>Loadingâ€¦</p>}
       </div>
     )
   }
@@ -212,6 +226,15 @@ export default function MemberDetailPage() {
       if (passwords.value && passwords.value !== passwords.confirm) {
         throw new Error('Passwords do not match')
       }
+      if (occupationCategory === 'professional_services' && !occupationSpecialization) {
+        throw new Error('Please select professional service specialization')
+      }
+      if (educationCategory === 'graduate' && !graduateSpecialization) {
+        throw new Error('Please select graduate specialization')
+      }
+      if (educationCategory === 'postgraduate' && !String(postgraduateCustomText || '').trim()) {
+        throw new Error('Please enter postgraduate qualification')
+      }
       const payload = {
         name: member.name,
         displayName: member.displayName,
@@ -223,6 +246,7 @@ export default function MemberDetailPage() {
         contactEmail: member.contactEmail,
         status: member.status,
         alternatePhone: member.alternatePhone,
+        showPhoneOnPublic: member.showPhoneOnPublic,
         occupation: member.occupation,
         designation: member.designation,
         department: member.department,
@@ -312,13 +336,19 @@ export default function MemberDetailPage() {
     return '__custom'
   }
 
+  const occupationCategory = getOccupationCategory(member.occupation)
+  const occupationSpecialization = getOccupationSpecialization(member.occupation)
+  const educationCategory = getEducationCategory(member.education)
+  const graduateSpecialization = getGraduateSpecialization(member.education)
+  const postgraduateCustomText = getPostgraduateCustomText(member.education)
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">{member.name}</h1>
           <p className="text-sm text-slate-500">
-            Member profile · Role: <span className="capitalize">{member.role}</span>
+            Member profile Â· Role: <span className="capitalize">{member.role}</span>
           </p>
         </div>
         <button
@@ -326,7 +356,7 @@ export default function MemberDetailPage() {
           disabled={deleting}
           className="rounded border border-red-300 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60"
         >
-          {deleting ? 'Deleting…' : 'Delete member'}
+          {deleting ? 'Deletingâ€¦' : 'Delete member'}
         </button>
       </div>
 
@@ -342,39 +372,103 @@ export default function MemberDetailPage() {
           <Field label="Email" value={member.email || ''} onChange={(val) => updateMemberField('email', val)} />
           <Field label="Contact email" value={member.contactEmail || ''} onChange={(val) => updateMemberField('contactEmail', val)} />
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">
-              Occupation
+          <SelectField
+            label={lang === 'hi' ? 'Occupation' : 'Occupation'}
+            value={occupationCategory}
+            onChange={(value) =>
+              updateMemberField(
+                'occupation',
+                composeOccupationValue({
+                  category: value,
+                  specialization: occupationSpecialization
+                })
+              )
+            }
+            options={OCCUPATION_CATEGORY_OPTIONS[lang] || OCCUPATION_CATEGORY_OPTIONS.en}
+            placeholder={lang === 'hi' ? 'Select occupation' : 'Select occupation'}
+          />
+          {occupationCategory === 'professional_services' && (
+            <SelectField
+              label={lang === 'hi' ? 'Professional Services Specialization' : 'Professional Services Specialization'}
+              value={occupationSpecialization}
+              onChange={(value) =>
+                updateMemberField(
+                  'occupation',
+                  composeOccupationValue({
+                    category: 'professional_services',
+                    specialization: value
+                  })
+                )
+              }
+              options={PROFESSIONAL_SERVICE_OPTIONS[lang] || PROFESSIONAL_SERVICE_OPTIONS.en}
+              placeholder={lang === 'hi' ? 'Select specialization' : 'Select specialization'}
+            />
+          )}
+          <SelectField
+            label={lang === 'hi' ? 'Education' : 'Education'}
+            value={educationCategory}
+            onChange={(value) =>
+              updateMemberField(
+                'education',
+                composeEducationValue({
+                  category: value,
+                  graduateSpecialization,
+                  postgraduateCustomText
+                })
+              )
+            }
+            options={EDUCATION_CATEGORY_OPTIONS[lang] || EDUCATION_CATEGORY_OPTIONS.en}
+            placeholder={lang === 'hi' ? 'Select education' : 'Select education'}
+          />
+          {educationCategory === 'graduate' && (
+            <SelectField
+              label={lang === 'hi' ? 'Graduate Specialization' : 'Graduate Specialization'}
+              value={graduateSpecialization}
+              onChange={(value) =>
+                updateMemberField(
+                  'education',
+                  composeEducationValue({
+                    category: 'graduate',
+                    graduateSpecialization: value,
+                    postgraduateCustomText
+                  })
+                )
+              }
+              options={GRADUATE_SPECIALIZATION_OPTIONS[lang] || GRADUATE_SPECIALIZATION_OPTIONS.en}
+              placeholder={lang === 'hi' ? 'Select graduate specialization' : 'Select graduate specialization'}
+            />
+          )}
+          {educationCategory === 'postgraduate' && (
+            <label className="block text-sm">
+              <span className="font-semibold text-slate-600">{lang === 'hi' ? 'Postgraduate Qualification' : 'Postgraduate Qualification'}</span>
+              <input
+                value={postgraduateCustomText}
+                onChange={(e) =>
+                  updateMemberField(
+                    'education',
+                    composeEducationValue({
+                      category: 'postgraduate',
+                      graduateSpecialization,
+                      postgraduateCustomText: e.target.value
+                    })
+                  )
+                }
+                className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+                placeholder={lang === 'hi' ? 'Type your qualification' : 'Type your qualification'}
+              />
             </label>
-
-            <select
-              className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={member.occupation || ""}
-              onChange={(e) => updateMemberField("occupation", e.target.value)}
-            >
-              <option value="">Select Occupation</option>
-              <option value="government_job">Government Job</option>
-              <option value="private_job">Private Job</option>
-              <option value="business">Business</option>
-              <option value="student">Student</option>
-            </select>
-          </div>
-
-          <label className="block text-sm">
-            <span className="font-semibold text-slate-600">
-              {lang === 'hi' ? 'शिक्षा' : 'Education'}
-            </span>
-
-            <select value={member.education} onChange={(e) => updateMemberField('education', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white">
-              <option value=""> {lang === 'hi' ? 'शिक्षा चुनें' : 'Select Education'} </option>
-              <option value="high_school"> {lang === 'hi' ? 'हाई स्कूल' : 'High School'} </option>
-              <option value="graduate"> {lang === 'hi' ? 'स्नातक' : 'Graduate'}</option>
-              <option value="postgraduate">{lang === 'hi' ? 'स्नातकोत्तर' : 'Postgraduate'}</option>
-              <option value="phd">{lang === 'hi' ? 'पीएचडी' : 'PhD'}</option>
-            </select>
+          )}
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+            <input
+              type="checkbox"
+              checked={Boolean(member.showPhoneOnPublic)}
+              onChange={(e) => updateMemberField('showPhoneOnPublic', e.target.checked)}
+              className="h-4 w-4"
+            />
+            {lang === 'hi' ? 'Show phone publicly on profile pages' : 'Show phone publicly on profile pages'}
           </label>
           <label className="block text-sm">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'à¤¡à¤¿à¤ªà¤¾à¤°à¥à¤Ÿà¤®à¥‡à¤‚à¤Ÿ' : 'Department'}</span>
             <input value={member.department} onChange={(e) => updateMemberField('department', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
           </label>
           <Field label="Designation" value={member.designation || ''} onChange={(val) => updateMemberField('designation', val)} />
@@ -422,7 +516,7 @@ export default function MemberDetailPage() {
           {/* address  */}
 
           <AddressBlock
-            title={lang === 'hi' ? 'व्यवसाय का पता' : 'Occupation Address'}
+            title={lang === 'hi' ? 'à¤µà¥à¤¯à¤µà¤¸à¤¾à¤¯ à¤•à¤¾ à¤ªà¤¤à¤¾' : 'Occupation Address'}
             formKey="occupationAddress"
             form={member}
             setForm={setMember}
@@ -456,14 +550,14 @@ export default function MemberDetailPage() {
                 className="h-4 w-4"
               />
               {lang === 'hi'
-                ? 'वर्तमान पता व्यवसाय के पते जैसा ही है' :
+                ? 'à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤ªà¤¤à¤¾ à¤µà¥à¤¯à¤µà¤¸à¤¾à¤¯ à¤•à¥‡ à¤ªà¤¤à¥‡ à¤œà¥ˆà¤¸à¤¾ à¤¹à¥€ à¤¹à¥ˆ' :
                 'Current address is same as occupation address'}
             </label>
 
           </label>
           {!sameAsOccupation && (
             <AddressBlock
-              title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+              title={lang === 'hi' ? 'à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤ªà¤¤à¤¾' : 'Current Address'}
               formKey="currentAddress"
               form={member}
               setForm={setMember}
@@ -497,7 +591,7 @@ export default function MemberDetailPage() {
                 className="h-4 w-4"
               />
               {lang === 'hi'
-                ? 'पैतृक पता वर्तमान पते जैसा ही है'
+                ? 'à¤ªà¥ˆà¤¤à¥ƒà¤• à¤ªà¤¤à¤¾ à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤ªà¤¤à¥‡ à¤œà¥ˆà¤¸à¤¾ à¤¹à¥€ à¤¹à¥ˆ'
                 : 'Parental address is same as current address'}
             </label>
 
@@ -505,7 +599,7 @@ export default function MemberDetailPage() {
 
           {!sameAsCurrent && (
             <AddressBlock
-              title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+              title={lang === 'hi' ? 'à¤ªà¥ˆà¤¤à¥ƒà¤• à¤ªà¤¤à¤¾' : 'Parental Address'}
               formKey="parentalAddress"
               form={member}
               setForm={setMember}
@@ -533,7 +627,7 @@ export default function MemberDetailPage() {
 	          />
 	            {gotraChoice(member.gotra?.self) === '__custom' && (
 	              <input
-	                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                placeholder={lang === 'hi' ? 'à¤—à¥‹à¤¤à¥à¤° à¤²à¤¿à¤–à¥‡à¤‚' : 'Enter gotra'}
 	                value={gotraform?.self || ''}
 	                onChange={handleChangeNew('self')}
 	                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
@@ -550,7 +644,7 @@ export default function MemberDetailPage() {
 	          />
 	            {gotraChoice(member.gotra?.mother) === '__custom' && (
 	              <input
-	                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                placeholder={lang === 'hi' ? 'à¤—à¥‹à¤¤à¥à¤° à¤²à¤¿à¤–à¥‡à¤‚' : 'Enter gotra'}
 	                value={gotraform?.mother || ''}
 	                onChange={handleChangeNew('mother')}
 	                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
@@ -566,7 +660,7 @@ export default function MemberDetailPage() {
 	          />
 	            {gotraChoice(member.gotra?.dadi) === '__custom' && (
 	              <input
-	                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                placeholder={lang === 'hi' ? 'à¤—à¥‹à¤¤à¥à¤° à¤²à¤¿à¤–à¥‡à¤‚' : 'Enter gotra'}
 	                value={gotraform?.dadi || ''}
 	                onChange={handleChangeNew('dadi')}
 	                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
@@ -582,7 +676,7 @@ export default function MemberDetailPage() {
 	          />
 	            {gotraChoice(member.gotra?.nani) === '__custom' && (
 	              <input
-	                placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                placeholder={lang === 'hi' ? 'à¤—à¥‹à¤¤à¥à¤° à¤²à¤¿à¤–à¥‡à¤‚' : 'Enter gotra'}
 	                value={gotraform?.nani || ''}
 	                onChange={handleChangeNew('nani')}
 	                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
@@ -603,7 +697,7 @@ export default function MemberDetailPage() {
             onUpload={handleAvatarUpload}
             uploading={uploading.avatar}
             accept="image/*"
-            hint="JPG/PNG • Max 1 MB"
+            hint="JPG/PNG â€¢ Max 1 MB"
           />
           <UploadField
             label="Jan Aadhaar (file URL)"
@@ -612,7 +706,7 @@ export default function MemberDetailPage() {
             onUpload={handleJanUpload}
             uploading={uploading.jan}
             accept="application/pdf,image/*"
-            hint="PDF or image • Max 10 MB"
+            hint="PDF or image â€¢ Max 10 MB"
           />
         </div>
 
@@ -639,7 +733,7 @@ export default function MemberDetailPage() {
             onUpload={handleAdimageUpload}
             uploading={uploading.adimage}
             accept="application/pdf,image/*"
-            hint="PDF or image • Max 10 MB"
+            hint="PDF or image â€¢ Max 10 MB"
           />
 
           <Field label="Bussiness Details (URL)" value={member?.bussinessurl || ''} onChange={(val) => updateMemberField('bussinessurl', val)} />
@@ -651,7 +745,7 @@ export default function MemberDetailPage() {
             disabled={saving}
             className="rounded bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
-            {saving ? 'Saving…' : 'Save profile'}
+            {saving ? 'Savingâ€¦' : 'Save profile'}
           </button>
         </div>
       </form>
@@ -695,7 +789,7 @@ export default function MemberDetailPage() {
                 onUpload={handleSpotlightBannerUpload}
                 uploading={spotlightBannerUploading}
                 accept="image/*"
-                hint="max 1 MB  size 1920×1080"
+                hint="max 1 MB  size 1920Ã—1080"
               />
             </div>
           </div>
@@ -733,7 +827,7 @@ export default function MemberDetailPage() {
               disabled={savingSpotlight}
               className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
             >
-              {savingSpotlight ? 'Saving…' : 'Save public profile'}
+              {savingSpotlight ? 'Savingâ€¦' : 'Save public profile'}
             </button>
           </div>
         </form>
@@ -771,7 +865,7 @@ function UploadField({ label, value, onChange, onUpload, uploading, accept, hint
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="https://…"
+        placeholder="https://â€¦"
         className="mt-1 w-full max-w-2xl  rounded border border-slate-300 px-3 py-2 text-sm"
       />
       <div className="mt-3 flex items-center gap-3">
@@ -787,12 +881,10 @@ function UploadField({ label, value, onChange, onUpload, uploading, accept, hint
             }}
             disabled={uploading}
           />
-          {uploading ? 'Uploading…' : 'Upload file'}
+          {uploading ? 'Uploadingâ€¦' : 'Upload file'}
         </label>
         {hint && <span className="text-xs text-slate-500">{hint}</span>}
       </div>
     </div>
   )
 }
-
-const hasValues = (obj = {}) => Object.values(obj || {}).some((val) => val)

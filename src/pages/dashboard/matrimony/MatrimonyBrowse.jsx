@@ -10,30 +10,8 @@ import {
   sendMatrimonyInterest,
 } from '../../../lib/dashboardApi'
 import { makeInitialAvatar } from '../../../lib/avatar'
+import { OCCUPATION_FILTER_OPTIONS, normalizeOccupationValue } from '../../../constants/profileOptions'
 let API_File = import.meta.env.VITE_API_File
-
-const normalizeOccupationKey = (value) => {
-  const v = String(value || '').trim()
-  if (!v) return ''
-  if (v === 'govt') return 'government_job'
-  if (v === 'private') return 'private_job'
-  return v
-}
-
-const OCCUPATION_OPTIONS = {
-  en: [
-    { value: 'government_job', label: 'Government Job' },
-    { value: 'private_job', label: 'Private Job' },
-    { value: 'business', label: 'Business' },
-    { value: 'student', label: 'Student' },
-  ],
-  hi: [
-    { value: 'government_job', label: 'सरकारी नौकरी' },
-    { value: 'private_job', label: 'प्राइवेट नौकरी' },
-    { value: 'business', label: 'व्यवसाय' },
-    { value: 'student', label: 'छात्र' },
-  ],
-}
 
 const sortOptions = [
   { value: 'recent', labelEn: 'Recently updated', labelHi: 'हाल ही में अपडेट' },
@@ -90,7 +68,7 @@ export default function MatrimonyBrowse() {
     const nameQ = nameQuery.trim().toLowerCase()
     const desgQ = designationQuery.trim().toLowerCase()
     const deptQ = departmentQuery.trim().toLowerCase()
-    const occQ = normalizeOccupationKey(occupationQuery)
+    const occQ = normalizeOccupationValue(occupationQuery)
     const addrQ = addressQuery.trim().toLowerCase()
     const keyQ = keywordQuery.trim().toLowerCase()
 
@@ -109,7 +87,7 @@ export default function MatrimonyBrowse() {
       const par = profile.parentalAddress || {}
       const addressText = `${cur.village || ''} ${cur.city || ''} ${cur.district || ''} ${cur.state || ''} ${occ.village || ''} ${occ.city || ''} ${occ.district || ''} ${occ.state || ''} ${par.village || ''} ${par.city || ''} ${par.district || ''} ${par.state || ''}`.toLowerCase()
 
-      const normalizedOccupation = normalizeOccupationKey(profile.occupation || user.occupation)
+      const normalizedOccupation = normalizeOccupationValue(profile.occupation || user.occupation)
       const occupationText = `${normalizedOccupation} ${(profile.occupation || '')} ${(user.occupation || '')}`.toLowerCase()
       const keywordText = `${nameText} ${designationText} ${departmentText} ${occupationText} ${locationText} ${addressText} ${(profile.gotra?.self || '').toLowerCase()}`.toLowerCase()
 
@@ -293,7 +271,7 @@ export default function MatrimonyBrowse() {
               className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
             >
               <option value="">{lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}</option>
-              {(lang === 'hi' ? OCCUPATION_OPTIONS.hi : OCCUPATION_OPTIONS.en).map((o) => (
+              {OCCUPATION_FILTER_OPTIONS[lang].map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
@@ -475,3 +453,4 @@ export default function MatrimonyBrowse() {
     </div>
   )
 }
+

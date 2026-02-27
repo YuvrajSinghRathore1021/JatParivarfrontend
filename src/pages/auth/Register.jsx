@@ -10,6 +10,19 @@ import FileDrop from '../../components/FileDrop'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
 import { useGotraOptions } from '../../hooks/useGotraOptions'
 import AddressBlock from '../../components/AddressBlock'
+import {
+  OCCUPATION_CATEGORY_OPTIONS,
+  PROFESSIONAL_SERVICE_OPTIONS,
+  EDUCATION_CATEGORY_OPTIONS,
+  GRADUATE_SPECIALIZATION_OPTIONS,
+  getOccupationCategory,
+  getOccupationSpecialization,
+  composeOccupationValue,
+  getEducationCategory,
+  getGraduateSpecialization,
+  getPostgraduateCustomText,
+  composeEducationValue,
+} from '../../constants/profileOptions'
 const copy = {
   en: {
     title: 'Create your account',
@@ -166,37 +179,6 @@ const MARITAL = {
   ],
 }
 
-const EDUCATION = {
-  en: [
-    { value: 'high_school', label: 'High school' },
-    { value: 'graduate', label: 'Graduate' },
-    { value: 'postgraduate', label: 'Postgraduate' },
-    { value: 'phd', label: 'PhD' },
-  ],
-
-  hi: [
-    { value: 'high_school', label: 'हाई स्कूल' },
-    { value: 'graduate', label: 'स्नातक' },
-    { value: 'postgraduate', label: 'परास्नातक' },
-    { value: 'phd', label: 'पीएचडी' },
-  ],
-}
-
-const OCCUPATION = {
-  en: [
-    { value: 'govt', label: 'Government job' },
-    { value: 'private', label: 'Private job' },
-    { value: 'business', label: 'Business' },
-    { value: 'student', label: 'Student' },
-  ],
-  hi: [
-    { value: 'govt', label: 'सरकारी नौकरी' },
-    { value: 'private', label: 'निजी नौकरी' },
-    { value: 'business', label: 'व्यवसाय' },
-    { value: 'student', label: 'छात्र' },
-  ],
-}
-
 const REFERRAL_REGEX = /^[A-Z0-9-]{6}$/
 const DRAFT_KEY = 'jp_register_draft_v2'
 
@@ -302,7 +284,8 @@ export default function Register() {
     name: '', email: '', password: '',
     dob: '', gender: '', maritalStatus: '',
     education: '', occupation: '',
-      department: '',
+    showPhoneOnPublic: true,
+    department: '',
     designation: '',
 
     occupationAddress: {
@@ -608,6 +591,18 @@ export default function Register() {
       setError(t.occupationRequired)
       return
     }
+    if (getOccupationCategory(form.occupation) === 'professional_services' && !getOccupationSpecialization(form.occupation)) {
+      setError(lang === 'hi' ? 'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤ªà¥à¤°à¥‹à¤«à¥‡à¤¶à¤¨à¤² à¤¸à¤°à¥à¤µà¤¿à¤¸ à¤•à¤¾ à¤µà¤¿à¤¶à¥‡à¤· à¤µà¤¿à¤•à¤²à¥à¤ª à¤šà¥à¤¨à¥‡à¤‚à¥¤' : 'Please select a professional service specialization.')
+      return
+    }
+    if (getEducationCategory(form.education) === 'graduate' && !getGraduateSpecialization(form.education)) {
+      setError(lang === 'hi' ? 'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¥à¤¨à¤¾à¤¤à¤• à¤µà¤¿à¤¶à¥‡à¤·à¤œà¥à¤žà¤¤à¤¾ à¤šà¥à¤¨à¥‡à¤‚à¥¤' : 'Please select graduate specialization.')
+      return
+    }
+    if (getEducationCategory(form.education) === 'postgraduate' && !String(getPostgraduateCustomText(form.education)).trim()) {
+      setError(lang === 'hi' ? 'à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¥à¤¨à¤¾à¤¤à¤•à¥‹à¤¤à¥à¤¤à¤° à¤¯à¥‹à¤—à¥à¤¯à¤¤à¤¾ à¤¦à¤°à¥à¤œ à¤•à¤°à¥‡à¤‚à¥¤' : 'Please enter your postgraduate qualification.')
+      return
+    }
     if (!form.department || !form.department.trim()) {
       setError(t.departmentRequired)
       return
@@ -715,6 +710,11 @@ export default function Register() {
     if (v && gotraValueSet?.has(v)) return v
     return '__custom'
   }
+  const occupationCategory = getOccupationCategory(form.occupation)
+  const occupationSpecialization = getOccupationSpecialization(form.occupation)
+  const educationCategory = getEducationCategory(form.education)
+  const graduateSpecialization = getGraduateSpecialization(form.education)
+  const postgraduateCustomText = getPostgraduateCustomText(form.education)
   const [sameAsCurrent, setSameAsCurrent] = useState(true)
   const [sameAsOccupation, setSameAsOccupation] = useState(true)
   useEffect(() => {
@@ -904,6 +904,16 @@ export default function Register() {
                   required
                 />
 
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(form.showPhoneOnPublic)}
+                    onChange={(e) => setForm({ ...form, showPhoneOnPublic: e.target.checked })}
+                    className="h-4 w-4"
+                  />
+                  {lang === 'hi' ? 'à¤ªà¥à¤°à¥‹à¤«à¤¼à¤¾à¤‡à¤² à¤ªà¥‡à¤œ à¤ªà¤° à¤«à¥‹à¤¨ à¤¨à¤‚à¤¬à¤° à¤¦à¤¿à¤–à¤¾à¤à¤‚' : 'Show phone publicly on profile pages'}
+                </label>
+
                 <div className="relative">
                   <input
                     type={showPwd ? "text" : "password"}
@@ -1006,22 +1016,96 @@ export default function Register() {
               <div className="space-y-4">
                 <SelectField
                   label={t.education}
-                  value={form.education}
-                  onChange={(v) => setForm({ ...form, education: v })}
-                  options={EDUCATION[lang]}
+                  value={educationCategory}
+                  onChange={(v) => {
+                    const next = composeEducationValue({
+                      category: v,
+                      graduateSpecialization,
+                      postgraduateCustomText
+                    })
+                    setForm({ ...form, education: next })
+                  }}
+                  options={EDUCATION_CATEGORY_OPTIONS[lang]}
                   placeholder={t.placeholders.education}
                   required
                 />
 
+                {educationCategory === 'graduate' && (
+                  <SelectField
+                    label={lang === 'hi' ? 'à¤¸à¥à¤¨à¤¾à¤¤à¤• à¤µà¤¿à¤¶à¥‡à¤·à¤œà¥à¤žà¤¤à¤¾' : 'Graduate Specialization'}
+                    value={graduateSpecialization}
+                    onChange={(v) =>
+                      setForm({
+                        ...form,
+                        education: composeEducationValue({
+                          category: 'graduate',
+                          graduateSpecialization: v,
+                          postgraduateCustomText
+                        })
+                      })
+                    }
+                    options={GRADUATE_SPECIALIZATION_OPTIONS[lang]}
+                    placeholder={lang === 'hi' ? 'à¤¸à¥à¤¨à¤¾à¤¤à¤• à¤µà¤¿à¤¶à¥‡à¤·à¤œà¥à¤žà¤¤à¤¾ à¤šà¥à¤¨à¥‡à¤‚' : 'Select graduate specialization'}
+                    required
+                  />
+                )}
+
+                {educationCategory === 'postgraduate' && (
+                  <label className="block text-sm">
+                    <span className="font-semibold text-slate-600">{lang === 'hi' ? 'à¤¸à¥à¤¨à¤¾à¤¤à¤•à¥‹à¤¤à¥à¤¤à¤° à¤¯à¥‹à¤—à¥à¤¯à¤¤à¤¾' : 'Postgraduate Qualification'}</span>
+                    <input
+                      value={postgraduateCustomText}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          education: composeEducationValue({
+                            category: 'postgraduate',
+                            graduateSpecialization,
+                            postgraduateCustomText: e.target.value
+                          })
+                        })
+                      }
+                      className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+                      placeholder={lang === 'hi' ? 'à¤…à¤ªà¤¨à¥€ à¤¯à¥‹à¤—à¥à¤¯à¤¤à¤¾ à¤²à¤¿à¤–à¥‡à¤‚' : 'Type your qualification'}
+                    />
+                  </label>
+                )}
 
                 <SelectField
                   label={t.occupation}
-                  value={form.occupation}
-                  onChange={(v) => setForm({ ...form, occupation: v })}
-                  options={OCCUPATION[lang]}
+                  value={occupationCategory}
+                  onChange={(v) =>
+                    setForm({
+                      ...form,
+                      occupation: composeOccupationValue({
+                        category: v,
+                        specialization: occupationSpecialization
+                      })
+                    })
+                  }
+                  options={OCCUPATION_CATEGORY_OPTIONS[lang]}
                   placeholder={t.placeholders.occupation}
                   required
                 />
+
+                {occupationCategory === 'professional_services' && (
+                  <SelectField
+                    label={lang === 'hi' ? 'à¤ªà¥à¤°à¥‹à¤«à¥‡à¤¶à¤¨à¤² à¤¸à¤°à¥à¤µà¤¿à¤¸ à¤µà¤¿à¤¶à¥‡à¤·à¤œà¥à¤žà¤¤à¤¾' : 'Professional Services Specialization'}
+                    value={occupationSpecialization}
+                    onChange={(v) =>
+                      setForm({
+                        ...form,
+                        occupation: composeOccupationValue({
+                          category: 'professional_services',
+                          specialization: v
+                        })
+                      })
+                    }
+                    options={PROFESSIONAL_SERVICE_OPTIONS[lang]}
+                    placeholder={lang === 'hi' ? 'à¤µà¤¿à¤¶à¥‡à¤·à¤œà¥à¤žà¤¤à¤¾ à¤šà¥à¤¨à¥‡à¤‚' : 'Select specialization'}
+                    required
+                  />
+                )}
                 <label className="block text-sm">
                         <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
                         <input value={form.department} 
@@ -1215,3 +1299,4 @@ export default function Register() {
     </main>
   )
 }
+

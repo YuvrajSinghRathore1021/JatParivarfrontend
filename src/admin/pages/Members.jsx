@@ -1,4 +1,4 @@
-// frontend/src/admin/pages/Members.jsx
+﻿// frontend/src/admin/pages/Members.jsx
 import { useMemo, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAdminAuth } from '../context/AdminAuthContext.jsx'
@@ -10,14 +10,27 @@ import SelectField from '../../components/SelectField'
 import { useGeoOptions } from '../../hooks/useGeoOptions'
 import { useGotraOptions } from '../../hooks/useGotraOptions'
 import AddressBlock from '../../components/AddressBlock.jsx'
+import {
+  OCCUPATION_CATEGORY_OPTIONS,
+  PROFESSIONAL_SERVICE_OPTIONS,
+  EDUCATION_CATEGORY_OPTIONS,
+  GRADUATE_SPECIALIZATION_OPTIONS,
+  getOccupationCategory,
+  getOccupationSpecialization,
+  composeOccupationValue,
+  getEducationCategory,
+  getGraduateSpecialization,
+  getPostgraduateCustomText,
+  composeEducationValue,
+} from '../../constants/profileOptions'
 const pageSizes = [20, 50, 100]
 const sortOptions = [
   { value: 'createdAt:desc', label: 'Newest first' },
   { value: 'createdAt:asc', label: 'Oldest first' },
-  { value: 'name:asc', label: 'Name (A–Z)' },
-  { value: 'name:desc', label: 'Name (Z–A)' },
-  { value: 'role:asc', label: 'Role (A–Z)' },
-  { value: 'role:desc', label: 'Role (Z–A)' },
+  { value: 'name:asc', label: 'Name (Aâ€“Z)' },
+  { value: 'name:desc', label: 'Name (Zâ€“A)' },
+  { value: 'role:asc', label: 'Role (Aâ€“Z)' },
+  { value: 'role:desc', label: 'Role (Zâ€“A)' },
 ]
 
 export default function MembersPage() {
@@ -100,7 +113,7 @@ export default function MembersPage() {
               type="text"
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              placeholder="Name, phone, referral code, gotra…"
+              placeholder="Name, phone, referral code, gotraâ€¦"
               className="mt-1 w-full max-w-2xl  border border-slate-300 rounded px-3 py-2 text-sm"
             />
           </div>
@@ -179,7 +192,7 @@ export default function MembersPage() {
             {isLoading && (
               <tr>
                 <td colSpan={7} className="px-4 py-6 text-center text-slate-500">
-                  Loading…
+                  Loadingâ€¦
                 </td>
               </tr>
             )}
@@ -195,9 +208,9 @@ export default function MembersPage() {
             {list.map((member) => (
               <tr key={member.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-slate-800 break-all line-clamp-2">{member.name || '—'}</div>
+                  <div className="font-medium text-slate-800 break-all line-clamp-2">{member.name || 'â€”'}</div>
                   <div className="text-xs text-slate-500 break-all line-clamp-2">{member.displayName}</div>
-                  <div className="text-xs text-slate-400">{member.email || '—'}</div>
+                  <div className="text-xs text-slate-400">{member.email || 'â€”'}</div>
                 </td>
                 <td className="px-4 py-3 text-slate-700">
                   <div>{member.phone}</div>
@@ -205,10 +218,10 @@ export default function MembersPage() {
                     <div className="text-xs text-slate-500">{member.alternatePhone}</div>
                   )}
                 </td>
-                <td className="px-4 py-3 text-slate-700 capitalize">{member.role || '—'}</td>
+                <td className="px-4 py-3 text-slate-700 capitalize">{member.role || 'â€”'}</td>
                 <td className="px-4 py-3 text-slate-700 font-mono text-xs">
                   <div className="flex items-center gap-2">
-                    <span>{member.referralCode || '—'}</span>
+                    <span>{member.referralCode || 'â€”'}</span>
                     {member.referralCode && (
                       <button
                         type="button"
@@ -223,7 +236,7 @@ export default function MembersPage() {
                     <div className="mt-1 text-[11px] font-sans text-slate-600">
                       Referred by:{' '}
                       <span className="font-medium">
-                        {member.referredByUser?.name || '—'}
+                        {member.referredByUser?.name || 'â€”'}
                       </span>
                       {member.referredBy && (
                         <span className="font-mono text-slate-700"> ({member.referredBy})</span>
@@ -256,7 +269,7 @@ export default function MembersPage() {
                   <StatusBadge status={member.status} />
                 </td>
                 <td className="px-4 py-3 text-slate-700">
-                  {member.currentAddress?.city ? `${member.currentAddress.city}, ${member.currentAddress?.state || ''}` : '—'}
+                  {member.currentAddress?.city ? `${member.currentAddress.city}, ${member.currentAddress?.state || ''}` : 'â€”'}
                 </td>
                 <td className="px-4 py-3 text-sm">
                   <div className="flex items-center gap-2">
@@ -273,7 +286,7 @@ export default function MembersPage() {
 
         <div className="flex items-center justify-between px-4 py-3 bg-slate-50 text-sm">
           <p>
-            Showing {(meta.page - 1) * meta.pageSize + 1} –{' '}
+            Showing {(meta.page - 1) * meta.pageSize + 1} â€“{' '}
             {Math.min(meta.page * meta.pageSize, meta.total)} of {meta.total}
           </p>
           <div className="space-x-2">
@@ -357,6 +370,7 @@ function MemberCreateButton({ onCreated }) {
     status: 'active',
     dateOfBirth: '',
     alternatePhone: '',
+    showPhoneOnPublic: true,
     avatarUrl: '',
     janAadhaarUrl: '',
     gotra: { self: '__custom', mother: '__custom', dadi: '__custom', nani: '__custom' },
@@ -417,6 +431,7 @@ function MemberCreateButton({ onCreated }) {
       status: 'active',
       dateOfBirth: '',
       alternatePhone: '',
+      showPhoneOnPublic: true,
       avatarUrl: '',
       janAadhaarUrl: '',
       gotra: { self: '__custom', mother: '__custom', dadi: '__custom', nani: '__custom' },
@@ -520,12 +535,26 @@ function MemberCreateButton({ onCreated }) {
     return '__custom'
   }
 
+  const occupationCategory = getOccupationCategory(form.occupation)
+  const occupationSpecialization = getOccupationSpecialization(form.occupation)
+  const educationCategory = getEducationCategory(form.education)
+  const graduateSpecialization = getGraduateSpecialization(form.education)
+  const postgraduateCustomText = getPostgraduateCustomText(form.education)
+
   const submit = async (e) => {
     e.preventDefault()
     setSaving(true)
     setError('')
     try {
-      console.log(form);
+      if (occupationCategory === 'professional_services' && !occupationSpecialization) {
+        throw new Error('Please select professional service specialization')
+      }
+      if (educationCategory === 'graduate' && !graduateSpecialization) {
+        throw new Error('Please select graduate specialization')
+      }
+      if (educationCategory === 'postgraduate' && !String(postgraduateCustomText || '').trim()) {
+        throw new Error('Please enter postgraduate qualification')
+      }
       const payload = {
         name: form.name,
         displayName: form.displayName || form.name,
@@ -540,6 +569,7 @@ function MemberCreateButton({ onCreated }) {
         status: form.status,
         dateOfBirth: form.dateOfBirth || undefined,
         alternatePhone: form.alternatePhone || undefined,
+        showPhoneOnPublic: form.showPhoneOnPublic,
         avatarUrl: form.avatarUrl || undefined,
         janAadhaarUrl: form.janAadhaarUrl || undefined,
         gotra: {
@@ -683,73 +713,107 @@ function MemberCreateButton({ onCreated }) {
             </select>
           </div>
 
-          <label className="block text-sm md:col-span-2">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'व्यवसाय' : 'Occupation'}</span>
-
-            <select
-              value={form.occupation}
-              onChange={(e) => handleChange('occupation', e.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
-            >
-              <option value="">
-                {lang === 'hi' ? 'व्यवसाय चुनें' : 'Select Occupation'}
-              </option>
-
-              <option value="government_job">
-                {lang === 'hi' ? 'सरकारी नौकरी' : 'Government Job'}
-              </option>
-
-              <option value="private_job">
-                {lang === 'hi' ? 'प्राइवेट नौकरी' : 'Private Job'}
-              </option>
-
-              <option value="business">
-                {lang === 'hi' ? 'व्यवसाय' : 'Business'}
-              </option>
-
-              <option value="student">
-                {lang === 'hi' ? 'छात्र' : 'Student'}
-              </option>
-            </select>
+          <SelectField
+            label={lang === 'hi' ? 'Occupation' : 'Occupation'}
+            value={occupationCategory}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                occupation: composeOccupationValue({
+                  category: value,
+                  specialization: occupationSpecialization
+                })
+              }))
+            }
+            options={OCCUPATION_CATEGORY_OPTIONS[lang] || OCCUPATION_CATEGORY_OPTIONS.en}
+            placeholder={lang === 'hi' ? 'Select occupation' : 'Select occupation'}
+          />
+          {occupationCategory === 'professional_services' && (
+            <SelectField
+              label={lang === 'hi' ? 'Professional Services Specialization' : 'Professional Services Specialization'}
+              value={occupationSpecialization}
+              onChange={(value) =>
+                setForm((prev) => ({
+                  ...prev,
+                  occupation: composeOccupationValue({
+                    category: 'professional_services',
+                    specialization: value
+                  })
+                }))
+              }
+              options={PROFESSIONAL_SERVICE_OPTIONS[lang] || PROFESSIONAL_SERVICE_OPTIONS.en}
+              placeholder={lang === 'hi' ? 'Select specialization' : 'Select specialization'}
+            />
+          )}
+          <SelectField
+            label={lang === 'hi' ? 'Education' : 'Education'}
+            value={educationCategory}
+            onChange={(value) =>
+              setForm((prev) => ({
+                ...prev,
+                education: composeEducationValue({
+                  category: value,
+                  graduateSpecialization,
+                  postgraduateCustomText
+                })
+              }))
+            }
+            options={EDUCATION_CATEGORY_OPTIONS[lang] || EDUCATION_CATEGORY_OPTIONS.en}
+            placeholder={lang === 'hi' ? 'Select education' : 'Select education'}
+          />
+          {educationCategory === 'graduate' && (
+            <SelectField
+              label={lang === 'hi' ? 'Graduate Specialization' : 'Graduate Specialization'}
+              value={graduateSpecialization}
+              onChange={(value) =>
+                setForm((prev) => ({
+                  ...prev,
+                  education: composeEducationValue({
+                    category: 'graduate',
+                    graduateSpecialization: value,
+                    postgraduateCustomText
+                  })
+                }))
+              }
+              options={GRADUATE_SPECIALIZATION_OPTIONS[lang] || GRADUATE_SPECIALIZATION_OPTIONS.en}
+              placeholder={lang === 'hi' ? 'Select graduate specialization' : 'Select graduate specialization'}
+            />
+          )}
+          {educationCategory === 'postgraduate' && (
+            <label className="block text-sm">
+              <span className="font-semibold text-slate-600">{lang === 'hi' ? 'Postgraduate Qualification' : 'Postgraduate Qualification'}</span>
+              <input
+                value={postgraduateCustomText}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    education: composeEducationValue({
+                      category: 'postgraduate',
+                      graduateSpecialization,
+                      postgraduateCustomText: e.target.value
+                    })
+                  }))
+                }
+                className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2"
+                placeholder={lang === 'hi' ? 'Type your qualification' : 'Type your qualification'}
+              />
+            </label>
+          )}
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+            <input
+              type="checkbox"
+              checked={Boolean(form.showPhoneOnPublic)}
+              onChange={(e) => handleChange('showPhoneOnPublic', e.target.checked)}
+              className="h-4 w-4"
+            />
+            {lang === 'hi' ? 'Show phone publicly on profile pages' : 'Show phone publicly on profile pages'}
           </label>
-
           <label className="block text-sm">
-            <span className="font-semibold text-slate-600">
-              {lang === 'hi' ? 'शिक्षा' : 'Education'}
-            </span>
-
-            <select
-              value={form.education}
-              onChange={(e) => handleChange('education', e.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 bg-white"
-            >
-              <option value="">
-                {lang === 'hi' ? 'शिक्षा चुनें' : 'Select Education'}
-              </option>
-
-              <option value="high_school">
-                {lang === 'hi' ? 'हाई स्कूल' : 'High School'}
-              </option>
-
-              <option value="graduate">
-                {lang === 'hi' ? 'स्नातक' : 'Graduate'}
-              </option>
-
-              <option value="postgraduate">
-                {lang === 'hi' ? 'स्नातकोत्तर' : 'Postgraduate'}
-              </option>
-
-              <option value="phd">
-                {lang === 'hi' ? 'पीएचडी' : 'PhD'}
-              </option>
-            </select>
-          </label>
-          <label className="block text-sm">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'डिपार्टमेंट' : 'Department'}</span>
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'à¤¡à¤¿à¤ªà¤¾à¤°à¥à¤Ÿà¤®à¥‡à¤‚à¤Ÿ' : 'Department'}</span>
             <input value={form.department} onChange={(e) => handleChange('department', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
           </label>
           <label className="block text-sm">
-            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'पद का नाम' : 'Designation'}</span>
+            <span className="font-semibold text-slate-600">{lang === 'hi' ? 'à¤ªà¤¦ à¤•à¤¾ à¤¨à¤¾à¤®' : 'Designation'}</span>
             <input value={form.designation} onChange={(e) => handleChange('designation', e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" />
           </label>
 
@@ -795,7 +859,7 @@ function MemberCreateButton({ onCreated }) {
                   }}
                   disabled={uploading.avatar}
                 />
-                {uploading.avatar ? 'Uploading…' : 'Upload'}
+                {uploading.avatar ? 'Uploadingâ€¦' : 'Upload'}
               </label>
             </div>
           </div>
@@ -821,7 +885,7 @@ function MemberCreateButton({ onCreated }) {
                   }}
                   disabled={uploading.jan}
                 />
-                {uploading.jan ? 'Uploading…' : 'Upload'}
+                {uploading.jan ? 'Uploadingâ€¦' : 'Upload'}
               </label>
             </div>
           </div>
@@ -829,7 +893,7 @@ function MemberCreateButton({ onCreated }) {
             <p className="md:col-span-2 text-xs font-semibold text-slate-600 uppercase">Address</p>
 
             <AddressBlock
-              title={lang === 'hi' ? 'व्यवसाय का पता' : 'Occupation Address'}
+              title={lang === 'hi' ? 'à¤µà¥à¤¯à¤µà¤¸à¤¾à¤¯ à¤•à¤¾ à¤ªà¤¤à¤¾' : 'Occupation Address'}
               formKey="occupationAddress"
               form={form}
               setForm={setForm}
@@ -843,12 +907,12 @@ function MemberCreateButton({ onCreated }) {
                 className="h-4 w-4"
               />
               {lang === 'hi'
-                ? 'वर्तमान पता व्यवसाय के पते जैसा ही है' :
+                ? 'à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤ªà¤¤à¤¾ à¤µà¥à¤¯à¤µà¤¸à¤¾à¤¯ à¤•à¥‡ à¤ªà¤¤à¥‡ à¤œà¥ˆà¤¸à¤¾ à¤¹à¥€ à¤¹à¥ˆ' :
                 'Current address is same as occupation address'}
             </label>
             {!sameAsOccupation && (
               <AddressBlock
-                title={lang === 'hi' ? 'वर्तमान पता' : 'Current Address'}
+                title={lang === 'hi' ? 'à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤ªà¤¤à¤¾' : 'Current Address'}
                 formKey="currentAddress"
                 form={form}
                 setForm={setForm}
@@ -862,12 +926,12 @@ function MemberCreateButton({ onCreated }) {
                 className="h-4 w-4"
               />
               {lang === 'hi'
-                ? 'पैतृक पता वर्तमान पते जैसा ही है'
+                ? 'à¤ªà¥ˆà¤¤à¥ƒà¤• à¤ªà¤¤à¤¾ à¤µà¤°à¥à¤¤à¤®à¤¾à¤¨ à¤ªà¤¤à¥‡ à¤œà¥ˆà¤¸à¤¾ à¤¹à¥€ à¤¹à¥ˆ'
                 : 'Parental address is same as current address'}
             </label>
             {!sameAsCurrent && (
               <AddressBlock
-                title={lang === 'hi' ? 'पैतृक पता' : 'Parental Address'}
+                title={lang === 'hi' ? 'à¤ªà¥ˆà¤¤à¥ƒà¤• à¤ªà¤¤à¤¾' : 'Parental Address'}
                 formKey="parentalAddress"
                 form={form}
                 setForm={setForm}
@@ -886,7 +950,7 @@ function MemberCreateButton({ onCreated }) {
 	            />
 	              {gotraChoice(form.gotra?.self) === '__custom' && (
 	                <input
-	                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                  placeholder={lang === 'hi' ? 'à¤—à¥‹à¤¤à¥à¤° à¤²à¤¿à¤–à¥‡à¤‚' : 'Enter gotra'}
 	                  value={gotraform.self}
 	                  onChange={handleChangeNew('self')}
 	                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
@@ -903,7 +967,7 @@ function MemberCreateButton({ onCreated }) {
 	            />
 	              {gotraChoice(form.gotra?.mother) === '__custom' && (
 	                <input
-	                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                  placeholder={lang === 'hi' ? 'à¤—à¥‹à¤¤à¥à¤° à¤²à¤¿à¤–à¥‡à¤‚' : 'Enter gotra'}
 	                  value={gotraform.mother}
 	                  onChange={handleChangeNew('mother')}
 	                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
@@ -919,7 +983,7 @@ function MemberCreateButton({ onCreated }) {
 	            />
 	              {gotraChoice(form.gotra?.dadi) === '__custom' && (
 	                <input
-	                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                  placeholder={lang === 'hi' ? 'à¤—à¥‹à¤¤à¥à¤° à¤²à¤¿à¤–à¥‡à¤‚' : 'Enter gotra'}
 	                  value={gotraform.dadi}
 	                  onChange={handleChangeNew('dadi')}
 	                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
@@ -935,7 +999,7 @@ function MemberCreateButton({ onCreated }) {
 	            />
 	              {gotraChoice(form.gotra?.nani) === '__custom' && (
 	                <input
-	                  placeholder={lang === 'hi' ? 'गोत्र लिखें' : 'Enter gotra'}
+	                  placeholder={lang === 'hi' ? 'à¤—à¥‹à¤¤à¥à¤° à¤²à¤¿à¤–à¥‡à¤‚' : 'Enter gotra'}
 	                  value={gotraform.nani}
 	                  onChange={handleChangeNew('nani')}
 	                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
@@ -960,7 +1024,7 @@ function MemberCreateButton({ onCreated }) {
               disabled={saving}
               className="px-3 py-2 text-sm bg-slate-900 text-white rounded disabled:opacity-50"
             >
-              {saving ? 'Saving…' : 'Save member'}
+              {saving ? 'Savingâ€¦' : 'Save member'}
             </button>
           </div>
         </form>
@@ -984,5 +1048,3 @@ function Field({ label, value, onChange, type = 'text', placeholder, required })
     </div>
   )
 }
-
-const hasValues = (obj = {}) => Object.values(obj || {}).some((val) => val)

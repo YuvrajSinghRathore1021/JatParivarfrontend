@@ -3,23 +3,8 @@ import { useParams } from "react-router-dom";
 import { fetchMatrimonyDetail } from "../../../lib/dashboardApi";
 import { useLang } from "../../../lib/useLang";
 import { makeInitialAvatar } from "../../../lib/avatar";
+import { getOccupationLabel, getEducationLabel } from "../../../constants/profileOptions";
 let API_File = import.meta.env.VITE_API_File
-
-const EDUCATION_LABELS = {
-    high_school: 'High school',
-    graduate: 'Graduate',
-    postgraduate: 'Postgraduate',
-    phd: 'PhD',
-}
-
-const OCCUPATION_LABELS = {
-    government_job: 'Government job',
-    private_job: 'Private job',
-    business: 'Business',
-    student: 'Student',
-    govt: 'Government job',
-    private: 'Private job',
-}
 
 const MARITAL_LABELS = {
     never_married: 'Never married',
@@ -71,8 +56,8 @@ export default function MatrimonyDetail() {
         ? API_File + item.photos[0]
         : makeInitialAvatar(item.name || 'Member', { size: 640, radius: 40 })
 
-    const education = EDUCATION_LABELS[item.education] || item.education || '—'
-    const occupation = OCCUPATION_LABELS[item.occupation] || item.occupation || '—'
+    const education = getEducationLabel(item.education, lang) || '—'
+    const occupation = getOccupationLabel(item.occupation, lang) || '—'
     const maritalStatus = MARITAL_LABELS[item.maritalStatus] || item.maritalStatus || '—'
     const gender = GENDER_LABELS[item.gender] || item.gender || '—'
     const designation = item?.designation || '—'
@@ -188,3 +173,6 @@ function CardBlock({ title, children }) {
         </div>
     )
 }
+
+
+
